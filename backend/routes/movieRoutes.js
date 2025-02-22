@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/fetch-movies', fetchAndSaveMovies);
 //fetch from api to mongoDB
-router.get('/movies', getMovies);
+router.get('/phims', getMovies);
 //get data from mongoDB
 
 export default router;
