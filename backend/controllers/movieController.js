@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MovieModel from '../movie/movie.js';
+// import MovieModel from '../movie/movie.js';
 import Phim from '../models/PhimSchema.js';
 
 // const axios = require('axios');
@@ -26,7 +26,7 @@ export const fetchAndSaveMovies = async (req, res) => {
         // Lưu vào MongoDB (upsert để tránh trùng lặp)
         for (const phim of filteredMovies) {
             await Phim.updateOne(
-                { id: phim.id },
+                { ma_phim: phim.id },
                 {
                     $set: {
                         ten_phim: phim.name,
@@ -69,7 +69,7 @@ export const getMovies = async (req, res) => {
     }
 };
 
-//Hàm lấy danh sách phim [sắp chiếu] - 14 ngày
+//Hàm lấy danh sách phim [sắp chiếu] - 14 ngày sau
 export const getUpcomingMovies = async (req, res) => {
     try {
         const today = new Date();
@@ -98,6 +98,7 @@ export const getUpcomingMovies = async (req, res) => {
     }
 };
 
+//Hàm lấy danh sách phim [đang chiếu] - 7 ngày trước
 export const getNowShowingMovies = async (req, res) => {
     try {
         const today = new Date();

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const PhimSchema = new mongoose.Schema({
-  id: { type: String },
+  ma_phim: { type: String },
   ten_phim: { type: String, required: true },
   id_the_loai: { type: mongoose.Types.ObjectId, ref: "TheLoaiPhim" },
   mo_ta: { type: String },
