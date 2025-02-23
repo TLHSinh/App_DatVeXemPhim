@@ -34,7 +34,7 @@ export const fetchAndSaveCinemas = async (req, res) => {
 }
 
 //Hàm lấy danh sách rạp phim từ MongoDB
-export const getCinemas = async (req, res) => {
+export const getAllCinemas = async (req, res) => {
     try {
         const rapphims = await RapPhim.find();
         res.json(rapphims);
