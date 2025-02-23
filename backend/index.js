@@ -3,12 +3,16 @@ import cookieParser from "cookie-parser"
 import cors from 'cors'
 import mongoose from "mongoose"
 import dotenv from 'dotenv'
-import movieRoutes from "./routes/movieRoutes.js"
 
 
 
+
+
+
+//Import routes
 
 import authRoute from "./routes/auth.js"
+import movieRoutes from "./routes/movieRoutes.js"
 
 
 dotenv.config()
