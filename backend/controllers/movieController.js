@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Phim from '../models/PhimSchema.js';
 
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -26,35 +26,35 @@ export const fetchAndSaveMovies = async (req, res) => {
             const releaseYear = new Date(phim.release).getFullYear();
             return phim.release_vn === "CGV" && releaseYear === new Date().getFullYear();
         });
-                const generatedMaPhim = ma_phim || uuidv4();
-
 
         // Lưu vào MongoDB (upsert để tránh trùng lặp)
         for (const phim of filteredMovies) {
+
+            let thoiLuong = phim.duration ? parseInt(phim.duration.replace(/\D/g, ""), 10) : 0;
+
+            // Kiểm tra nếu NaN thì đặt về 0
+            if (isNaN(thoiLuong)) {
+                thoiLuong = 0;
+            }
+
             await Phim.updateOne(
-                { id: phim.id },
+                { ma_phim: phim.id },
                 {
                     $set: {
-                        ma_phim: generatedMaPhim,
                         ten_phim: phim.name,
                         id_the_loai: null,
                         mo_ta: phim.description,
                         url_poster: phim.poster,
                         url_trailer: phim.trailer,
-                        thoi_luong: phim.duration,
-                        gioi_han_tuoi: phim.age_restricted,
-                        ngay_cong_chieu: parseDate(phim.release),
-                        danh_gia: phim.star_rating_count > 0 ? phim.star_rating_value / phim.star_rating_count : 0,
-                        ngon_ngu: null
+                        thoi_luong: thoiLuong,
+                        ngay_cong_chieu: phim.release,
+                        danh_gia: phim.star_rating_count > 0 ? (phim.star_rating_value / phim.star_rating_count).toFixed(1) : 0,
+                        ngon_ngu: null,
+                        gioi_han_tuoi: phim.age_restricted
                     }
                 },
                 { upsert: true }
             );
-            // await MovieModel.updateOne(
-            //     { id: movie.id },
-            //     { $set: movie },
-            //     { upsert: true }
-            // );
         }
 
         res.json({ message: "Movies successfully saved to MongoDB!" });
@@ -131,7 +131,7 @@ export const addPhim = async (req, res) => {
             ma_phim: generatedMaPhim,
             ten_phim,
             id_the_loai,
-            phien_ban, 
+            phien_ban,
             mo_ta,
             url_poster,
             url_trailer,
@@ -204,22 +204,19 @@ export const getAllPhim = async (req, res) => {
 export const getUpcomingMovies = async (req, res) => {
     try {
         const today = new Date();
-        const tenDaysLater = new Date();
-        tenDaysLater.setDate(today.getDate() + 14);
+        today.setHours(0, 0, 0, 0); // Đặt về 00:00:00 để so sánh chính xác
 
-        // Hàm chuyển đổi từ "dd-MM-yyyy" sang Date
-        const convertToDate = (dateStr) => {
-            const [day, month, year] = dateStr.split('-');
-            return new Date(`${year}-${month}-${day}`);
-        };
+        const fourteenDaysLater = new Date();
+        fourteenDaysLater.setDate(today.getDate() + 14);
+        fourteenDaysLater.setHours(23, 59, 59, 999); // Đặt về cuối ngày để bao quát tất cả phim của ngày đó
 
-        // Lấy tất cả phim từ MongoDB (vì không thể lọc trực tiếp bằng `$gte` và `$lte` với String)
+        // Lấy tất cả phim từ MongoDB
         const allMovies = await Phim.find();
 
         // Lọc phim có ngày công chiếu trong khoảng từ hôm nay đến 14 ngày sau
         const upcomingMovies = allMovies.filter(movie => {
-            const movieDate = convertToDate(movie.ngay_cong_chieu);
-            return movieDate >= today && movieDate <= tenDaysLater;
+            const movieDate = new Date(movie.ngay_cong_chieu);
+            return movieDate >= today && movieDate <= fourteenDaysLater;
         });
 
         res.json(upcomingMovies);
@@ -229,24 +226,23 @@ export const getUpcomingMovies = async (req, res) => {
     }
 };
 
+
+//Hàm lấy danh sách phim [đang chiếu] - 7 ngày trước
 export const getNowShowingMovies = async (req, res) => {
     try {
         const today = new Date();
+        today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00 để so sánh chính xác
+
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
-
-        // Hàm chuyển đổi từ "dd-MM-yyyy" sang Date
-        const convertToDate = (dateStr) => {
-            const [day, month, year] = dateStr.split('-');
-            return new Date(`${year}-${month}-${day}`);
-        };
+        sevenDaysAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
 
         // Lấy tất cả phim từ MongoDB
         const allMovies = await Phim.find();
 
         // Lọc phim có ngày công chiếu trong khoảng từ 7 ngày trước đến hôm nay
         const nowShowingMovies = allMovies.filter(movie => {
-            const movieDate = convertToDate(movie.ngay_cong_chieu);
+            const movieDate = new Date(movie.ngay_cong_chieu);
             return movieDate >= sevenDaysAgo && movieDate <= today;
         });
 
@@ -254,9 +250,9 @@ export const getNowShowingMovies = async (req, res) => {
     } catch (error) {
         console.error("Error retrieving now showing movies:", error);
         res.status(500).json({ message: "Error retrieving now showing movies" });
-
     }
 };
+
 
 
 

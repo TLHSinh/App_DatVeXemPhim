@@ -9,10 +9,12 @@ import dotenv from 'dotenv'
 
 
 
+
 //Import routes
 
 import authRoute from "./routes/auth.js"
 import movieRoutes from "./routes/movieRoutes.js"
+import cinemaRoutes from "./routes/cinemaRoutes.js"
 import userRoutes  from './routes/userRoutes.js';
 
 
@@ -51,12 +53,13 @@ app.use(cors(corsOptions));
 
 app.use('/api/v1/auth', authRoute); //domain/api/v1/auth/register
 app.use('/api/v1', movieRoutes);
+app.use('/api/v1', cinemaRoutes);
 app.use('/api/v1/user', userRoutes);
 
 
 app.listen(port, () => {
     connectDB();
-    console.log("🔍 JWT_SECRET_KEY:", process.env.JWT_SECRET_KEY);
+
 
     console.log("server running on port: " + port)
 })
