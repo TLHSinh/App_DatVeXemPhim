@@ -8,6 +8,10 @@ import dotenv from 'dotenv'
 
 
 
+
+
+//Import routes
+
 import authRoute from "./routes/auth.js"
 import movieRoutes from "./routes/movieRoutes.js"
 import cinemaRoutes from "./routes/cinemaRoutes.js"
