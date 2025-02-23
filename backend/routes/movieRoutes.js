@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { fetchAndSaveMovies, getAllMovies,addPhim,updatePhim, fetchAndSaveMovies, getMovies, getUpcomingMovies, getNowShowingMovies } from '../controllers/movieController.js';
+import { fetchAndSaveMovies, getAllMovies,addPhim,updatePhim, getUpcomingMovies, getNowShowingMovies } from '../controllers/movieController.js';
 
 const router = express.Router();
 
@@ -20,7 +20,6 @@ router.get('/updateMovies', updatePhim);
 router.get('/fetch-movies', fetchAndSaveMovies);
 
 //get data from mongoDB
-router.get('/phims', getMovies);
 router.get('/phims/sapchieu', getUpcomingMovies);
 router.get('/phims/dangchieu', getNowShowingMovies);
 

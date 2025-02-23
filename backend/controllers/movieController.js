@@ -26,6 +26,8 @@ export const fetchAndSaveMovies = async (req, res) => {
             const releaseYear = new Date(phim.release).getFullYear();
             return phim.release_vn === "CGV" && releaseYear === new Date().getFullYear();
         });
+                const generatedMaPhim = ma_phim || uuidv4();
+
 
         // Lưu vào MongoDB (upsert để tránh trùng lặp)
         for (const phim of filteredMovies) {
@@ -33,16 +35,17 @@ export const fetchAndSaveMovies = async (req, res) => {
                 { id: phim.id },
                 {
                     $set: {
+                        ma_phim: generatedMaPhim,
                         ten_phim: phim.name,
                         id_the_loai: null,
                         mo_ta: phim.description,
                         url_poster: phim.poster,
                         url_trailer: phim.trailer,
                         thoi_luong: phim.duration,
+                        gioi_han_tuoi: phim.age_restricted,
                         ngay_cong_chieu: parseDate(phim.release),
                         danh_gia: phim.star_rating_count > 0 ? phim.star_rating_value / phim.star_rating_count : 0,
-                        ngon_ngu: null,
-                        gioi_han_tuoi: phim.age_restricted
+                        ngon_ngu: null
                     }
                 },
                 { upsert: true }
