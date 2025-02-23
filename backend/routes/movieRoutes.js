@@ -1,11 +1,14 @@
 import express from 'express';
-import { fetchAndSaveMovies, getMovies } from '../controllers/movieController.js';
+import { fetchAndSaveMovies, getMovies, getUpcomingMovies, getNowShowingMovies } from '../controllers/movieController.js';
 
 const router = express.Router();
 
-router.get('/fetch-movies', fetchAndSaveMovies);
 //fetch from api to mongoDB
-router.get('/phims', getMovies);
+router.get('/fetch-movies', fetchAndSaveMovies);
+
 //get data from mongoDB
+router.get('/phims', getMovies);
+router.get('/phims/sapchieu', getUpcomingMovies);
+router.get('/phims/dangchieu', getNowShowingMovies);
 
 export default router;

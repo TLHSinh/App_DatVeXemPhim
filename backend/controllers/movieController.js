@@ -69,4 +69,64 @@ export const getMovies = async (req, res) => {
     }
 };
 
+//Hàm lấy danh sách phim [sắp chiếu] - 14 ngày
+export const getUpcomingMovies = async (req, res) => {
+    try {
+        const today = new Date();
+        const tenDaysLater = new Date();
+        tenDaysLater.setDate(today.getDate() + 14);
+
+        // Hàm chuyển đổi từ "dd-MM-yyyy" sang Date
+        const convertToDate = (dateStr) => {
+            const [day, month, year] = dateStr.split('-');
+            return new Date(`${year}-${month}-${day}`);
+        };
+
+        // Lấy tất cả phim từ MongoDB (vì không thể lọc trực tiếp bằng `$gte` và `$lte` với String)
+        const allMovies = await Phim.find();
+
+        // Lọc phim có ngày công chiếu trong khoảng từ hôm nay đến 14 ngày sau
+        const upcomingMovies = allMovies.filter(movie => {
+            const movieDate = convertToDate(movie.ngay_cong_chieu);
+            return movieDate >= today && movieDate <= tenDaysLater;
+        });
+
+        res.json(upcomingMovies);
+    } catch (error) {
+        console.error("Error retrieving upcoming movies:", error);
+        res.status(500).json({ message: "Error retrieving upcoming movies" });
+    }
+};
+
+export const getNowShowingMovies = async (req, res) => {
+    try {
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        // Hàm chuyển đổi từ "dd-MM-yyyy" sang Date
+        const convertToDate = (dateStr) => {
+            const [day, month, year] = dateStr.split('-');
+            return new Date(`${year}-${month}-${day}`);
+        };
+
+        // Lấy tất cả phim từ MongoDB
+        const allMovies = await Phim.find();
+
+        // Lọc phim có ngày công chiếu trong khoảng từ 7 ngày trước đến hôm nay
+        const nowShowingMovies = allMovies.filter(movie => {
+            const movieDate = convertToDate(movie.ngay_cong_chieu);
+            return movieDate >= sevenDaysAgo && movieDate <= today;
+        });
+
+        res.json(nowShowingMovies);
+    } catch (error) {
+        console.error("Error retrieving now showing movies:", error);
+        res.status(500).json({ message: "Error retrieving now showing movies" });
+    }
+};
+
+
+
+
 //module.exports = { fetchAndSaveMovies, getMovies };
