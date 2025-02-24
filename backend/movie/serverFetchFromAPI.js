@@ -20,7 +20,7 @@ app.get('/fetch-movies', async (req, res) => {
         // Lọc phim theo điều kiện release_vn = "CGV" và năm phát hành 2025
         const filteredMovies = movies.filter(movie => {
             const releaseYear = new Date(movie.release).getFullYear();
-            return movie.release_vn === "CGV" && releaseYear === 2025;
+            return movie.release_vn === "CGV" && releaseYear === new Date().getFullYear();
         });
 
         // Lấy 50 phim cuối cùng
