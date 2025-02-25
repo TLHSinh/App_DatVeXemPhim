@@ -15,7 +15,10 @@ import dotenv from 'dotenv'
 import authRoute from "./routes/auth.js"
 import movieRoutes from "./routes/movieRoutes.js"
 import cinemaRoutes from "./routes/cinemaRoutes.js"
-import userRoutes  from './routes/userRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
+import MovieManagementRoutes from './admin/routes/MovieManagementRoutes.js';
+import CinemaManagementRoutes from './admin/routes/CinemaManagementRoutes.js';
 
 
 dotenv.config()
@@ -55,11 +58,14 @@ app.use('/api/v1/auth', authRoute); //domain/api/v1/auth/register
 app.use('/api/v1', movieRoutes);
 app.use('/api/v1', cinemaRoutes);
 app.use('/api/v1/user', userRoutes);
-
+//-----------------------------------
+//[ADMIN]
+app.use('/api/admin', UserManagementRoutes);
+app.use('/api/admin', MovieManagementRoutes);
+app.use('/api/admin', CinemaManagementRoutes);
 
 app.listen(port, () => {
     connectDB();
-
 
     console.log("server running on port: " + port)
 })
