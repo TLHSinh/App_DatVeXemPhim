@@ -3,8 +3,8 @@ import { getAllCinemas, addCinema, updateCinema, getAllRooms, addRoom, updateRoo
 
 const router = express.Router();
 
-router.post('/theaters', addCinema);
 router.get('/theaters', getAllCinemas);
+router.post('/theaters', addCinema);
 router.put('/theaters/:id', updateCinema);
 
 router.get('/theaters/:id_rap/rooms', getAllRooms);

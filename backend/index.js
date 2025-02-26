@@ -19,6 +19,7 @@ import userRoutes from './routes/userRoutes.js';
 import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
 import MovieManagementRoutes from './admin/routes/MovieManagementRoutes.js';
 import CinemaManagementRoutes from './admin/routes/CinemaManagementRoutes.js';
+import SeatManagementRoutes from './admin/routes/SeatManagementRoutes.js';
 
 
 dotenv.config()
@@ -51,6 +52,7 @@ const connectDB = async () => {
 //middleware
 //middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
@@ -63,6 +65,7 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/admin', UserManagementRoutes);
 app.use('/api/admin', MovieManagementRoutes);
 app.use('/api/admin', CinemaManagementRoutes);
+app.use('/api/admin', SeatManagementRoutes);
 
 app.listen(port, () => {
     connectDB();
