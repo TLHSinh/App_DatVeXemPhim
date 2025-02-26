@@ -8,7 +8,7 @@ const DonDatVeSchema = new mongoose.Schema({
   tong_tien: { type: Number, required: true, min: 0 },
   tien_giam: { type: Number, default: 0 },
   tien_thanh_toan: { type: Number, required: true, min: 0 },
-  trang_thai: { type: String, enum: ['đang chờ', 'đã xác nhận', 'đã hủy', 'đã xuất vé'] },
+  trang_thai: { type: String, enum: ['đang chờ', 'đã xác nhận', 'đã hủy', 'đã xuất vé', 'đã hoàn tiền', 'chờ hoàn tiền'] },
   nhanVienXuatVeGiay: { type: mongoose.Types.ObjectId, ref: "NhanVien" }
 }, { timestamps: true });
 

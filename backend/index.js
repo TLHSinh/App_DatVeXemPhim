@@ -20,6 +20,7 @@ import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
 import MovieManagementRoutes from './admin/routes/MovieManagementRoutes.js';
 import CinemaManagementRoutes from './admin/routes/CinemaManagementRoutes.js';
 import SeatManagementRoutes from './admin/routes/SeatManagementRoutes.js';
+import BookTicketManagementRoutes from './admin/routes/BookTicketManagementRoutes.js';
 
 
 dotenv.config()
@@ -66,6 +67,7 @@ app.use('/api/admin', UserManagementRoutes);
 app.use('/api/admin', MovieManagementRoutes);
 app.use('/api/admin', CinemaManagementRoutes);
 app.use('/api/admin', SeatManagementRoutes);
+app.use('/api/admin', BookTicketManagementRoutes);
 
 app.listen(port, () => {
     connectDB();

@@ -27,7 +27,7 @@ export const getAllSeats = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
-
+// Tạo ghế cho phòng
 export const createSeats = async (req, res) => {
     const { id_phong } = req.params;
 
@@ -78,7 +78,7 @@ export const createSeats = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
-
+// Cập nhật trạng thái ghê [có sẵn <-> đã đặt trước]
 export const updateStateSeat = async (req, res) => {
     const { id_ghe } = req.params;
     const { trang_thai } = req.body;
@@ -111,7 +111,7 @@ export const updateStateSeat = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
-
+// Reset tất cả trạng thái ghê về [có sẵn] khi chiếu phim xong
 export const resetAllSeatsState = async (req, res) => {
     const { id_phong } = req.params;
 
