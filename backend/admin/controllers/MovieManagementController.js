@@ -2,6 +2,7 @@ import Phim from "../../models/PhimSchema.js";
 import LichChieu from "../../models/LichChieuSchema.js";
 import PhongChieu from "../../models/PhongChieuSchema.js";
 import { v4 as uuidv4 } from 'uuid';
+import mongoose from "mongoose";
 
 /* [Movie] */
 //Thêm phim mới
@@ -102,9 +103,82 @@ export const deleteMovie = async (req, res) => {
 
 
 /* [Schedule] */
+// Lấy lịch chiếu của phim [group-by phòng]
+export const getScheduleByRoom = async (req, res) => {
+    const { id_phim } = req.params;
+
+    try {
+        // Kiểm tra id_phim có hợp lệ không
+        if (!mongoose.Types.ObjectId.isValid(id_phim)) {
+            return res.status(400).json({ success: false, message: "ID phim không hợp lệ" });
+        }
+
+        // Kiểm tra phim có tồn tại không
+        const movie = await Phim.findById(id_phim);
+        if (!movie) {
+            return res.status(404).json({ success: false, message: "Phim không tồn tại" });
+        }
+
+        // Lấy lịch chiếu, nhóm theo phòng chiếu
+        const schedules = await LichChieu.aggregate([
+            { $match: { id_phim: new mongoose.Types.ObjectId(id_phim) } },
+            {
+                $lookup: {
+                    from: "phongchieus",
+                    localField: "id_phong",
+                    foreignField: "_id",
+                    as: "phong"
+                }
+            },
+            { $unwind: "$phong" },
+            {
+                $group: {
+                    _id: "$id_phong",
+                    ten_phong: { $first: "$phong.ten_phong" },
+                    lich_chieu: { $push: "$$ROOT" }
+                }
+            }
+        ]);
+
+        res.status(200).json({ success: true, data: schedules });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    }
+};
+// Lấy lịch chiếu của phim theo phòng riêng biệt
+export const getScheduleOfRoom = async (req, res) => {
+    const { id_phim, id_phong } = req.params;
+
+    try {
+        // Kiểm tra id_phim và id_phong có hợp lệ không
+        if (!mongoose.Types.ObjectId.isValid(id_phim) || !mongoose.Types.ObjectId.isValid(id_phong)) {
+            return res.status(400).json({ success: false, message: "ID phim hoặc ID phòng không hợp lệ" });
+        }
+
+        // Kiểm tra phim có tồn tại không
+        const movie = await Phim.findById(id_phim);
+        if (!movie) {
+            return res.status(404).json({ success: false, message: "Phim không tồn tại" });
+        }
+
+        // Kiểm tra phòng chiếu có tồn tại không
+        const room = await PhongChieu.findById(id_phong);
+        if (!room) {
+            return res.status(404).json({ success: false, message: "Phòng chiếu không tồn tại" });
+        }
+
+        // Lấy lịch chiếu theo phòng cụ thể
+        const schedules = await LichChieu.find({ id_phim, id_phong });
+
+        res.status(200).json({ success: true, data: schedules });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    }
+};
 // Tạo lịch chiếu
 export const createMovieSchedule = async (req, res) => {
-    const { id_phim, id_phong, thoi_gian_chieu, gia_ve } = req.body;
+    const { id_phim } = req.params;
+    const { id_phong, thoi_gian_chieu, gia_ve } = req.body;
 
     try {
         // Kiểm tra phim tồn tại
@@ -141,8 +215,8 @@ export const createMovieSchedule = async (req, res) => {
 };
 // Cập nhật lịch chiếu
 export const updateMovieSchedule = async (req, res) => {
-    const { id } = req.params; // Lấy ID của lịch chiếu từ URL
-    const { id_phim, id_phong, thoi_gian_chieu, gia_ve } = req.body;
+    const { id_phim, id } = req.params; // Lấy ID của lịch chiếu từ URL
+    const { id_phong, thoi_gian_chieu, gia_ve } = req.body;
 
     try {
         // Kiểm tra lịch chiếu có tồn tại không
