@@ -1,4 +1,4 @@
-import DonDatVe from "../../models/DonDatVeSchema";
+import DonDatVe from "../../models/DonDatVeSchema.js";
 
 
 // Xem danh sách đặt vé
