@@ -12,6 +12,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _imageController = TextEditingController();
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _fullNameFocus = FocusNode();
+  final FocusNode _genderFocus = FocusNode();
+  final FocusNode _imageFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -29,6 +40,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final response = await ApiService.post("/register", {
         "email": _emailController.text.trim(),
         "matKhau": _passwordController.text.trim(),
+        "hoTen": _fullNameController.text.trim(),
+        "gioiTinh": _genderController.text.trim(),
+        "hinhAnh": _imageController.text.trim(),
+        "role": "user", // Mặc định role là "user"
       });
 
       if (response != null && response.statusCode == 200) {
@@ -48,9 +63,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _fullNameController.dispose();
+    _genderController.dispose();
+    _imageController.dispose();
+    _emailFocus.dispose();
+    _fullNameFocus.dispose();
+    _genderFocus.dispose();
+    _imageFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF1E1E1E),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -59,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Image.asset('assets/images/logofull.png', width: 600),
+                child: Image.asset('assets/images/logofull.png', width: 100),
               ),
               SizedBox(height: 40),
               const Text(
@@ -70,13 +102,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Colors.white),
               ),
               const SizedBox(height: 20),
-              _buildTextField(_emailController, "Email"),
+              _buildTextField(_emailController, "Email",
+                  focusNode: _emailFocus, nextFocus: _fullNameFocus),
+              const SizedBox(height: 15),
+              _buildTextField(_fullNameController, "Họ và tên",
+                  focusNode: _fullNameFocus, nextFocus: _genderFocus),
+              const SizedBox(height: 15),
+              _buildTextField(_genderController, "Giới tính",
+                  focusNode: _genderFocus, nextFocus: _imageFocus),
+              const SizedBox(height: 15),
+              _buildTextField(_imageController, "Link ảnh đại diện",
+                  focusNode: _imageFocus, nextFocus: _passwordFocus),
               const SizedBox(height: 15),
               _buildTextField(_passwordController, "Mật khẩu",
-                  isPassword: true),
+                  isPassword: true,
+                  focusNode: _passwordFocus,
+                  nextFocus: _confirmPasswordFocus),
               const SizedBox(height: 15),
               _buildTextField(_confirmPasswordController, "Xác nhận mật khẩu",
-                  isPassword: true),
+                  isPassword: true,
+                  focusNode: _confirmPasswordFocus,
+                  submitAction: _register),
               const SizedBox(height: 10),
               _errorMessage != null
                   ? Text(_errorMessage!,
@@ -122,11 +168,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildTextField(TextEditingController controller, String hint,
-      {bool isPassword = false}) {
+      {bool isPassword = false,
+      FocusNode? focusNode,
+      FocusNode? nextFocus,
+      Function? submitAction}) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      focusNode: focusNode,
       style: const TextStyle(color: Colors.white),
+      textInputAction:
+          nextFocus != null ? TextInputAction.next : TextInputAction.done,
+      onSubmitted: (value) {
+        if (nextFocus != null) {
+          FocusScope.of(context).requestFocus(nextFocus);
+        } else {
+          submitAction?.call();
+        }
+      },
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.grey[900],

@@ -10,6 +10,8 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -26,7 +28,7 @@ class LoginScreenState extends State<LoginScreen> {
     try {
       final response = await ApiService.post("/login", {
         "email": _emailController.text.trim(),
-        "password": _passwordController.text.trim(),
+        "matKhau": _passwordController.text.trim(),
       });
 
       if (response == null) {
@@ -49,9 +51,18 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF1E1E1E),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -65,19 +76,28 @@ class LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 40),
               const Text(
                 'Đăng nhập',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
               const SizedBox(height: 20),
-              _buildTextField(_emailController, "Email"),
+              _buildTextField(_emailController, "Email",
+                  focusNode: _emailFocus, nextFocus: _passwordFocus),
               const SizedBox(height: 15),
-              _buildTextField(_passwordController, "Mật khẩu", isPassword: true),
+              _buildTextField(_passwordController, "Mật khẩu",
+                  isPassword: true,
+                  focusNode: _passwordFocus,
+                  submitAction: _login),
               const SizedBox(height: 10),
               _errorMessage != null
-                  ? Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 14))
+                  ? Text(_errorMessage!,
+                      style: const TextStyle(color: Colors.red, fontSize: 14))
                   : const SizedBox.shrink(),
               const SizedBox(height: 25),
               _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                  ? const Center(
+                      child: CircularProgressIndicator(color: Colors.white))
                   : SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -86,11 +106,13 @@ class LoginScreenState extends State<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text(
                           'Đăng nhập',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -111,11 +133,25 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {bool isPassword = false}) {
+  Widget _buildTextField(TextEditingController controller, String hint,
+      {bool isPassword = false,
+      FocusNode? focusNode,
+      FocusNode? nextFocus,
+      Function? submitAction}) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
+      focusNode: focusNode,
       style: const TextStyle(color: Colors.white),
+      textInputAction:
+          nextFocus != null ? TextInputAction.next : TextInputAction.done,
+      onSubmitted: (value) {
+        if (nextFocus != null) {
+          FocusScope.of(context).requestFocus(nextFocus);
+        } else {
+          submitAction?.call();
+        }
+      },
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.grey[900],

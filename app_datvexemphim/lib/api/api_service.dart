@@ -4,7 +4,7 @@ class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
       baseUrl:
-          "http://10.0.2.2:8000/api/v1/auth", // Nếu chạy trên Android Emulator
+          "http://localhost:5000/api/v1/auth", // Nếu chạy trên Android Emulator
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),

@@ -33,9 +33,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextPage() {
     if (_currentPage < onboardingData.length - 1) {
       _pageController.nextPage(
-          duration: Duration(milliseconds: 500), curve: Curves.ease);
+        duration: Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
     } else {
-      _goToHome();
+      _pageController.jumpToPage(0); // Quay lại trang đầu tiên
     }
   }
 
@@ -46,18 +48,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF1E1E1E),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100), // Tăng chiều cao AppBar
         child: AppBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Color(0xFF1E1E1E),
           elevation: 0,
           title: Align(
             alignment: Alignment.centerLeft, // Đưa logo về góc trái
             child: Image.asset(
               'assets/images/logo2.png',
               width: 150, // Kích thước logo lớn hơn
-              height: 600,
               fit: BoxFit.contain,
             ),
           ),
@@ -146,7 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   child: Text(_currentPage == onboardingData.length - 1
-                      ? "Bắt đầu"
+                      ? "Quay lại"
                       : "Tiếp tục"),
                 ),
               ],
