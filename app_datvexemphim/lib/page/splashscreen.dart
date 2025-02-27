@@ -24,9 +24,6 @@
 //   }
 // }
 
-
-
-
 // import 'package:animated_splash_screen/animated_splash_screen.dart';
 // import 'package:app_datvexemphim/page/homepage.dart';
 // import 'package:flutter/material.dart';
@@ -47,16 +44,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:app_datvexemphim/page/login_logout/welcome.dart';
 import 'package:flutter/material.dart';
@@ -69,11 +56,10 @@ class Splashscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      splash: 
-      Transform.scale(
-    scale: 2.0,
-    child: Lottie.asset('assets/animation/Animation - 1740246483371.json'),
-  ),
+      splash: Transform.scale(
+        scale: 2.0,
+        child: Lottie.asset('assets/animation/Animation - 1740246483371.json'),
+      ),
       nextScreen: const Welcome(),
       duration: 3000,
       centered: true,
@@ -81,5 +67,3 @@ class Splashscreen extends StatelessWidget {
     );
   }
 }
-
-
