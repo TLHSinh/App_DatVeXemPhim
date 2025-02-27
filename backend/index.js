@@ -3,12 +3,19 @@ import cookieParser from "cookie-parser"
 import cors from 'cors'
 import mongoose from "mongoose"
 import dotenv from 'dotenv'
-import movieRoutes from "./routes/movieRoutes.js"
 
 
 
+
+
+
+
+//Import routes
 
 import authRoute from "./routes/auth.js"
+import movieRoutes from "./routes/movieRoutes.js"
+import cinemaRoutes from "./routes/cinemaRoutes.js"
+import userRoutes  from './routes/userRoutes.js';
 
 
 dotenv.config()
@@ -46,10 +53,14 @@ app.use(cors(corsOptions));
 
 app.use('/api/v1/auth', authRoute); //domain/api/v1/auth/register
 app.use('/api/v1', movieRoutes);
+app.use('/api/v1', cinemaRoutes);
+app.use('/api/v1/user', userRoutes);
 
 
 app.listen(port, () => {
     connectDB();
+
+
     console.log("server running on port: " + port)
 })
 
