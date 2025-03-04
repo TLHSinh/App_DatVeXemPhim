@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl:
-          "http://localhost:5000/api/v1/auth", // Nếu chạy trên Android Emulator
+      baseUrl: "http://192.168.1.6:5000/api/v1/auth"
+      // "http://localhost:5000/api/v1/auth"
+      ,
+      // Nếu chạy trên Android Emulator
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),

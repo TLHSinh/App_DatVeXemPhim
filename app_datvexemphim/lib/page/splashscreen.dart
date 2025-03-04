@@ -48,7 +48,6 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:app_datvexemphim/page/login_logout/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'homepage.dart';
 
 class Splashscreen extends StatelessWidget {
   const Splashscreen({super.key});
