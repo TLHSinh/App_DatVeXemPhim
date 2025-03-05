@@ -184,6 +184,16 @@ export const getSinglePhim = async (req, res) => {
         if (!phim) {
             return res.status(404).json({ success: false, message: "Phim không tồn tại" });
         }
+
+
+
+        // const phimUpdated = {
+        //     ...phim._doc,
+        //     url_poster: phim.url_poster ? `https://rapchieuphim.com${phim.url_poster}` : null
+        // };
+
+
+
         res.status(200).json({ success: true, data: phim });
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi tìm phim", error: err.message });
@@ -194,7 +204,16 @@ export const getSinglePhim = async (req, res) => {
 export const getAllPhim = async (req, res) => {
     try {
         const danhSachPhim = await Phim.find().populate("id_the_loai");
-        res.status(200).json({ success: true, data: danhSachPhim });
+
+
+        // const danhSachPhimUpdated = danhSachPhim.map(phim => ({
+        //     ...phim._doc,
+        //     url_poster: phim.url_poster ? `https://rapchieuphim.com${phim.url_poster}` : null
+        // }));
+
+
+
+        res.status(200).json({ success: true, data: danhSachPhim, });
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi lấy danh sách phim", error: err.message });
     }
@@ -207,7 +226,7 @@ export const getUpcomingMovies = async (req, res) => {
         today.setHours(0, 0, 0, 0); // Đặt về 00:00:00 để so sánh chính xác
 
         const fourteenDaysLater = new Date();
-        fourteenDaysLater.setDate(today.getDate() + 14);
+        fourteenDaysLater.setDate(today.getDate() + 365);
         fourteenDaysLater.setHours(23, 59, 59, 999); // Đặt về cuối ngày để bao quát tất cả phim của ngày đó
 
         // Lấy tất cả phim từ MongoDB
@@ -234,7 +253,7 @@ export const getNowShowingMovies = async (req, res) => {
         today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00 để so sánh chính xác
 
         const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(today.getDate() - 7);
+        sevenDaysAgo.setDate(today.getDate() - 90);
         sevenDaysAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
 
         // Lấy tất cả phim từ MongoDB

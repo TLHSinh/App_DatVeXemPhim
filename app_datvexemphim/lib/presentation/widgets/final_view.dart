@@ -1,3 +1,4 @@
+import 'package:app_datvexemphim/presentation/screens/gift_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/location_screen.dart';
 import 'package:app_datvexemphim/presentation/size_config.dart';
@@ -19,7 +20,9 @@ class _FinalViewState extends State<FinalView> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const LocationScreen(),
-    const Center(child: Text("Profile Screen", style: TextStyle(color: Colors.white))),
+    const GiftScreen(),
+    const Center(
+        child: Text("Profile Screen", style: TextStyle(color: Colors.white))),
   ];
 
   @override
@@ -36,9 +39,6 @@ class _FinalViewState extends State<FinalView> {
           ],
         ),
       ),
-
-      // body: _screens[_currentIndex],
-      // bottomNavigationBar: bottomNav(),
     );
   }
 
@@ -48,7 +48,6 @@ class _FinalViewState extends State<FinalView> {
       padding: EdgeInsets.fromLTRB(AppSizes.blockSizeHorizontal * 0, 0,
           AppSizes.blockSizeHorizontal * 0, 0),
       child: Material(
-        // borderRadius: BorderRadius.circular(),
         color: Colors.transparent,
         elevation: 10,
         child: Container(
@@ -56,7 +55,6 @@ class _FinalViewState extends State<FinalView> {
           width: AppSizes.screenWidth,
           decoration: BoxDecoration(
             color: Colors.grey[900],
-            // borderRadius: BorderRadius.circular(30),
           ),
           child: Stack(
             children: [
@@ -79,19 +77,29 @@ class _FinalViewState extends State<FinalView> {
                           });
                         }),
                     BottomNavBtn(
-                icon: FontAwesome.location_dot_solid,
-                currentIndex: _currentIndex,
-                index: 1,
-                onPress: (val) {
-                  setState(() {
-                    _currentIndex = val;
-                  });
-                },
-              ),
+                      icon: FontAwesome.location_dot_solid,
+                      currentIndex: _currentIndex,
+                      index: 1,
+                      onPress: (val) {
+                        setState(() {
+                          _currentIndex = val;
+                        });
+                      },
+                    ),
+                    BottomNavBtn(
+                      icon: FontAwesome.gift_solid,
+                      currentIndex: _currentIndex,
+                      index: 2,
+                      onPress: (val) {
+                        setState(() {
+                          _currentIndex = val;
+                        });
+                      },
+                    ),
                     BottomNavBtn(
                         icon: FontAwesome.user,
                         currentIndex: _currentIndex,
-                        index: 2,
+                        index: 3,
                         onPress: (val) {
                           setState(() {
                             _currentIndex = val;
