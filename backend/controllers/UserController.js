@@ -123,6 +123,7 @@ export const getUserProfile = async (req, res) => {
     const userID = req.userID;
 
     try {
+        console.log("User ID từ middleware:", req.userId); // Debug ID lấy từ middleware
         const user = await NguoiDung.findById(userID).select("-matKhau");
 
         if (!user) {

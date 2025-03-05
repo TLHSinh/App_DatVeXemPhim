@@ -10,11 +10,13 @@ import dotenv from 'dotenv'
 
 
 
+
 //Import routes
 
 import authRoute from "./routes/auth.js"
 import movieRoutes from "./routes/movieRoutes.js"
 import cinemaRoutes from "./routes/cinemaRoutes.js"
+
 import userRoutes from './routes/userRoutes.js';
 import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
 import MovieManagementRoutes from './admin/routes/MovieManagementRoutes.js';
@@ -23,6 +25,14 @@ import SeatManagementRoutes from './admin/routes/SeatManagementRoutes.js';
 import BookTicketManagementRoutes from './admin/routes/BookTicketManagementRoutes.js';
 import VoucherManagementRoutes from './admin/routes/VoucherManagementRoutes.js';
 
+import userRoutes  from './routes/userRoutes.js';
+import seatRoutes from "./routes/seatRoutes.js"
+import bookTicketsRoutes from "./routes/bookTicketsRoutes.js"
+import advertiseRoutes from "./routes/advertiseRoutes.js"
+
+
+
+//import "./controllers/paymentTime.js"; // Import cron job
 
 dotenv.config()
 
@@ -62,6 +72,7 @@ app.use('/api/v1/auth', authRoute); //domain/api/v1/auth/register
 app.use('/api/v1', movieRoutes);
 app.use('/api/v1', cinemaRoutes);
 app.use('/api/v1/user', userRoutes);
+
 //-----------------------------------
 //[ADMIN]
 app.use('/api/admin', UserManagementRoutes);
@@ -70,6 +81,13 @@ app.use('/api/admin', CinemaManagementRoutes);
 app.use('/api/admin', SeatManagementRoutes);
 app.use('/api/admin', BookTicketManagementRoutes);
 app.use('/api/admin', VoucherManagementRoutes);
+
+app.use('/api/v1/seat', seatRoutes);
+app.use('/api/v1/book', bookTicketsRoutes);
+app.use('/api/v1/advertise', advertiseRoutes);
+
+
+
 
 app.listen(port, () => {
     connectDB();
