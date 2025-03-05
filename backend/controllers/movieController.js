@@ -207,7 +207,7 @@ export const getUpcomingMovies = async (req, res) => {
         today.setHours(0, 0, 0, 0); // Đặt về 00:00:00 để so sánh chính xác
 
         const fourteenDaysLater = new Date();
-        fourteenDaysLater.setDate(today.getDate() + 14);
+        fourteenDaysLater.setDate(today.getDate() + 30);
         fourteenDaysLater.setHours(23, 59, 59, 999); // Đặt về cuối ngày để bao quát tất cả phim của ngày đó
 
         // Lấy tất cả phim từ MongoDB
@@ -234,7 +234,7 @@ export const getNowShowingMovies = async (req, res) => {
         today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00 để so sánh chính xác
 
         const twoWeeksAgo = new Date();
-        twoWeeksAgo.setDate(today.getDate() - 14);
+        twoWeeksAgo.setDate(today.getDate() - 30);
         twoWeeksAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
 
         // Lấy tất cả phim từ MongoDB
