@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 double animatedPositionLeftValue (int currentIndex){
   switch (currentIndex) {
     case 0:
-      return AppSizes.blockSizeHorizontal *12.5;
+      return AppSizes.blockSizeHorizontal *8.8;
     case 1:
-      return AppSizes.blockSizeHorizontal *43.8;
+      return AppSizes.blockSizeHorizontal *32.2;
     case 2:
-      return AppSizes.blockSizeHorizontal *75.5;
+      return AppSizes.blockSizeHorizontal *55.7;
+    case 3:
+      return AppSizes.blockSizeHorizontal *79.3;
     default: 
       return 0;
 
