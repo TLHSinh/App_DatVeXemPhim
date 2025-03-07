@@ -24,8 +24,10 @@ import CinemaManagementRoutes from './admin/routes/CinemaManagementRoutes.js';
 import SeatManagementRoutes from './admin/routes/SeatManagementRoutes.js';
 import BookTicketManagementRoutes from './admin/routes/BookTicketManagementRoutes.js';
 import VoucherManagementRoutes from './admin/routes/VoucherManagementRoutes.js';
+import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
+import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 
-import userRoutes  from './routes/userRoutes.js';
+// import userRoutes  from './routes/userRoutes.js';
 import seatRoutes from "./routes/seatRoutes.js"
 import bookTicketsRoutes from "./routes/bookTicketsRoutes.js"
 import advertiseRoutes from "./routes/advertiseRoutes.js"
@@ -81,6 +83,8 @@ app.use('/api/admin', CinemaManagementRoutes);
 app.use('/api/admin', SeatManagementRoutes);
 app.use('/api/admin', BookTicketManagementRoutes);
 app.use('/api/admin', VoucherManagementRoutes);
+app.use('/api/admin', FoodManagementRoutes);
+app.use('/api/admin', AdsManagementRoutes);
 
 app.use('/api/v1/seat', seatRoutes);
 app.use('/api/v1/book', bookTicketsRoutes);
