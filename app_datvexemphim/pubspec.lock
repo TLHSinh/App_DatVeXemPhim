@@ -109,17 +109,11 @@ packages:
     dependency: transitive
     description:
       name: csslib
-<<<<<<< HEAD
       sha256: "09bad715f418841f976c77db72d5398dc1253c21fb9c0c7f0b0b985860b2d58e"
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-=======
-      sha256: "831883fb353c8bdc1d71979e5b342c7d88acfbc643113c14ae51e2442ea0f20f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.3"
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
+
   cupertino_icons:
     dependency: transitive
     description:
@@ -371,17 +365,10 @@ packages:
     dependency: transitive
     description:
       name: html
-<<<<<<< HEAD
       sha256: "1fc58edeaec4307368c60d59b7e15b9d658b57d7f3125098b6294153c75337ec"
       url: "https://pub.dev"
     source: hosted
     version: "0.15.5"
-=======
-      sha256: "3a7812d5bcd2894edf53dfaf8cd640876cf6cef50a8f238745c8b8120ea74d3a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.15.4"
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
   http:
     dependency: "direct main"
     description:
@@ -554,17 +541,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-<<<<<<< HEAD
       sha256: "0ca7359dad67fd7063cb2892ab0c0737b2daafd807cf1acecd62374c8fae6c12"
       url: "https://pub.dev"
     source: hosted
     version: "2.2.16"
-=======
-      sha256: "4adf4fd5423ec60a29506c76581bc05854c55e3a0b72d35bb28d661c9686edf2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.15"
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
   path_provider_foundation:
     dependency: transitive
     description:
@@ -830,17 +810,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-<<<<<<< HEAD
       sha256: "1d0eae19bd7606ef60fe69ef3b312a437a16549476c42321d5dc1506c9ca3bf4"
       url: "https://pub.dev"
     source: hosted
     version: "6.3.15"
-=======
-      sha256: "6fc2f56536ee873eeb867ad176ae15f304ccccc357848b351f6f0d8d4a40d193"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.14"
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
   url_launcher_ios:
     dependency: transitive
     description:
@@ -941,17 +914,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_android
-<<<<<<< HEAD
       sha256: d949a83d1a333178eb3a9683f70afa41b7771c2bfa4cedd894fe836942de06b1
       url: "https://pub.dev"
     source: hosted
     version: "2.8.1"
-=======
-      sha256: "7018dbcb395e2bca0b9a898e73989e67c0c4a5db269528e1b036ca38bcca0d0b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.17"
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
   video_player_avfoundation:
     dependency: transitive
     description:
