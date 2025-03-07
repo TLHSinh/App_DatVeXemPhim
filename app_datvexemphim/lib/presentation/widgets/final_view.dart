@@ -17,7 +17,7 @@ class FinalView extends StatefulWidget {
 class _FinalViewState extends State<FinalView> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    const HomeScreen(),
+     HomeScreen(),
     const LocationScreen(),
     const Center(child: Text("Profile Screen", style: TextStyle(color: Colors.white))),
   ];

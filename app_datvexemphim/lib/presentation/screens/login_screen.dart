@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   LoginScreenState createState() => LoginScreenState();
 }

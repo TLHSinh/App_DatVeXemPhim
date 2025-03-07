@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
