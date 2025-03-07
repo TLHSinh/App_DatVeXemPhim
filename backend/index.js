@@ -26,6 +26,7 @@ import BookTicketManagementRoutes from './admin/routes/BookTicketManagementRoute
 import VoucherManagementRoutes from './admin/routes/VoucherManagementRoutes.js';
 import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
+import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 
 // import userRoutes  from './routes/userRoutes.js';
 import seatRoutes from "./routes/seatRoutes.js"
@@ -85,6 +86,7 @@ app.use('/api/admin', BookTicketManagementRoutes);
 app.use('/api/admin', VoucherManagementRoutes);
 app.use('/api/admin', FoodManagementRoutes);
 app.use('/api/admin', AdsManagementRoutes);
+app.use('/api/admin', RevenueManagementRoutes);
 
 app.use('/api/v1/seat', seatRoutes);
 app.use('/api/v1/book', bookTicketsRoutes);
