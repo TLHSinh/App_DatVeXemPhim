@@ -5,8 +5,8 @@ class ApiService {
     BaseOptions(
       baseUrl:
           // "http://localhost:5000/api/v1", // Nếu chạy trên Android Emulator
-          "http://10.21.4.16:5000/api/v1",
-          // "http://192.168.1.11:5000/api/v1",
+          // "http://10.21.0.61:5000/api/v1",
+          "http://192.168.1.10:5000/api/v1",
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),

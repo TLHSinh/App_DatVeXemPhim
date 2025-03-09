@@ -35,7 +35,8 @@ class _FinalViewState extends State<FinalView> {
         child: Stack(
           children: [
             Positioned.fill(child: _screens[_currentIndex]),
-            Positioned(bottom: 0, right: 0, left: 0, child: bottomNav())
+            Positioned(bottom: 0, right: 0, left: 0, child: bottomNav()),
+
           ],
         ),
       ),
