@@ -252,9 +252,9 @@ export const getNowShowingMovies = async (req, res) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00 để so sánh chính xác
 
-        const twoWeeksAgo = new Date();
-        twoWeeksAgo.setDate(today.getDate() - 14);
-        twoWeeksAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
 
         // Lấy tất cả phim từ MongoDB
         const allMovies = await Phim.find();

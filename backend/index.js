@@ -24,13 +24,6 @@ import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 
-import userRoutes  from './routes/userRoutes.js';
-import seatRoutes from "./routes/seatRoutes.js"
-import bookTicketsRoutes from "./routes/bookTicketsRoutes.js"
-import advertiseRoutes from "./routes/advertiseRoutes.js"
-
-
-
 //import "./controllers/paymentTime.js"; // Import cron job
 
 dotenv.config()
