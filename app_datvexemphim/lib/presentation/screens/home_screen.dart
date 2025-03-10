@@ -114,7 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => DetailMovieScreen(movie: movie),
+                                        builder: (context) =>
+                                            DetailMovieScreen(movie: movie),
                                       ),
                                     );
                                   },

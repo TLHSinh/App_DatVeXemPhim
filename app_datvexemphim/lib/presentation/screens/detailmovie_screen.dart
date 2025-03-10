@@ -169,7 +169,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PickCinemaAndTimeScreen(),
+                  builder: (context) => PickCinemaAndTimeScreen(movie: widget.movie),
                 ),
               );
             },
@@ -182,10 +182,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
             ),
             child: Text(
               "Đặt Vé",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ),

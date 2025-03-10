@@ -20,6 +20,7 @@ export const fetchAndSaveCinemas = async (req, res) => {
                         ten_rap: rapchieuphim.name,
                         dia_chi: rapchieuphim.address,
                         so_dien_thoai: rapchieuphim.phone,
+                        anh: rapchieuphim.image
                     }
                 },
                 { upsert: true }

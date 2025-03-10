@@ -18,11 +18,11 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
     id "com.android.application" version "8.2.1" apply false
-=======
+=========
     id 'com.android.application' version '8.2.1' apply false
->>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
+>>>>>>>>> Temporary merge branch 2
     id "org.jetbrains.kotlin.android" version "1.8.22" apply false
 }
 
