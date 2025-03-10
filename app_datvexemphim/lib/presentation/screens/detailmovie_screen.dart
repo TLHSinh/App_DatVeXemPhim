@@ -77,12 +77,17 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
             SizedBox(height: 20),
             Row(
               children: [
-                Text(
-                  widget.movie["ten_phim"] ?? "Không có tên",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Text(
+                    widget.movie["ten_phim"] ?? "Không có tên",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 SizedBox(width: 20),
                 Container(
