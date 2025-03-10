@@ -1,6 +1,6 @@
 name: app_datvexemphim
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -21,9 +21,12 @@ dependencies:
   flutter_widget_from_html: ^0.16.0
   youtube_player_flutter: ^9.1.1
   video_player: ^2.9.3
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 03c08b9b1ef5f7bfb1bc3cda4b1d5706fadbc09a
 
 dev_dependencies:
   flutter_test:
@@ -35,5 +38,3 @@ flutter:
 
   assets:
     - assets/images/
-
-   
