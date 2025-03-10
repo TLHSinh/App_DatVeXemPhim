@@ -184,6 +184,16 @@ export const getSinglePhim = async (req, res) => {
         if (!phim) {
             return res.status(404).json({ success: false, message: "Phim không tồn tại" });
         }
+
+
+
+        // const phimUpdated = {
+        //     ...phim._doc,
+        //     url_poster: phim.url_poster ? `https://rapchieuphim.com${phim.url_poster}` : null
+        // };
+
+
+
         res.status(200).json({ success: true, data: phim });
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi tìm phim", error: err.message });
@@ -194,7 +204,16 @@ export const getSinglePhim = async (req, res) => {
 export const getAllPhim = async (req, res) => {
     try {
         const danhSachPhim = await Phim.find().populate("id_the_loai");
-        res.status(200).json({ success: true, data: danhSachPhim });
+
+
+        // const danhSachPhimUpdated = danhSachPhim.map(phim => ({
+        //     ...phim._doc,
+        //     url_poster: phim.url_poster ? `https://rapchieuphim.com${phim.url_poster}` : null
+        // }));
+
+
+
+        res.status(200).json({ success: true, data: danhSachPhim, });
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi lấy danh sách phim", error: err.message });
     }

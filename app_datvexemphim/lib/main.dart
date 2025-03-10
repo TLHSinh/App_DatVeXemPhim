@@ -1,3 +1,4 @@
+import 'package:app_datvexemphim/presentation/widgets/final_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/splash_screen.dart';
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/register',
         builder: (context, state) => RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => FinalView(),
       ),
     ],
   );
