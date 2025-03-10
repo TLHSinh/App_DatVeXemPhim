@@ -1,4 +1,5 @@
 
+import 'package:app_datvexemphim/presentation/screens/pickmovieandtime_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
@@ -124,6 +125,104 @@ class _LocationScreenState extends State<LocationScreen> {
 }
 
 // Widget hiển thị Card của rạp
+// class CinemaCard extends StatelessWidget {
+//   final Map<String, dynamic> cinema;
+
+//   const CinemaCard({Key? key, required this.cinema}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     String imageBaseUrl = "https://rapchieuphim.com";
+//     String fullImageUrl = imageBaseUrl + (cinema["anh"] ?? "");
+
+//     return Card(
+//       color: Colors.white10,
+//       margin: EdgeInsets.only(bottom: 16),
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//       child: Column(
+         
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           // Hình ảnh rạp
+//           ClipRRect(
+//             borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+//             child: Image.network(
+//               fullImageUrl,
+//               height: 150,
+//               width: double.infinity,
+//               fit: BoxFit.cover,
+//               errorBuilder: (context, error, stackTrace) {
+//                 return Image.network(
+//                   "https://via.placeholder.com/300",
+//                   height: 150,
+//                   width: double.infinity,
+//                   fit: BoxFit.cover,
+//                 );
+//               },
+//             ),
+//           ),
+
+//           // Thông tin rạp
+//           Padding(
+//             padding: EdgeInsets.all(12),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 // Tên rạp
+//                 Text(
+//                   cinema["ten_rap"] ?? "Không có tên",
+//                   style: TextStyle(
+//                     color: Colors.white,
+//                     fontSize: 18,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//                 SizedBox(height: 6),
+
+//                 // Địa chỉ
+//                 Row(
+//                   children: [
+//                     Icon(Icons.location_on, color: Colors.redAccent, size: 20),
+//                     SizedBox(width: 6),
+//                     Expanded(
+//                       child: Text(
+//                         cinema["dia_chi"] ?? "Không có địa chỉ",
+//                         style: TextStyle(color: Colors.white70, fontSize: 14),
+//                         maxLines: 2,
+//                         overflow: TextOverflow.ellipsis,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+
+//                 SizedBox(height: 6),
+
+//                 // Số điện thoại
+//                 Row(
+//                   children: [
+//                     Icon(Icons.phone, color: Colors.green, size: 20),
+//                     SizedBox(width: 6),
+//                     Text(
+//                       cinema["so_dien_thoai"] ?? "Không có SĐT",
+//                       style: TextStyle(color: Colors.white70, fontSize: 14),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//                   SizedBox(height: 100),       
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+
+
 class CinemaCard extends StatelessWidget {
   final Map<String, dynamic> cinema;
 
@@ -134,86 +233,92 @@ class CinemaCard extends StatelessWidget {
     String imageBaseUrl = "https://rapchieuphim.com";
     String fullImageUrl = imageBaseUrl + (cinema["anh"] ?? "");
 
-    return Card(
-      color: Colors.white10,
-      margin: EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Column(
-         
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hình ảnh rạp
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(
-              fullImageUrl,
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Image.network(
-                  "https://via.placeholder.com/300",
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                );
-              },
-            ),
-          ),
+    return GestureDetector(
+      onTap: () {
+        // TODO: Kiểm tra nếu dữ liệu 'cinema' thiếu thông tin quan trọng trước khi chuyển trang
+        // TODO: Hiển thị hiệu ứng khi bấm vào (ví dụ: hiệu ứng nhấn xuống)
+        // TODO: Truyền thêm dữ liệu như danh sách phim đang chiếu tại rạp (nếu có)
 
-          // Thông tin rạp
-          Padding(
-            padding: EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Tên rạp
-                Text(
-                  cinema["ten_rap"] ?? "Không có tên",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PickCinemaAndTimeScreen(cinema:cinema["_id"]),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white10,
+        margin: EdgeInsets.only(bottom: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hình ảnh rạp
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              child: Image.network(
+                fullImageUrl,
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.network(
+                    "https://via.placeholder.com/300",
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
+            ),
+
+            // Thông tin rạp
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cinema["ten_rap"] ?? "Không có tên",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 6),
-
-                // Địa chỉ
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.redAccent, size: 20),
-                    SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        cinema["dia_chi"] ?? "Không có địa chỉ",
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                  SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.redAccent, size: 20),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          cinema["dia_chi"] ?? "Không có địa chỉ",
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 6),
-
-                // Số điện thoại
-                Row(
-                  children: [
-                    Icon(Icons.phone, color: Colors.green, size: 20),
-                    SizedBox(width: 6),
-                    Text(
-                      cinema["so_dien_thoai"] ?? "Không có SĐT",
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.phone, color: Colors.green, size: 20),
+                      SizedBox(width: 6),
+                      Text(
+                        cinema["so_dien_thoai"] ?? "Không có SĐT",
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-                  SizedBox(height: 100),       
-        ],
+          ],
+        ),
       ),
     );
   }

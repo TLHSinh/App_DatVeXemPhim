@@ -114,8 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            DetailMovieScreen(movie: movie),
+                                        builder: (context) => DetailMovieScreen(movie: movie),
                                       ),
                                     );
                                   },
@@ -161,11 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 children: comingSoonMovies.map((movie) {
-                                  String fullImageUrl = imageBaseUrl +
-                                      (movie["url_poster"] ?? "");
-                                  String movieTitle =
-                                      movie["ten_phim"] ?? "Không có tên";
-
+                                  String fullImageUrl = imageBaseUrl + (movie["url_poster"] ?? "");
+                                  String movieTitle = movie["ten_phim"] ?? "Không có tên";
                                   return Container(
                                     margin: EdgeInsets.only(right: 10),
                                     width: 150,

@@ -5,7 +5,7 @@ class ApiService {
     BaseOptions(
       baseUrl:
           // "http://localhost:5000/api/v1", // Nếu chạy trên Android Emulator
-          "http://10.21.4.124:5000/api/v1",
+          "http://10.21.12.116:5000/api/v1",
           // "http://192.168.1.10:5000/api/v1",
 
       connectTimeout: const Duration(seconds: 10),
@@ -13,7 +13,8 @@ class ApiService {
     ),
   );
 
-  static Future<Response?> post(String endpoint, Map<String, dynamic> data) async {
+  static Future<Response?> post(
+      String endpoint, Map<String, dynamic> data) async {
     try {
       Response response = await _dio.post(endpoint, data: data);
       return response;
@@ -23,7 +24,8 @@ class ApiService {
     }
   }
 
-  static Future<Response?> get(String endpoint, {Map<String, dynamic>? params}) async {
+  static Future<Response?> get(String endpoint,
+      {Map<String, dynamic>? params}) async {
     try {
       Response response = await _dio.get(endpoint, queryParameters: params);
       return response;

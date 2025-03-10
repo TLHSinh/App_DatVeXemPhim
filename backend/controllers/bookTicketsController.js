@@ -98,6 +98,32 @@ export const getLichChieuTheoRap = async (req, res) => {
   }
 };
 
+export const getAllLichChieuTheoRap = async (req, res) => {
+  try {
+      //const { idPhim, idRap } = req.params;
+      const { idRap } = req.body;
+
+      if ( !mongoose.Types.ObjectId.isValid(idRap)) {
+          return res.status(400).json({ message: " D rạp không hợp lệ!" });
+      }
+
+      const lichChieuList = await LichChieu.find({ 
+          id_rap: idRap 
+      })
+          .populate("id_phim", "ten_phim")
+          .populate("id_phong", "ten_phong")
+          .populate("id_rap", "ten_rap")
+          .sort({ thoi_gian_chieu: 1 });
+
+      if (lichChieuList.length === 0) {
+          return res.status(404).json({ message: "Không tìm thấy lịch chiếu cho phim này tại rạp đã chọn!" });
+      }
+
+      res.status(200).json({ message: "Lấy danh sách lịch chiếu thành công!", lich_chieu: lichChieuList });
+  } catch (error) {
+      res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
 
 
 export const datGhe = async (req, res) => {
