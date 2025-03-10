@@ -38,8 +38,8 @@ export const getLichChieu = async (req, res) => {
 // Lấy danh sách tất cả lịch chiếu của một phim theo ngày
 export const getLichChieuTheoNgay = async (req, res) => {
   try {
-      //const { idPhim, ngay } = req.params;
-      const { idPhim, ngay } =req.body;
+      const { idPhim } = req.params;
+      const { ngay } =req.body;
 
       if (!mongoose.Types.ObjectId.isValid(idPhim)) {
           return res.status(400).json({ message: "ID phim không hợp lệ!" });
@@ -72,8 +72,8 @@ export const getLichChieuTheoNgay = async (req, res) => {
 // Lấy danh sách tất cả lịch chiếu của một phim theo rạp
 export const getLichChieuTheoRap = async (req, res) => {
   try {
-      //const { idPhim, idRap } = req.params;
-      const { idPhim, idRap } = req.body;
+      const { idPhim } = req.params;
+      const { idRap } = req.body;
 
       if (!mongoose.Types.ObjectId.isValid(idPhim) || !mongoose.Types.ObjectId.isValid(idRap)) {
           return res.status(400).json({ message: "ID phim hoặc ID rạp không hợp lệ!" });
@@ -100,8 +100,8 @@ export const getLichChieuTheoRap = async (req, res) => {
 
 export const getAllLichChieuTheoRap = async (req, res) => {
   try {
-      //const { idPhim, idRap } = req.params;
-      const { idRap } = req.body;
+      const { idRap } = req.params;
+      //const { idRap } = req.body;
 
       if ( !mongoose.Types.ObjectId.isValid(idRap)) {
           return res.status(400).json({ message: " D rạp không hợp lệ!" });

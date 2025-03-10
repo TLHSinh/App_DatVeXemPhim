@@ -174,7 +174,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PickCinemaAndTime(movie: widget.movie),
+                  builder: (context) => PickCinemaAndTimeScreen(movie: widget.movie),
                 ),
               );
             },

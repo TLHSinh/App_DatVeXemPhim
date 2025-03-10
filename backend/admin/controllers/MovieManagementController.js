@@ -1,7 +1,10 @@
 import Phim from "../../models/PhimSchema.js";
 import LichChieu from "../../models/LichChieuSchema.js";
 import PhongChieu from "../../models/PhongChieuSchema.js";
+import RapPhim from "../../models/RapPhimSchema.js";
 import { v4 as uuidv4 } from 'uuid';
+
+
 import mongoose from "mongoose";
 
 /* [Movie] */
@@ -178,7 +181,7 @@ export const getScheduleOfRoom = async (req, res) => {
 // Tạo lịch chiếu
 export const createMovieSchedule = async (req, res) => {
     const { id_phim } = req.params;
-    const { id_phong, thoi_gian_chieu, gia_ve } = req.body;
+    const { id_phong, thoi_gian_chieu, gia_ve, id_rap } = req.body;
 
     try {
         // Kiểm tra phim tồn tại
@@ -193,6 +196,11 @@ export const createMovieSchedule = async (req, res) => {
             return res.status(404).json({ success: false, message: "Phòng chiếu không tồn tại" });
         }
 
+        const rapPhim = await RapPhim.findById(id_rap);
+        if (!rapPhim) {
+            return res.status(404).json({ success: false, message: "Rạp phim không tồn tại" });
+        }
+
         // Kiểm tra trùng lịch chiếu (cùng phòng, cùng thời gian)
         const existingSchedule = await LichChieu.findOne({ id_phong, thoi_gian_chieu });
         if (existingSchedule) {
@@ -203,6 +211,7 @@ export const createMovieSchedule = async (req, res) => {
         const newSchedule = new LichChieu({
             id_phim,
             id_phong,
+            id_rap,
             thoi_gian_chieu,
             gia_ve
         });

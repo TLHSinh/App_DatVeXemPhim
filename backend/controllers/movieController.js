@@ -246,7 +246,7 @@ export const getUpcomingMovies = async (req, res) => {
 };
 
 
-//Hàm lấy danh sách phim [đang chiếu] - 14 ngày trước
+//Hàm lấy danh sách phim [đang chiếu] - 7 ngày trước
 export const getNowShowingMovies = async (req, res) => {
     try {
         const today = new Date();
@@ -259,7 +259,7 @@ export const getNowShowingMovies = async (req, res) => {
         // Lấy tất cả phim từ MongoDB
         const allMovies = await Phim.find();
 
-        // Lọc phim có ngày công chiếu trong khoảng từ 14 ngày trước đến hôm nay
+        // Lọc phim có ngày công chiếu trong khoảng từ 7 ngày trước đến hôm nay
         const nowShowingMovies = allMovies.filter(movie => {
             const movieDate = new Date(movie.ngay_cong_chieu);
             return movieDate >= twoWeeksAgo && movieDate <= today;
@@ -271,7 +271,6 @@ export const getNowShowingMovies = async (req, res) => {
         res.status(500).json({ message: "Error retrieving now showing movies" });
     }
 };
-
 
 
 
