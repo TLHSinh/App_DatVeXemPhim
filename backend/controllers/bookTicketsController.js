@@ -19,8 +19,8 @@ export const getLichChieu = async (req, res) => {
         }
 
         const lichChieuList = await LichChieu.find({ id_phim: idPhim })
-            .populate("id_phim", "ten_phim")
-            .populate("id_phong", "ten_phong")
+        .populate("id_phim", ["ten_phim","url_poster"])
+        .populate("id_phong", "ten_phong")
             .populate("id_rap", "ten_rap")
             .sort({ thoi_gian_chieu: 1 });
 
@@ -54,8 +54,8 @@ export const getLichChieuTheoNgay = async (req, res) => {
           id_phim: idPhim, 
           thoi_gian_chieu: { $gte: startOfDay, $lte: endOfDay } 
       })
-          .populate("id_phim", "ten_phim")
-          .populate("id_phong", "ten_phong")
+      .populate("id_phim", ["ten_phim","url_poster"])
+      .populate("id_phong", "ten_phong")
           .sort({ thoi_gian_chieu: 1 });
 
       if (lichChieuList.length === 0) {
@@ -83,7 +83,7 @@ export const getLichChieuTheoRap = async (req, res) => {
           id_phim: idPhim, 
           id_rap: idRap 
       })
-          .populate("id_phim", "ten_phim")
+          .populate("id_phim", ["ten_phim","url_poster"])
           .populate("id_phong", "ten_phong")
           .populate("id_rap", "ten_rap")
           .sort({ thoi_gian_chieu: 1 });
@@ -110,8 +110,8 @@ export const getAllLichChieuTheoRap = async (req, res) => {
       const lichChieuList = await LichChieu.find({ 
           id_rap: idRap 
       })
-          .populate("id_phim", "ten_phim")
-          .populate("id_phong", "ten_phong")
+      .populate("id_phim", ["ten_phim","url_poster"])
+      .populate("id_phong", "ten_phong")
           .populate("id_rap", "ten_rap")
           .sort({ thoi_gian_chieu: 1 });
 
