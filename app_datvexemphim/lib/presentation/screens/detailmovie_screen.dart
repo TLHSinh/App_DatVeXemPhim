@@ -53,10 +53,12 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       backgroundColor: const Color(0xff1B1B1B),
       appBar: AppBar(
         title: Text(
-          widget.movie["ten_phim"] ?? "Chi Tiết Phim",
-          style: TextStyle(color: Colors.white),
+          widget.movie['ten_phim'] ?? "Chọn Giờ Chiếu",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.black,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.white), // Mũi tên Back màu trắng
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -83,10 +85,9 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
-                        fontWeight: FontWeight.bold
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.bold),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(width: 20),
@@ -174,7 +175,8 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PickCinemaAndTimeScreen(movie: widget.movie),
+                  builder: (context) =>
+                      PickCinemaAndTimeScreen(movie: widget.movie),
                 ),
               );
             },
@@ -187,7 +189,10 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
             ),
             child: Text(
               "Đặt Vé",
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
