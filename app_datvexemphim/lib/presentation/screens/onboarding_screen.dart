@@ -16,7 +16,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> onboardingData = [
     {
       "image": "assets/images/onboarding1.png",
-      "title": "Chào mừng bạn đến với App!",
+      "title": "Chào mừng bạn đến với ATSH!",
       "description": "Khám phá hàng ngàn bộ phim hấp dẫn ngay hôm nay.",
     },
     {
@@ -39,55 +39,44 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.ease,
       );
     } else {
-      _pageController.jumpToPage(0); // Quay lại trang đầu tiên
+      _goToHome();
     }
   }
 
   void _goToHome() {
-    context.go('/home'); // Điều hướng đến màn hình chính
+    context.go('/home');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1E1E1E),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100), // Tăng chiều cao AppBar
-        child: AppBar(
-          backgroundColor: Color(0xFF1E1E1E),
-          elevation: 0,
-          title: Align(
-            alignment: Alignment.centerLeft, // Đưa logo về góc trái
-            child: Image.asset(
-              'assets/images/logo2.png',
-              width: 150, // Kích thước logo lớn hơn
-              fit: BoxFit.contain,
-            ),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        elevation: 0,
+        title: Text(
+          "ATSH CGV.",
+          style: TextStyle(
+            color: const Color.fromARGB(255, 255, 0, 0), // Màu đỏ #c20077
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: TextButton(
-                onPressed: () {
-                  context.go('/login'); // Điều hướng đến trang đăng nhập
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.grey[800],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: Text(
-                  'Đăng nhập',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+        ),
+        titleSpacing: 20, // Đưa title về sát trái hơn
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: TextButton(
+              onPressed: () => context.go('/login'),
+              child: Text(
+                'Đăng nhập',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -99,28 +88,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 setState(() => _currentPage = index);
               },
               itemBuilder: (context, index) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(onboardingData[index]["image"]!, width: 300),
-                    SizedBox(height: 20),
-                    Text(
-                      onboardingData[index]["title"]!,
-                      style: TextStyle(
-                          color: Colors.white,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(onboardingData[index]["image"]!, width: 300),
+                      SizedBox(height: 20),
+                      Text(
+                        onboardingData[index]["title"]!,
+                        style: TextStyle(
+                          color: Color(0xFF545454), // Màu #545454
                           fontSize: 24,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
                         onboardingData[index]["description"]!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style:
+                            TextStyle(color: Color(0xFF545454), fontSize: 16),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
@@ -129,33 +120,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _pageController,
             count: onboardingData.length,
             effect: ExpandingDotsEffect(
-              activeDotColor: Colors.red,
+              activeDotColor: Color(0xFFC20077), // Màu #c20077
               dotHeight: 8,
               dotWidth: 8,
             ),
           ),
-          SizedBox(height: 30),
+          SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   onPressed: _goToHome,
-                  child: Text("Bỏ qua",
-                      style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  child: Text(
+                    "Bỏ qua",
+                    style: TextStyle(color: Color(0xFF545454), fontSize: 16),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: _nextPage,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: Text(_currentPage == onboardingData.length - 1
-                      ? "Quay lại"
-                      : "Tiếp tục"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFC20077), // Màu nền #c20077
+                    foregroundColor: Colors.white, // Màu chữ trắng
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Bo tròn góc
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12), // Căn chỉnh kích thước
+                  ),
+                  child: Text(
+                    _currentPage == onboardingData.length - 1
+                        ? "Bắt đầu ngay"
+                        : "Tiếp tục",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 40),
         ],
       ),
     );

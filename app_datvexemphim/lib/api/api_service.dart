@@ -6,6 +6,7 @@ class ApiService {
       baseUrl: "http://localhost:5000/api/v1",
       //"http://10.21.8.240:5000/api/v1",
       // "http://192.168.1.11:5000/api/v1",
+
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),
@@ -22,14 +23,5 @@ class ApiService {
     }
   }
 
-  static Future<Response?> get(String endpoint,
-      {Map<String, dynamic>? params}) async {
-    try {
-      Response response = await _dio.get(endpoint, queryParameters: params);
-      return response;
-    } catch (e) {
-      print("❌ API GET Error: $e");
-      return null;
-    }
-  }
+  static get(String s) {}
 }

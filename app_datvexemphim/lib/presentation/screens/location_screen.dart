@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
@@ -27,10 +26,12 @@ class _LocationScreenState extends State<LocationScreen> {
   // Gọi API lấy danh sách tỉnh/thành từ nguồn công khai
   Future<void> fetchProvinces() async {
     try {
-      Response response = await Dio().get("https://provinces.open-api.vn/api/?depth=1");
+      Response response =
+          await Dio().get("https://provinces.open-api.vn/api/?depth=1");
       if (response.statusCode == 200) {
         setState(() {
-          provinces = response.data.map<String>((p) => p["name"].toString()).toList();
+          provinces =
+              response.data.map<String>((p) => p["name"].toString()).toList();
         });
       }
     } catch (e) {
@@ -70,7 +71,8 @@ class _LocationScreenState extends State<LocationScreen> {
         backgroundColor: Colors.black,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
+          ? Center(
+              child: CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
           : Column(
               children: [
                 // Dropdown chọn tỉnh/thành
@@ -81,7 +83,8 @@ class _LocationScreenState extends State<LocationScreen> {
                       labelText: "Chọn tỉnh/thành",
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     value: selectedProvince,
                     items: provinces.map((String province) {
@@ -116,7 +119,6 @@ class _LocationScreenState extends State<LocationScreen> {
                           },
                         ),
                 ),
-              
               ],
             ),
     );
@@ -139,7 +141,6 @@ class CinemaCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Column(
-         
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Hình ảnh rạp
@@ -212,7 +213,7 @@ class CinemaCard extends StatelessWidget {
               ],
             ),
           ),
-                  SizedBox(height: 100),       
+          SizedBox(height: 100),
         ],
       ),
     );
