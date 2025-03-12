@@ -16,6 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   final String imageBaseUrl = "https://rapchieuphim.com"; // Đường dẫn cố định
 
+  String selectedLocation = "TP.HCM"; // Vị trí mặc định
+
   @override
   void initState() {
     super.initState();
@@ -47,27 +49,45 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff212121),
+      //backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(255, 252, 234, 255),
         elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Logo
-            Image.asset(
-              'assets/images/logo2.png', // Thay bằng đường dẫn logo của bạn
-              height: 40,
-            ),
-
-            // Icon người dùng
-            IconButton(
-              icon: Icon(Icons.account_circle, size: 30, color: Colors.white),
-              onPressed: () {},
-            ),
-          ],
+        title: Text(
+          "ATSH CGV.",
+          style: TextStyle(
+            color: const Color.fromARGB(255, 255, 0, 0),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              _showLocationPicker(context, (value) {
+                setState(() {
+                  selectedLocation = value;
+                });
+              });
+            },
+            child: Row(
+              children: [
+                Text(
+                  selectedLocation ?? "Chọn vị trí",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Icon(Icons.arrow_drop_down, color: Colors.black),
+                SizedBox(width: 10),
+              ],
+            ),
+          ),
+        ],
       ),
+
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(), // Giúp nội dung cuộn mượt mà
         child: Padding(
@@ -82,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   : nowShowingMovies.isEmpty
                       ? Center(
                           child: Text("Không có phim nào đang chiếu",
-                              style: TextStyle(color: Colors.white)))
+                              style: TextStyle(color: Colors.black)))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -93,16 +113,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Text(
                                 "Phim Đang Chiếu",
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
+                                  color: Color(0xFF545454),
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 22,
                                 ),
                               ),
                             ),
                             // Carousel Phim Đang Chiếu
                             CarouselSlider(
                               options: CarouselOptions(
-                                height: MediaQuery.of(context).size.width * 1.2,
+                                height: MediaQuery.of(context).size.width * 1.3,
                                 autoPlay: true,
                                 enlargeCenterPage: true,
                               ),
@@ -148,9 +168,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Text(
                                 "Phim Sắp Chiếu",
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
+                                  color: Color(0xFF545454),
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 22,
                                 ),
                               ),
                             ),
@@ -173,25 +193,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         // Hình ảnh phim
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: AspectRatio(aspectRatio: 2/3,
-                                            child: Image.network(
-                                            fullImageUrl,
-                                            height: 220,
-                                            width: 150,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.network(
-                                                "https://via.placeholder.com/150",
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: AspectRatio(
+                                              aspectRatio: 2 / 3,
+                                              child: Image.network(
+                                                fullImageUrl,
                                                 height: 220,
                                                 width: 150,
                                                 fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),)
-                                        ),
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.network(
+                                                    "https://via.placeholder.com/150",
+                                                    height: 220,
+                                                    width: 150,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              ),
+                                            )),
                                         SizedBox(height: 8),
                                       ],
                                     ),
@@ -206,6 +227,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // Hàm mở dialog chọn vị trí
+  void _showLocationPicker(BuildContext context, Function(String) onSelected) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Chọn vị trí"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ["Hà Nội", "TP.HCM", "Đà Nẵng"].map((city) {
+              return ListTile(
+                title: Text(city),
+                onTap: () {
+                  onSelected(city);
+                  Navigator.of(context).pop();
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
