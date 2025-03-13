@@ -1,0 +1,250 @@
+.title-ad{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    line-height: 44px;
+    color: #66B5A3;
+    font-weight: 400;
+}
+.rbc-today{
+    background: #f0fcf8 !important;
+}
+.rbc-btn-group button{
+    color: #66B5A3 !important;
+    border: 1px solid#66B5A3 !important;
+}
+.user-table{
+    border-collapse: collapse;
+
+    font-size: 16px;
+    width: 100%;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.user-table thead tr{
+    background-color: #66B5A3;
+    color: #fff;
+    text-align: left;
+    font-weight: bold;
+}
+
+
+.user-table .nameandsort {
+  display: flex;
+  align-items: center; /* Căn giữa nội dung và icon */
+  justify-content: space-between; /* Khoảng cách giữa tiêu đề và icon */
+  padding: 12px 15px;
+  cursor: pointer; /* Hiệu ứng con trỏ */
+}
+
+
+
+
+.user-table th,
+.user-table td{
+    padding: 12px 15px;
+}
+.user-table tbody tr{
+    border-bottom: 1px solid #dddddd;
+}
+.user-table tbody tr:nth-of-type(even){
+    background-color: #f3f3f3;
+}
+.user-table tbody tr:last-of-type{
+    border-bottom: 2px solid #66B5A3;
+}
+@media only screen and (max-width: 767.98px) {
+  .user-table {
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+      display: block;
+      overflow-x: auto;
+      width: 100%;
+  }
+  .title-ad{
+    font-size: 1.1em;
+  }
+}
+
+/* Style thanh tìm kiếm */
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 300px; /* Độ rộng tối đa */
+  /* margin-left: 43%;  */
+  float: right;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 15px 10px 40px; /* Chừa khoảng trống cho icon */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-bar input:focus {
+  border-color: #66B5A3; /* Đổi màu viền khi focus */
+}
+
+.search-bar .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px; /* Căn trái */
+  transform: translateY(-50%);
+  color: #aaa; /* Màu icon */
+  font-size: 18px; /* Kích thước icon */
+}
+
+.search-bar input:focus + .search-icon {
+  color: #66B5A3; /* Đổi màu icon khi input được focus */
+}
+
+.header-list-card{
+  margin: 10px 20px;
+  height: 60px;
+  padding: 10px;
+}
+
+.icon-function{
+outline: none;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+padding: 10px;
+background: none;
+}
+.icon-function:hover{
+    background: #f0fffb;
+    color: #66B5A3;
+}
+@keyframes animate {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-15px);
+    }
+    60% {
+      transform: translateY(-10px);
+    }
+  }
+  
+
+
+  .pop-up-addworking{
+    position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  }
+
+.card-list-ad{
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  margin-bottom: 25px;
+  width: 100%;
+  background: white;
+  padding: 10px;
+}
+
+
+
+  .status-confirmed {
+    background-color: #86e49d;
+    color: #006b21;
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding để đẹp hơn */
+    font-weight: 500; /* Đậm chữ */
+  }
+  
+  .status-cancelled {
+    background-color: #d893a3;
+    color: #b30021;
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding */
+    font-weight: 500; /* Đậm chữ */
+  }
+  
+  .status-pending {
+    background-color: #ebc474;
+    color: white; /* Chữ màu trắng */
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding */
+    font-weight: 500; /* Đậm chữ */
+  }
+
+
+
+
+  .status-hoanThanh {
+    background-color: #86e49d;
+    color: #006b21;
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding để đẹp hơn */
+    font-weight: 500; /* Đậm chữ */
+  }
+  
+  .status-dangDieuTri {
+    background-color: #d893a3;
+    color: #b30021;
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding */
+    font-weight: 500; /* Đậm chữ */
+  }
+  
+  .status-daXuatVien {
+    background-color: #ebc474;
+    color: white; /* Chữ màu trắng */
+    border-radius: 5px; /* Bo tròn */
+    padding: 5px 10px; /* Thêm một chút padding */
+    font-weight: 500; /* Đậm chữ */
+  }
+  
+  
+
+
+
+
+
+
+/* phân trang */
+  .pagination {
+    display: flex;
+    justify-content: left;
+    margin: 20px 0;
+  }
+  
+  .pagination button {
+    background-color: #66B5A3;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pagination button:hover {
+    background-color: #55A392;
+  }
+  
+  .pagination button.active {
+    background-color: #3d8b75;
+    font-weight: bold;
+  }
+  
+  .pagination button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }

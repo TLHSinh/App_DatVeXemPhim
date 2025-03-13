@@ -5,7 +5,7 @@ const TrangThaiGheSchema = new mongoose.Schema({
   id_ghe: { type: mongoose.Types.ObjectId, ref: "Ghe", required: true },
   trang_thai: { 
     type: String, 
-    enum: ["có sẵn", "đã đặt trước"], 
+    enum: ["có sẵn", ,"đã đặt", "đã đặt trước"], 
     default: "có sẵn" 
   },
 }, { timestamps: true });
