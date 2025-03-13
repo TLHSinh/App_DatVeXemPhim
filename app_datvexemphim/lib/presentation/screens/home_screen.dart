@@ -5,7 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -47,10 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff212121),
+      backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        elevation: 10,
+        backgroundColor: const Color(0xFFB22222),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xffcc040a),
+                Color(0xffb80407),
+                Color(0xff940404),
+                Color(0xff87040a)
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -62,38 +76,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Icon người dùng
             IconButton(
-              icon: Icon(Icons.account_circle, size: 30, color: Colors.white),
+              icon: const Icon(Icons.account_circle,
+                  size: 30, color: Colors.white),
               onPressed: () {},
             ),
           ],
         ),
       ),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(), // Giúp nội dung cuộn mượt mà
+        physics: const BouncingScrollPhysics(), // Giúp nội dung cuộn mượt mà
         child: Padding(
-          padding: EdgeInsets.only(bottom: 20), // Tránh bị khuất nội dung
+          padding: const EdgeInsets.only(bottom: 20), // Tránh bị khuất nội dung
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               isLoading
-                  ? Center(
+                  ? const Center(
                       child:
                           CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
                   : nowShowingMovies.isEmpty
-                      ? Center(
+                      ? const Center(
                           child: Text("Không có phim nào đang chiếu",
                               style: TextStyle(color: Colors.white)))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Tiêu đề "Phim Đang Chiếu"
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 10),
                               child: Text(
                                 "Phim Đang Chiếu",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -114,7 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => DetailMovieScreen(movie: movie),
+                                        builder: (context) =>
+                                            DetailMovieScreen(movie: movie),
                                       ),
                                     );
                                   },
@@ -141,13 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
 
                             // Tiêu đề "Phim Sắp Chiếu"
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 20),
                               child: Text(
                                 "Phim Sắp Chiếu",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -157,45 +173,47 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Carousel ngang Phim Sắp Chiếu
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 children: comingSoonMovies.map((movie) {
-                                  String fullImageUrl = imageBaseUrl + (movie["url_poster"] ?? "");
-                                  String movieTitle = movie["ten_phim"] ?? "Không có tên";
+                                  String fullImageUrl = imageBaseUrl +
+                                      (movie["url_poster"] ?? "");
                                   return Container(
-                                    margin: EdgeInsets.only(right: 10),
+                                    margin: const EdgeInsets.only(right: 10),
                                     width: 150,
                                     child: Column(
                                       children: [
                                         // Hình ảnh phim
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: AspectRatio(aspectRatio: 2/3,
-                                            child: Image.network(
-                                            fullImageUrl,
-                                            height: 220,
-                                            width: 150,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.network(
-                                                "https://via.placeholder.com/150",
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: AspectRatio(
+                                              aspectRatio: 2 / 3,
+                                              child: Image.network(
+                                                fullImageUrl,
                                                 height: 220,
                                                 width: 150,
                                                 fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),)
-                                        ),
-                                        SizedBox(height: 8),
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.network(
+                                                    "https://via.placeholder.com/150",
+                                                    height: 220,
+                                                    width: 150,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              ),
+                                            )),
+                                        const SizedBox(height: 8),
                                       ],
                                     ),
                                   );
                                 }).toList(),
                               ),
                             ),
-                            SizedBox(height: 100),
+                            const SizedBox(height: 100),
                           ],
                         ),
             ],

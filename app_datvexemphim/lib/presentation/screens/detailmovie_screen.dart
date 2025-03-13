@@ -6,7 +6,7 @@ import 'package:video_player/video_player.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailMovieScreen extends StatefulWidget {
-  final Map<String, dynamic> movie;
+ final Map<String, dynamic> movie; 
 
   const DetailMovieScreen({Key? key, required this.movie}) : super(key: key);
 
@@ -34,7 +34,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
         if (videoId != null) {
           _youtubeController = YoutubePlayerController(
             initialVideoId: videoId,
-            flags: YoutubePlayerFlags(autoPlay: false, mute: false),
+            flags: const YoutubePlayerFlags(autoPlay: false, mute: false),
           );
         }
       }
@@ -54,12 +54,12 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       appBar: AppBar(
         title: Text(
           widget.movie["ten_phim"] ?? "Chi Tiết Phim",
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,17 +70,17 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               Container(
                 height: 200,
                 color: Colors.black26,
-                child: Center(
+                child: const Center(
                     child: Text("Không có trailer",
                         style: TextStyle(color: Colors.white))),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: Text(
                     widget.movie["ten_phim"] ?? "Không có tên",
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold
@@ -89,9 +89,9 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                         overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   decoration: BoxDecoration(
                     color: _getAgeLimitColor(
                         widget.movie["gioi_han_tuoi"] ?? "P"), // Chọn màu nền
@@ -100,7 +100,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                   child: Text(
                     widget.movie["gioi_han_tuoi"] ??
                         "P", // Mặc định là "P" nếu không có
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white, // Chữ trắng
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -109,57 +109,57 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.yellow,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(FontAwesome.calendar_solid,
+                  child: const Icon(FontAwesome.calendar_solid,
                       color: Colors.black, size: 17),
                 ),
-                SizedBox(width: 8),
-                Text("Ngày chiếu: ",
+                const SizedBox(width: 8),
+                const Text("Ngày chiếu: ",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold)),
                 Text(
                   "${widget.movie["ngay_cong_chieu"] ?? "Không rõ"}",
-                  style: TextStyle(color: Colors.white70, fontSize: 15),
+                  style: const TextStyle(color: Colors.white70, fontSize: 15),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.yellow,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(FontAwesome.clock, color: Colors.black, size: 17),
+                  child: const Icon(FontAwesome.clock, color: Colors.black, size: 17),
                 ),
-                SizedBox(width: 8),
-                Text("Thời lượng: ",
+                const SizedBox(width: 8),
+                const Text("Thời lượng: ",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold)),
                 Text(
                   "${widget.movie["thoi_luong"] ?? "Không rõ"} phút",
-                  style: TextStyle(color: Colors.white70, fontSize: 15),
+                  style: const TextStyle(color: Colors.white70, fontSize: 15),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             HtmlWidget(
               widget.movie["mo_ta"] ?? "<p>Không có mô tả</p>",
-              textStyle: TextStyle(color: Colors.white, fontSize: 16),
+              textStyle: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
         ),
@@ -167,25 +167,25 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       bottomNavigationBar: BottomAppBar(
         color: Colors.black,
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: ElevatedButton(
             onPressed: () {
               // Chuyển đến trang chọn rạp & thời gian
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PickCinemaAndTime(movie: widget.movie),
+                  builder: (context) => PickCinemaAndTimeScreen(movie: widget.movie),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              padding: EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(
+            child: const Text(
               "Đặt Vé",
               style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),

@@ -73,7 +73,7 @@ app.use('/api/admin', CinemaManagementRoutes);
 app.use('/api/admin', SeatManagementRoutes);
 app.use('/api/admin', BookTicketManagementRoutes);
 app.use('/api/admin', VoucherManagementRoutes);
-app.use('/api/admin', FoodManagementRoutes);
+app.use('/api/v1', FoodManagementRoutes);
 app.use('/api/admin', AdsManagementRoutes);
 app.use('/api/admin', RevenueManagementRoutes);
 
