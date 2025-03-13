@@ -23,5 +23,14 @@ class ApiService {
     }
   }
 
-  static get(String s) {}
+  static Future<Response?> get(String endpoint,
+      {Map<String, dynamic>? params}) async {
+    try {
+      Response response = await _dio.get(endpoint, queryParameters: params);
+      return response;
+    } catch (e) {
+      print("❌ API GET Error: $e");
+      return null;
+    }
+  }
 }
