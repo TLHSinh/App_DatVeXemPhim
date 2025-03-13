@@ -69,10 +69,11 @@ class _LocationScreenState extends State<LocationScreen> {
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
         title: const Text("Danh Sách Rạp"),
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xfff9f9f9),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
+          ? const Center(
+              child: CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
           : Column(
               children: [
                 // Dropdown chọn tỉnh/thành
@@ -201,7 +202,8 @@ class CinemaCard extends StatelessWidget {
                         child: Text(
                           cinema["dia_chi"] ?? "Không có địa chỉ",
                           style: const TextStyle(
-                              color: Colors.black87, fontSize: 14), // Màu chữ đen
+                              color: Colors.black87,
+                              fontSize: 14), // Màu chữ đen
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -217,8 +219,8 @@ class CinemaCard extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         cinema["so_dien_thoai"] ?? "Không có SĐT",
-                        style:
-                            const TextStyle(color: Colors.black87, fontSize: 14), // Màu chữ đen
+                        style: const TextStyle(
+                            color: Colors.black87, fontSize: 14), // Màu chữ đen
                       ),
                     ],
                   ),
