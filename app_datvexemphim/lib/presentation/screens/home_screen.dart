@@ -5,7 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -15,8 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> comingSoonMovies = [];
   bool isLoading = true;
   final String imageBaseUrl = "https://rapchieuphim.com"; // Đường dẫn cố định
-
-  String selectedLocation = "TP.HCM"; // Vị trí mặc định
 
   @override
   void initState() {
@@ -49,73 +47,56 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
-        title: Text(
-          "ATSH CGV.",
-          style: TextStyle(
-            color: const Color.fromARGB(255, 255, 0, 0),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              _showLocationPicker(context, (value) {
-                setState(() {
-                  selectedLocation = value;
-                });
-              });
-            },
-            child: Row(
-              children: [
-                Text(
-                  selectedLocation ?? "Chọn vị trí",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Icon(Icons.arrow_drop_down, color: Colors.black),
-                SizedBox(width: 10),
-              ],
+        backgroundColor: const Color(0xfff9f9f9),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Logo
+            Image.asset(
+              'assets/images/logo2.png', // Thay bằng đường dẫn logo của bạn
+              height: 40,
             ),
-          ),
-        ],
-      ),
 
+            // Icon người dùng
+            IconButton(
+              icon: const Icon(Icons.account_circle,
+                  size: 30, color: Colors.white),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(), // Giúp nội dung cuộn mượt mà
+        physics: const BouncingScrollPhysics(), // Giúp nội dung cuộn mượt mà
         child: Padding(
-          padding: EdgeInsets.only(bottom: 20), // Tránh bị khuất nội dung
+          padding: const EdgeInsets.only(bottom: 20), // Tránh bị khuất nội dung
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               isLoading
-                  ? Center(
+                  ? const Center(
                       child:
                           CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
                   : nowShowingMovies.isEmpty
-                      ? Center(
+                      ? const Center(
                           child: Text("Không có phim nào đang chiếu",
-                              style: TextStyle(color: Colors.black)))
+                              style: TextStyle(color: Colors.white)))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Tiêu đề "Phim Đang Chiếu"
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 10),
                               child: Text(
                                 "Phim Đang Chiếu",
                                 style: TextStyle(
-                                  color: Color(0xFF545454),
-                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                   fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
@@ -162,15 +143,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
 
                             // Tiêu đề "Phim Sắp Chiếu"
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 20),
                               child: Text(
                                 "Phim Sắp Chiếu",
                                 style: TextStyle(
-                                  color: Color(0xFF545454),
-                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                   fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
@@ -178,16 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Carousel ngang Phim Sắp Chiếu
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 children: comingSoonMovies.map((movie) {
                                   String fullImageUrl = imageBaseUrl +
                                       (movie["url_poster"] ?? "");
-                                  String movieTitle =
-                                      movie["ten_phim"] ?? "Không có tên";
-
                                   return Container(
-                                    margin: EdgeInsets.only(right: 10),
+                                    margin: const EdgeInsets.only(right: 10),
                                     width: 150,
                                     child: Column(
                                       children: [
@@ -213,44 +192,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 },
                                               ),
                                             )),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                       ],
                                     ),
                                   );
                                 }).toList(),
                               ),
                             ),
-                            SizedBox(height: 100),
+                            const SizedBox(height: 100),
                           ],
                         ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  // Hàm mở dialog chọn vị trí
-  void _showLocationPicker(BuildContext context, Function(String) onSelected) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Chọn vị trí"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: ["Hà Nội", "TP.HCM", "Đà Nẵng"].map((city) {
-              return ListTile(
-                title: Text(city),
-                onTap: () {
-                  onSelected(city);
-                  Navigator.of(context).pop();
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
     );
   }
 }

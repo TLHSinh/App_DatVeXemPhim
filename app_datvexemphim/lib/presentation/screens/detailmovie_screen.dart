@@ -52,12 +52,18 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
 
   Color _getAgeLimitColor(String? ageLimit) {
     switch (ageLimit) {
-      case "K": return Colors.blue;
-      case "T13": return Colors.yellow;
-      case "T16": return Colors.orange;
-      case "T18": return Colors.red;
-      case "P": return Colors.green;
-      default: return Colors.grey;
+      case "K":
+        return Colors.blue;
+      case "T13":
+        return Colors.yellow;
+      case "T16":
+        return Colors.orange;
+      case "T18":
+        return Colors.red;
+      case "P":
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -78,7 +84,8 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 color: Color(0xFF545454),
                 fontSize: 16,
                 fontWeight: FontWeight.bold)),
-        Text(value, style: const TextStyle(color: Color(0xFF545454), fontSize: 15)),
+        Text(value,
+            style: const TextStyle(color: Color(0xFF545454), fontSize: 15)),
       ],
     );
   }
@@ -91,9 +98,10 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       appBar: AppBar(
         title: Text(
           movie['ten_phim'] ?? "Chọn Giờ Chiếu",
-          style: const TextStyle(color: Color(0xFF545454), fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Color(0xFF545454), fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color.fromARGB(255, 252, 234, 255),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -126,26 +134,33 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 ),
                 const SizedBox(width: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   decoration: BoxDecoration(
                     color: _getAgeLimitColor(movie["gioi_han_tuoi"]),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     movie["gioi_han_tuoi"] ?? "P",
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            _buildMovieInfoRow(FontAwesome.calendar_solid, "Ngày chiếu", _formatDate(movie["ngay_cong_chieu"])),
+            _buildMovieInfoRow(FontAwesome.calendar_solid, "Ngày chiếu",
+                _formatDate(movie["ngay_cong_chieu"])),
             const SizedBox(height: 10),
-            _buildMovieInfoRow(FontAwesome.clock_solid, "Thời lượng", "${movie["thoi_luong"] ?? "Không rõ"} phút"),
+            _buildMovieInfoRow(FontAwesome.clock_solid, "Thời lượng",
+                "${movie["thoi_luong"] ?? "Không rõ"} phút"),
             const SizedBox(height: 20),
             HtmlWidget(
               movie["mo_ta"] ?? "<p>Không có mô tả</p>",
-              textStyle: const TextStyle(color: Color(0xFF545454), fontSize: 16),
+              textStyle:
+                  const TextStyle(color: Color(0xFF545454), fontSize: 16),
             ),
           ],
         ),
@@ -165,7 +180,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC20077),
+                backgroundColor: Color(0xFFEE0033),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -174,7 +189,10 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 shadowColor: Colors.black26,
               ),
               child: const Text("Đặt Vé",
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
             ),
           ),
         ),

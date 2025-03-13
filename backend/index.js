@@ -24,9 +24,9 @@ import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 
-//import "./controllers/paymentTime.js"; // Import cron job
 
-dotenv.config()
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -73,7 +73,7 @@ app.use('/api/admin', CinemaManagementRoutes);
 app.use('/api/admin', SeatManagementRoutes);
 app.use('/api/admin', BookTicketManagementRoutes);
 app.use('/api/admin', VoucherManagementRoutes);
-app.use('/api/admin', FoodManagementRoutes);
+app.use('/api/v1', FoodManagementRoutes);
 app.use('/api/admin', AdsManagementRoutes);
 app.use('/api/admin', RevenueManagementRoutes);
 

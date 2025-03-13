@@ -5,8 +5,4 @@ const router = express.Router();
 
 // API lấy danh sách ghế theo suất chiếu
 router.get("/:idLichChieu", getSeatsByShowtime);
-
-
-
-
 export default router;

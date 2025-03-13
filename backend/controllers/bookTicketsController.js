@@ -19,8 +19,8 @@ export const getLichChieu = async (req, res) => {
         }
 
         const lichChieuList = await LichChieu.find({ id_phim: idPhim })
-            .populate("id_phim", "ten_phim")
-            .populate("id_phong", "ten_phong")
+        .populate("id_phim", ["ten_phim","url_poster"])
+        .populate("id_phong", "ten_phong")
             .populate("id_rap", "ten_rap")
             .sort({ thoi_gian_chieu: 1 });
 
@@ -38,8 +38,8 @@ export const getLichChieu = async (req, res) => {
 // Lấy danh sách tất cả lịch chiếu của một phim theo ngày
 export const getLichChieuTheoNgay = async (req, res) => {
   try {
-      //const { idPhim, ngay } = req.params;
-      const { idPhim, ngay } =req.body;
+      const { idPhim } = req.params;
+      const { ngay } =req.body;
 
       if (!mongoose.Types.ObjectId.isValid(idPhim)) {
           return res.status(400).json({ message: "ID phim không hợp lệ!" });
@@ -54,8 +54,8 @@ export const getLichChieuTheoNgay = async (req, res) => {
           id_phim: idPhim, 
           thoi_gian_chieu: { $gte: startOfDay, $lte: endOfDay } 
       })
-          .populate("id_phim", "ten_phim")
-          .populate("id_phong", "ten_phong")
+      .populate("id_phim", ["ten_phim","url_poster","thoi_luong","gioi_han_tuoi","ngay_cong_chieu"])
+      .populate("id_phong", "ten_phong")
           .sort({ thoi_gian_chieu: 1 });
 
       if (lichChieuList.length === 0) {
@@ -72,8 +72,8 @@ export const getLichChieuTheoNgay = async (req, res) => {
 // Lấy danh sách tất cả lịch chiếu của một phim theo rạp
 export const getLichChieuTheoRap = async (req, res) => {
   try {
-      //const { idPhim, idRap } = req.params;
-      const { idPhim, idRap } = req.body;
+      const { idPhim } = req.params;
+      const { idRap } = req.body;
 
       if (!mongoose.Types.ObjectId.isValid(idPhim) || !mongoose.Types.ObjectId.isValid(idRap)) {
           return res.status(400).json({ message: "ID phim hoặc ID rạp không hợp lệ!" });
@@ -83,7 +83,7 @@ export const getLichChieuTheoRap = async (req, res) => {
           id_phim: idPhim, 
           id_rap: idRap 
       })
-          .populate("id_phim", "ten_phim")
+          .populate("id_phim", ["ten_phim","url_poster","thoi_luong","gioi_han_tuoi","ngay_cong_chieu"])
           .populate("id_phong", "ten_phong")
           .populate("id_rap", "ten_rap")
           .sort({ thoi_gian_chieu: 1 });
@@ -98,6 +98,32 @@ export const getLichChieuTheoRap = async (req, res) => {
   }
 };
 
+export const getAllLichChieuTheoRap = async (req, res) => {
+  try {
+      const { idRap } = req.params;
+      //const { idRap } = req.body;
+
+      if ( !mongoose.Types.ObjectId.isValid(idRap)) {
+          return res.status(400).json({ message: " D rạp không hợp lệ!" });
+      }
+
+      const lichChieuList = await LichChieu.find({ 
+          id_rap: idRap 
+      })
+      .populate("id_phim", ["ten_phim","url_poster","thoi_luong","gioi_han_tuoi","ngay_cong_chieu"])
+      .populate("id_phong", "ten_phong")
+          .populate("id_rap", "ten_rap")
+          .sort({ thoi_gian_chieu: 1 });
+
+      if (lichChieuList.length === 0) {
+          return res.status(404).json({ message: "Không tìm thấy lịch chiếu cho phim này tại rạp đã chọn!" });
+      }
+
+      res.status(200).json({ message: "Lấy danh sách lịch chiếu thành công!", lich_chieu: lichChieuList });
+  } catch (error) {
+      res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
 
 
 export const datGhe = async (req, res) => {
