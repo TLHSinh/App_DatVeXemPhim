@@ -24,6 +24,8 @@ import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 
+//Kiểm tra huỷ vé nếu chưa thanh toán
+//import "./controllers/paymentTime.js"; // Import cron job
 
 // Load environment variables
 dotenv.config();

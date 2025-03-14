@@ -56,14 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Logo
             Image.asset(
-              'assets/images/logo2.png', // Thay bằng đường dẫn logo của bạn
-              height: 40,
+              'assets/images/logo.png', // Thay bằng đường dẫn logo của bạn
+              height: 50,
             ),
 
             // Icon người dùng
             IconButton(
-              icon: const Icon(Icons.account_circle,
-                  size: 30, color: Colors.white),
+              icon: const Icon(Icons.search, size: 30, color: Colors.black),
               onPressed: () {},
             ),
           ],
@@ -103,9 +102,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Carousel Phim Đang Chiếu
                             CarouselSlider(
                               options: CarouselOptions(
-                                height: MediaQuery.of(context).size.width * 1.3,
+                                height: MediaQuery.of(context).size.width * 1.2,
                                 autoPlay: true,
                                 enlargeCenterPage: true,
+                                viewportFraction:
+                                    0.65, // Tăng giá trị này để giảm khoảng cách giữa các slide
                               ),
                               items: nowShowingMovies.map((movie) {
                                 String fullImageUrl =
@@ -121,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(10),
                                     child: AspectRatio(
                                       aspectRatio: 2 / 3,
                                       child: Image.network(
