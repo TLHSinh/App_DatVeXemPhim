@@ -143,13 +143,15 @@ ElevatedButton(
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  var detailsTicket = DetailsTicket(
+                  var detailsTicket3 = DetailsTicket(
                   selectedSeats: widget.selectedSeats,
                   totalPrice: totalPrice,
                   selectedFoods: selectedFoods,
                   foods: foods,
                   selectedMovie: widget.selectedMovie, movieId: '',
                 );
+                  var detailsTicket2 = detailsTicket3;
+                  var detailsTicket = detailsTicket2;
                   return detailsTicket;
                 },
               ),
