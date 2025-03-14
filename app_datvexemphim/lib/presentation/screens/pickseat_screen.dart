@@ -2,7 +2,7 @@ import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/pickfandb.dart';
 import 'package:app_datvexemphim/presentation/size_config.dart';
 import 'package:flutter/material.dart';
-// Import AppSizes
+import 'package:intl/intl.dart';
 
 class PickseatScreen extends StatefulWidget {
   final Map<String, dynamic> schedule;
@@ -13,8 +13,8 @@ class PickseatScreen extends StatefulWidget {
 }
 
 class _PickseatScreenState extends State<PickseatScreen> {
-  final int rows = 8;
-  final int cols = 15;
+  final int rows = 10;
+  final int cols = 12;
   List<String> bookedSeats = [];
   List<String> selectedSeats = [];
   bool isLoading = true;
@@ -62,7 +62,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
           children: [
             Text(widget.schedule["id_rap"]?["ten_rap"] ?? "Tên rạp"),
             Text(
-              "${widget.schedule["id_phong"]?["ten_phong"]} - ${widget.schedule["ngay_gio"]}",
+              "${widget.schedule["id_phong"]?["ten_phong"]} - ${widget.schedule["thoi_gian_chieu"]}",
               style: const TextStyle(fontSize: 14),
             ),
           ],
@@ -72,17 +72,27 @@ class _PickseatScreenState extends State<PickseatScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                SizedBox(
-                    height: AppSizes.blockSizeVertical *
-                        1), // 1% chiều cao màn hình
+                SizedBox(height: AppSizes.blockSizeVertical * 1),
                 _buildScreenIndicator(),
-                SizedBox(
-                    height: AppSizes.blockSizeVertical *
-                        1), // 1% chiều cao màn hình
-                Expanded(child: _buildSeatMap()),
-                SizedBox(
-                    height: AppSizes.blockSizeVertical *
-                        1), // 1% chiều cao màn hình
+                SizedBox(height: AppSizes.blockSizeVertical * 1),
+                Expanded(
+                  child: Container(
+                    width: 100000,
+                    child: InteractiveViewer(
+                      boundaryMargin: EdgeInsets.all(20),
+                      minScale: 0.0000005,
+                      maxScale: 3.0,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: _buildSeatMap(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: AppSizes.blockSizeVertical * 1),
                 _buildSeatLegend(),
               ],
             ),
@@ -93,28 +103,30 @@ class _PickseatScreenState extends State<PickseatScreen> {
   Widget _buildScreenIndicator() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-          vertical: AppSizes.blockSizeVertical * 1), // 1% chiều cao màn hình
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        "MÀN HÌNH",
-        style: TextStyle(
-            color: Colors.black,
-            fontSize:
-                AppSizes.blockSizeHorizontal * 4, // 4% chiều rộng màn hình
-            fontWeight: FontWeight.bold),
+      padding: EdgeInsets.symmetric(vertical: AppSizes.blockSizeVertical * 1),
+      child: Column(
+        children: [
+          CustomPaint(
+            size: Size(double.infinity, 50),
+            painter: ScreenPainter(),
+          ),
+          SizedBox(height: 5),
+          Text(
+            "MÀN HÌNH",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: AppSizes.blockSizeHorizontal * 4,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSeatLegend() {
     return Padding(
-      padding: EdgeInsets.only(
-          bottom: AppSizes.blockSizeVertical * 1), // 1% chiều cao màn hình
+      padding: EdgeInsets.only(bottom: AppSizes.blockSizeVertical * 1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -130,17 +142,15 @@ class _PickseatScreenState extends State<PickseatScreen> {
     return Row(
       children: [
         Container(
-          width: AppSizes.blockSizeHorizontal * 5, // 5% chiều rộng màn hình
-          height: AppSizes.blockSizeHorizontal * 5, // 5% chiều rộng màn hình
-          color: color,
+          width: AppSizes.blockSizeHorizontal * 5,
+          height: AppSizes.blockSizeHorizontal * 5,
+          decoration: BoxDecoration(
+              color: color, borderRadius: BorderRadius.circular(4)),
         ),
-        SizedBox(
-            width: AppSizes.blockSizeHorizontal * 1), // 1% chiều rộng màn hình
+        SizedBox(width: AppSizes.blockSizeHorizontal * 1),
         Text(
           label,
-          style: TextStyle(
-              fontSize: AppSizes.blockSizeHorizontal *
-                  3.5), // 3.5% chiều rộng màn hình
+          style: TextStyle(fontSize: AppSizes.blockSizeHorizontal * 3.5),
         ),
       ],
     );
@@ -151,49 +161,42 @@ class _PickseatScreenState extends State<PickseatScreen> {
     double seatHeight = AppSizes.blockSizeHorizontal * 6;
     double seatMargin = AppSizes.blockSizeHorizontal * 1;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, // Cho phép cuộn ngang nếu bị tràn
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical, // Cho phép cuộn dọc nếu bị tràn
-        child: Column(
-          children: List.generate(rows, (row) {
-            return Row(
-              mainAxisSize: MainAxisSize.min, // Đảm bảo không làm tràn Row
-              children: List.generate(cols, (col) {
-                String seatLabel = "${String.fromCharCode(65 + row)}${col + 1}";
-                bool isBooked = bookedSeats.contains(seatLabel);
-                bool isSelected = selectedSeats.contains(seatLabel);
+    return Column(
+      children: List.generate(rows, (row) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(cols, (col) {
+            String seatLabel = "${String.fromCharCode(65 + row)}${col + 1}";
+            bool isBooked = bookedSeats.contains(seatLabel);
+            bool isSelected = selectedSeats.contains(seatLabel);
 
-                return GestureDetector(
-                  onTap:
-                      isBooked ? null : () => _toggleSeatSelection(seatLabel),
-                  child: Container(
-                    width: seatWidth,
-                    height: seatHeight,
-                    margin: EdgeInsets.all(seatMargin),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: isBooked
-                          ? Colors.red
-                          : isSelected
-                              ? Colors.green
-                              : const Color(0xffb7b7b7),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      seatLabel,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppSizes.blockSizeHorizontal * 3),
-                    ),
-                  ),
-                );
-              }),
+            return GestureDetector(
+              onTap: isBooked ? null : () => _toggleSeatSelection(seatLabel),
+              child: Container(
+                width: seatWidth,
+                height: seatHeight,
+                margin: EdgeInsets.all(seatMargin),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isBooked
+                      ? Colors.red
+                      : isSelected
+                          ? Colors.green
+                          : const Color(0xffb7b7b7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  seatLabel,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.blockSizeHorizontal * 3),
+                ),
+              ),
             );
           }),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -206,6 +209,9 @@ class _PickseatScreenState extends State<PickseatScreen> {
       }
     });
   }
+  String formatCurrency(int amount) {
+  return NumberFormat("#,###", "vi_VN").format(amount);
+}
 
   Widget _buildBottomNavBar() {
     int ticketPrice = widget.schedule["gia_ve"] ?? 0;
@@ -213,9 +219,8 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
     return Container(
       padding: EdgeInsets.symmetric(
-          horizontal:
-              AppSizes.blockSizeHorizontal * 5, // 5% chiều rộng màn hình
-          vertical: AppSizes.blockSizeVertical * 2), // 2% chiều cao màn hình
+          horizontal: AppSizes.blockSizeHorizontal * 5,
+          vertical: AppSizes.blockSizeVertical * 2),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -240,8 +245,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                 widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
                 style: TextStyle(
                     color: const Color(0xffb81d24),
-                    fontSize: AppSizes.blockSizeHorizontal *
-                        4, // 4% chiều rộng màn hình
+                    fontSize: AppSizes.blockSizeHorizontal * 4,
                     fontWeight: FontWeight.bold),
               ),
               RichText(
@@ -250,18 +254,17 @@ class _PickseatScreenState extends State<PickseatScreen> {
                     TextSpan(
                       text: "Tổng: ",
                       style: TextStyle(
-                        color: Colors.black, // Chữ "Tổng" màu đen
-                        fontSize: AppSizes.blockSizeHorizontal *
-                            4, // 4% chiều rộng màn hình
+                        color: Colors.black,
+                        fontSize: AppSizes.blockSizeHorizontal * 4,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     TextSpan(
-                      text: "${totalPrice.toStringAsFixed(0)}đ",
+                      // text: "${totalPrice.toStringAsFixed(0)}đ",
+                               text: "${formatCurrency(totalPrice)}đ", // Cập nhật
                       style: TextStyle(
-                        color: Colors.red, // Số tiền màu đỏ
-                        fontSize: AppSizes.blockSizeHorizontal *
-                            4, // 4% chiều rộng màn hình
+                        color: Colors.red,
+                        fontSize: AppSizes.blockSizeHorizontal * 4,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -270,8 +273,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
               ),
             ],
           ),
-          SizedBox(
-              height: AppSizes.blockSizeVertical * 1), // 1% chiều cao màn hình
+          SizedBox(height: AppSizes.blockSizeVertical * 1),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -279,8 +281,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                 "Số ghế đã chọn: ${selectedSeats.length}",
                 style: TextStyle(
                     color: Colors.black,
-                    fontSize: AppSizes.blockSizeHorizontal *
-                        3.5), // 3.5% chiều rộng màn hình
+                    fontSize: AppSizes.blockSizeHorizontal * 3.5),
               ),
               ElevatedButton(
                 onPressed: selectedSeats.isEmpty ? null : _bookTickets,
@@ -289,8 +290,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                 child: Text(
                   "Đặt vé",
                   style: TextStyle(
-                      fontSize: AppSizes.blockSizeHorizontal *
-                          4, // 4% chiều rộng màn hình
+                      fontSize: AppSizes.blockSizeHorizontal * 4,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
@@ -317,7 +317,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => ComboSelectionScreen(
-          // selectedSeats: selectedSeats,
           selectedSeats: List<String>.from(selectedSeatsList),
           totalPrice: totalPrice,
           selectedMovie: selectedMovie,
@@ -329,4 +328,36 @@ class _PickseatScreenState extends State<PickseatScreen> {
       selectedSeats.clear();
     });
   }
+}
+
+class ScreenPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.red // Màu viền màn hình
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    Path path = Path();
+    path.moveTo(0, size.height);
+    path.quadraticBezierTo(size.width / 2, 0, size.width, size.height);
+
+    canvas.drawPath(path, paint);
+
+    Paint fillPaint = Paint()
+      ..color = Colors.red.withOpacity(0.1) // Màu nền màn hình
+      ..style = PaintingStyle.fill;
+
+    Path fillPath = Path();
+    fillPath.moveTo(0, size.height);
+    fillPath.quadraticBezierTo(size.width / 2, 0, size.width, size.height);
+    // fillPath.lineTo(size.width, size.height * 1);
+    // fillPath.lineTo(0, size.height * 1);
+    fillPath.close();
+
+    canvas.drawPath(fillPath, fillPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

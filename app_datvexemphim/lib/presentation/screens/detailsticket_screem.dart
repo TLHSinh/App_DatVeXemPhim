@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class DetailsTicket extends StatelessWidget {
   final List<String> selectedSeats;
-  final double totalPrice;
+  final int totalPrice;
   final Map<String, int> selectedFoods;
   final List<dynamic> foods;
     final Map<String, dynamic> selectedMovie; 
