@@ -1,3 +1,4 @@
+import 'package:app_datvexemphim/presentation/screens/pickseat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
@@ -265,9 +266,16 @@ class ShowtimeGrid extends StatelessWidget {
             backgroundColor: Colors.grey[850],
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          onPressed: () {
-            // TODO: Chuyển sang chọn ghế
-          },
+onPressed: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => PickseatScreen(
+        schedule: showtimes[index], // Truyền dữ liệu lịch chiếu
+      ),
+    ),
+  );
+},
           child: Text(formattedTime, style: TextStyle(color: Colors.white, fontSize: 16)),
         );
       },

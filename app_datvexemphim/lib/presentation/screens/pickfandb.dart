@@ -1,6 +1,7 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/detailsticket_screem.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
@@ -48,12 +49,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
       appBar: AppBar(title: const Text("Chọn Bắp Nước")),
       body: Column(
         children: [
-          // _buildSeatInfo(),
-          // Text("Phim: ${widget.selectedMovie["ten_phim"]}"),
-          // Text("Thời lượng: ${widget.selectedMovie["thoi_luong"]} phút"),
-          // Text("Giờ chiếu: ${widget.selectedMovie["gio_chieu"]}"),
-          // Text("Ghế đã chọn: ${widget.selectedSeats.join(", ")}"),
-          // Text("Tổng tiền: ${widget.totalPrice}đ"),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -84,9 +79,15 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
       ),
     );
   }
+
+
+  String formatCurrency(int amount) {
+  return NumberFormat("#,###", "vi_VN").format(amount);
+}
+
 /// 🍿 Hiển thị danh sách bắp nước đã chọn trong BottomNavBar
 Widget _buildBottomNavBar() {
-  double totalPrice = _calculateTotalPrice();
+  int totalPrice = _calculateTotalPrice();
 
   return Container(
     padding: const EdgeInsets.all(16),
@@ -132,7 +133,7 @@ Widget _buildBottomNavBar() {
         const SizedBox(height: 10),
         // Hiển thị tổng tiền và nút thanh toán
         Text(
-          "Tổng tiền: ${totalPrice.toStringAsFixed(0)}đ",
+          "Tổng tiền: ${formatCurrency(totalPrice)}đ",
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
@@ -215,17 +216,26 @@ Widget _buildSelectedFoodItem(Map<String, dynamic> food, int quantity) {
 }
 
   /// 🎟 Tính tổng tiền bao gồm giá vé và bắp nước
-  double _calculateTotalPrice() {
-    double total = widget.totalPrice.toDouble();
-    selectedFoods.forEach((foodId, quantity) {
-      var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
-      if (food.isNotEmpty) {
-        total += food["gia"] * quantity;
-      }
-    });
-    return total;
-  }
-
+  // int _calculateTotalPrice() {
+  //   int total = widget.totalPrice.toInt();
+  //   selectedFoods.forEach((foodId, quantity) {
+  //     var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
+  //     if (food.isNotEmpty) {
+  //       total += food["gia"] * quantity;
+  //     }
+  //   });
+  //   return total;
+  // }
+int _calculateTotalPrice() {
+  int total = widget.totalPrice;
+  selectedFoods.forEach((foodId, quantity) {
+    var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
+    if (food.isNotEmpty) {
+      total += ((food["gia"] as num?)?.toInt() ?? 0) * quantity;
+    }
+  });
+  return total;
+}
   /// 🍔 Tạo danh sách bắp nước có thể chọn
   Widget _buildFoodCard(Map<String, dynamic> food) {
     String foodId = food["_id"];
