@@ -101,7 +101,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
           style: const TextStyle(
               color: Color(0xFF545454), fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color.fromARGB(255, 252, 234, 255),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -180,7 +180,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC20077),
+                backgroundColor: Color(0xFFEE0033),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
