@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/storage_service.dart'; // File quản lý lưu trữ
 
 class LoginScreen extends StatefulWidget {

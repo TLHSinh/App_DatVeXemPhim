@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../../data/services/storage_service.dart';
-import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:app_datvexemphim/data/services/storage_service.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DetailprofileScreen extends StatefulWidget {
   const DetailprofileScreen({super.key});
@@ -15,6 +20,9 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   String? userId;
   Map<String, dynamic>? userData;
   bool isLoading = true;
+  File? _image;
+  final picker = ImagePicker();
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -32,12 +40,10 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   Future<void> _checkLoginStatus() async {
     token = await StorageService.getToken();
     userId = await StorageService.getUserId();
-
     if (token == null || userId == null) {
       setState(() => isLoading = false);
       return;
     }
-
     _fetchUserData();
   }
 
@@ -47,7 +53,6 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
         "http://localhost:5000/api/v1/user/$userId",
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
-
       if (response.statusCode == 200 && response.data['success'] == true) {
         setState(() {
           userData = response.data['data'];
@@ -67,7 +72,7 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
     }
   }
 
-  Future<void> _updateUserData() async {
+  Future<void> _updateUserData(String? imageUrl) async {
     try {
       final response = await Dio().put(
         "http://localhost:5000/api/v1/user/$userId",
@@ -78,6 +83,7 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
           "cccd": _cccdController.text,
           "gioiTinh": _genderController.text,
           "diaChi": _addressController.text,
+          if (imageUrl != null) "hinhAnh": imageUrl, // Cập nhật URL ảnh
         },
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
@@ -88,6 +94,100 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
       }
     } catch (e) {
       print("Lỗi cập nhật dữ liệu: $e");
+    }
+  }
+//dùng cho máy  máy thật chọn file từ đt
+  // Future<void> _pickImage() async {
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path);
+  //     });
+  //     print("Ảnh đã chọn: ${_image!.path}");
+  //   } else {
+  //     print("Người dùng chưa chọn ảnh.");
+  //   }
+  // }
+
+//dùng cho web chọn ảnh từ thư mục
+
+  File? _imageFile; // Dùng cho mobile
+  Uint8List? _imageBytes; // Dùng cho web
+
+  Future<void> _pickImage() async {
+    if (kIsWeb) {
+      // Trên Web: Dùng file_picker
+      FilePickerResult? result =
+          await FilePicker.platform.pickFiles(type: FileType.image);
+      if (result != null) {
+        setState(() {
+          _imageBytes = result.files.first.bytes;
+        });
+        print("Ảnh đã chọn (Web): ${result.files.first.name}");
+      } else {
+        print("Người dùng chưa chọn ảnh.");
+      }
+    } else {
+      // Trên Mobile: Dùng image_picker
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+        print("Ảnh đã chọn (Mobile): ${pickedFile.path}");
+      } else {
+        print("Người dùng chưa chọn ảnh.");
+      }
+    }
+  }
+
+//dùng cho máy  máy thật chọn file từ đt
+  // Future<String?> _uploadImageToFirebase(File imageFile) async {
+  //   try {
+  //     String fileName = "user_$userId.jpg";
+  //     Reference storageRef =
+  //         FirebaseStorage.instance.ref().child('users/$fileName');
+
+  //     UploadTask uploadTask = storageRef.putFile(imageFile);
+  //     TaskSnapshot snapshot = await uploadTask;
+
+  //     String downloadUrl = await snapshot.ref.getDownloadURL();
+  //     print("Upload thành công! URL: $downloadUrl");
+  //     return downloadUrl;
+  //   } catch (e) {
+  //     print("Lỗi upload ảnh lên Firebase: $e");
+  //     return null;
+  //   }
+  // }
+
+//dùng cho web chọn ảnh từ thư mục
+
+  Future<String?> _uploadImageToFirebase() async {
+    try {
+      String fileName = "user_$userId.jpg";
+      Reference storageRef =
+          FirebaseStorage.instance.ref().child('users/$fileName');
+      UploadTask uploadTask;
+
+      if (kIsWeb && _imageBytes != null) {
+        // Web: Upload bằng bytes
+        uploadTask = storageRef.putData(_imageBytes!);
+      } else if (!kIsWeb && _imageFile != null) {
+        // Mobile: Upload bằng file
+        uploadTask = storageRef.putFile(_imageFile!);
+      } else {
+        print("Không có ảnh nào để upload.");
+        return null;
+      }
+
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+      print("Upload thành công! URL: $downloadUrl");
+      return downloadUrl;
+    } catch (e) {
+      print("Lỗi upload ảnh lên Firebase: $e");
+      return null;
     }
   }
 
@@ -108,9 +208,26 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(userData?["hinhAnh"] ?? ""),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: _image != null
+                      ? FileImage(_image!)
+                      : (userData?["hinhAnh"] != null
+                              ? NetworkImage(userData!["hinhAnh"])
+                              : const AssetImage("assets/default_avatar.png"))
+                          as ImageProvider,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.camera_alt, color: Colors.blue),
+                    onPressed: _pickImage,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
@@ -122,9 +239,37 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
           _buildTextField("Giới tính", _genderController),
           _buildTextField("Địa chỉ", _addressController),
           const SizedBox(height: 30),
+
+          //dùng cho máy  máy thật chọn file từ đt
+          // Center(
+          //   child: ElevatedButton(
+          //     onPressed: () async {
+          //       String? imageUrl;
+          //       if (_image != null) {
+          //         imageUrl = await _uploadImageToFirebase(_image!);
+          //       }
+
+          //       if (imageUrl != null || userData?["hinhAnh"] != null) {
+          //         await _updateUserData(imageUrl ?? userData!["hinhAnh"]);
+          //       } else {
+          //         print("Không có ảnh nào để cập nhật.");
+          //       }
+          //     },
+          //     child: const Text("Lưu thông tin"),
+          //   ),
+          // ),
+
+//dùng cho web chọn ảnh từ thư mục
           Center(
             child: ElevatedButton(
-              onPressed: _updateUserData,
+              onPressed: () async {
+                String? imageUrl = await _uploadImageToFirebase();
+                if (imageUrl != null || userData?["hinhAnh"] != null) {
+                  await _updateUserData(imageUrl ?? userData!["hinhAnh"]);
+                } else {
+                  print("Không có ảnh nào để cập nhật.");
+                }
+              },
               child: const Text("Lưu thông tin"),
             ),
           ),
