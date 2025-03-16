@@ -72,7 +72,7 @@ export const getSingleUser = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const user = await NguoiDung.findById(id).select("-matKhau");
+        const user = await NguoiDung.findById(id);
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });

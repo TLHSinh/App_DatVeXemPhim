@@ -7,10 +7,17 @@ import 'package:app_datvexemphim/presentation/screens/loading_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/login_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/register_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
+
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await initializeDateFormatting('vi_VN', null);
   runApp(MyApp());
 }
@@ -42,6 +49,10 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/home',
         builder: (context, state) => FinalView(),
+      ),
+      GoRoute(
+        path: '/detailProfile',
+        builder: (context, state) => DetailprofileScreen(),
       ),
     ],
   );

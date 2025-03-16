@@ -3,6 +3,9 @@ allprojects {
         google()
         mavenCentral()
     }
+     dependencies {
+        classpath 'com.google.gms:google-services:4.3.15'  // Thêm phiên bản đúng của plugin
+    }
 }
 
 rootProject.buildDir = "../build"

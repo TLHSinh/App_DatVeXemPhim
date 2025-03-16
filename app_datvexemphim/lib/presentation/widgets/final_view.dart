@@ -22,7 +22,8 @@ class _FinalViewState extends State<FinalView> {
     HomeScreen(),
     const LocationScreen(),
     const TicketScreen(),
-    const GiftScreen(),
+    AccountScreen(),
+    //const GiftScreen(),
     ProfileScreen()
   ];
 
