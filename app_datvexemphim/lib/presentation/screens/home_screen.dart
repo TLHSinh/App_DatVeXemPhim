@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 autoPlay: true,
                                 enlargeCenterPage: true,
                                 viewportFraction:
-                                    0.65, // Tăng giá trị này để giảm khoảng cách giữa các slide
+                                    0.75, // Tăng giá trị này để giảm khoảng cách giữa các slide
                               ),
                               items: nowShowingMovies.map((movie) {
                                 String fullImageUrl =

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/services/storage_service.dart'; // File quản lý lưu trữ
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,6 +41,14 @@ class LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         print("✅ Đăng nhập thành công!");
+
+        String token = response.data['token'];
+        String userId = response.data['data']['_id'];
+
+        // Lưu vào SharedPreferences
+        await StorageService.saveUserData(token, userId);
+
+        // Chuyển hướng đến màn hình chính
         GoRouter.of(context).go('/home');
       } else {
         setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
@@ -147,7 +157,8 @@ class LoginScreenState extends State<LoginScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         'Đăng nhập',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
             ),
@@ -156,8 +167,7 @@ class LoginScreenState extends State<LoginScreen> {
               onTap: () => GoRouter.of(context).go('/register'),
               child: const Text(
                 "Chưa có tài khoản? Đăng ký ngay",
-                style: TextStyle(
-                    color: Colors.black, fontSize: 16),
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
           ],
