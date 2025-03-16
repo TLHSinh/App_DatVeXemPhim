@@ -1,0 +1,230 @@
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+
+class PickSeatScreen extends StatefulWidget {
+  final String cinemaName;
+  final String roomId;
+  final String roomName;
+  final String dateTime;
+  final String movieTitle;
+  final double ticketPrice;
+
+  const PickSeatScreen({
+    super.key,
+    required this.cinemaName,
+    required this.roomId,
+    required this.roomName,
+    required this.dateTime,
+    required this.movieTitle,
+    required this.ticketPrice,
+  });
+
+  @override
+  _PickSeatScreenState createState() => _PickSeatScreenState();
+}
+
+class _PickSeatScreenState extends State<PickSeatScreen> {
+  final Dio _dio = Dio();
+  final int rows = 8;
+  final int cols = 15;
+  List<String> bookedSeats = []; // Ghế đã đặt từ API
+  List<String> selectedSeats = []; // Ghế đang chọn
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookedSeats(); // Lấy danh sách ghế đã đặt từ API
+  }
+
+  /// **📌 Lấy danh sách ghế đã đặt từ API**
+  Future<void> _fetchBookedSeats() async {
+    try {
+      final response = await _dio.get('https://api.example.com/seats?roomId=${widget.roomId}');
+      setState(() {
+        bookedSeats = List<String>.from(response.data['bookedSeats']);
+        isLoading = false;
+      });
+    } catch (error) {
+      print("Lỗi khi lấy danh sách ghế: $error");
+      setState(() => isLoading = false);
+    }
+  }
+
+  /// **📌 Đặt vé: Gửi danh sách ghế đã chọn lên API**
+  Future<void> _bookTickets() async {
+    if (selectedSeats.isEmpty) return;
+    try {
+      final response = await _dio.post(
+        'https://api.example.com/bookings',
+        data: {
+          "roomId": widget.roomId,
+          "seats": selectedSeats,
+        },
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Đặt vé thành công: ${selectedSeats.join(", ")}")),
+        );
+        setState(() {
+          bookedSeats.addAll(selectedSeats);
+          selectedSeats.clear();
+        });
+      }
+    } catch (error) {
+      print("Lỗi khi đặt vé: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đặt vé thất bại!")),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.cinemaName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('${widget.roomName} - ${widget.dateTime}', style: const TextStyle(fontSize: 14)),
+          ],
+        ),
+        backgroundColor: Colors.black,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildSeatLegend(),
+                const SizedBox(height: 10),
+                _buildSeatMap(),
+              ],
+            ),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  /// **📌 Chú thích tình trạng ghế**
+  Widget _buildSeatLegend() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildLegendItem(Colors.green, "Ghế trống"),
+          _buildLegendItem(Colors.grey, "Ghế đã đặt"),
+          _buildLegendItem(Colors.orange, "Ghế đang chọn"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
+      children: [
+        Container(width: 20, height: 20, color: color),
+        const SizedBox(width: 5),
+        Text(label),
+      ],
+    );
+  }
+
+  /// **📌 Sơ đồ chỗ ngồi**
+  Widget _buildSeatMap() {
+    return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 15,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+          childAspectRatio: 1,
+        ),
+        itemCount: rows * cols,
+        itemBuilder: (context, index) {
+          int row = index ~/ cols;
+          int col = index % cols;
+          String seatLabel = '${String.fromCharCode(65 + row)}${col + 1}';
+
+          bool isBooked = bookedSeats.contains(seatLabel);
+          bool isSelected = selectedSeats.contains(seatLabel);
+
+          return GestureDetector(
+            onTap: isBooked ? null : () => _toggleSeatSelection(seatLabel),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isBooked
+                    ? Colors.grey
+                    : isSelected
+                        ? Colors.orange
+                        : Colors.green,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                seatLabel,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// **📌 Chọn/bỏ chọn ghế**
+  void _toggleSeatSelection(String seatLabel) {
+    setState(() {
+      if (selectedSeats.contains(seatLabel)) {
+        selectedSeats.remove(seatLabel);
+      } else {
+        selectedSeats.add(seatLabel);
+      }
+    });
+  }
+
+  /// **📌 Bottom Navigation Bar**
+  Widget _buildBottomNavBar() {
+    double totalPrice = selectedSeats.length * widget.ticketPrice;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(widget.movieTitle, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                "Tổng: ${totalPrice.toStringAsFixed(0)}đ",
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Ghế đã chọn: ${selectedSeats.join(", ")}", style: const TextStyle(color: Colors.white, fontSize: 14)),
+              ElevatedButton(
+                onPressed: selectedSeats.isEmpty ? null : _bookTickets,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text("Đặt vé", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

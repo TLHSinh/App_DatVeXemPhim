@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   LoginScreenState createState() => LoginScreenState();
 }
@@ -10,9 +12,8 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _emailFocus = FocusNode();
-  final FocusNode _passwordFocus = FocusNode();
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _errorMessage;
 
   Future<void> _login() async {
@@ -26,7 +27,7 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiService.post("/login", {
+      final response = await ApiService.post("/auth/login", {
         "email": _emailController.text.trim(),
         "matKhau": _passwordController.text.trim(),
       });
@@ -43,123 +44,123 @@ class LoginScreenState extends State<LoginScreen> {
         setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
       }
     } catch (e) {
-      print("❌ Lỗi đăng nhập: $e");
       setState(() => _errorMessage = "⚠️ Lỗi đăng nhập, thử lại!");
     }
 
     setState(() => _isLoading = false);
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF1E1E1E),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Image.asset('assets/images/logofull.png', width: 600),
-              ),
-              SizedBox(height: 40),
-              const Text(
-                'Đăng nhập',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              const SizedBox(height: 20),
-              _buildTextField(_emailController, "Email",
-                  focusNode: _emailFocus, nextFocus: _passwordFocus),
-              const SizedBox(height: 15),
-              _buildTextField(_passwordController, "Mật khẩu",
-                  isPassword: true,
-                  focusNode: _passwordFocus,
-                  submitAction: _login),
-              const SizedBox(height: 10),
-              _errorMessage != null
-                  ? Text(_errorMessage!,
-                      style: const TextStyle(color: Colors.red, fontSize: 14))
-                  : const SizedBox.shrink(),
-              const SizedBox(height: 25),
-              _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: Colors.white))
-                  : SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: const Text(
-                          'Đăng nhập',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-              const SizedBox(height: 20),
-              Center(
-                child: GestureDetector(
-                  onTap: () => GoRouter.of(context).go('/register'),
-                  child: const Text(
-                    "Chưa có tài khoản? Đăng ký ngay",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+  Widget _buildTextField(
+      TextEditingController controller, String hint, IconData icon,
+      {bool isPassword = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword ? _obscurePassword : false,
+      style: const TextStyle(color: Colors.black),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        labelText: hint,
+        labelStyle: const TextStyle(color: Color(0xFF545454)),
+        prefixIcon: Icon(icon, color: Color(0xFFC20077)),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: Color(0xFFC20077),
                 ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
               )
-            ],
-          ),
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFC20077)),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint,
-      {bool isPassword = false,
-      FocusNode? focusNode,
-      FocusNode? nextFocus,
-      Function? submitAction}) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      focusNode: focusNode,
-      style: const TextStyle(color: Colors.white),
-      textInputAction:
-          nextFocus != null ? TextInputAction.next : TextInputAction.done,
-      onSubmitted: (value) {
-        if (nextFocus != null) {
-          FocusScope.of(context).requestFocus(nextFocus);
-        } else {
-          submitAction?.call();
-        }
-      },
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[900],
-        labelText: hint,
-        labelStyle: const TextStyle(color: Colors.white70),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child:
+                        Image.asset('assets/images/logofull2.png', width: 500),
+                  ),
+                  const SizedBox(height: 40),
+                  const Text(
+                    'Đăng nhập',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(_emailController, "Email", Icons.email),
+                  const SizedBox(height: 15),
+                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock,
+                      isPassword: true),
+                  const SizedBox(height: 10),
+                  _errorMessage != null
+                      ? Text(_errorMessage!,
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 14))
+                      : const SizedBox.shrink(),
+                  const SizedBox(height: 25),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      bottomNavigationBar: Container(
+        color: const Color.fromARGB(255, 255, 243, 243),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _login,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Đăng nhập',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () => GoRouter.of(context).go('/register'),
+              child: const Text(
+                "Chưa có tài khoản? Đăng ký ngay",
+                style: TextStyle(
+                    color: Colors.black, fontSize: 16),
+              ),
+            ),
+          ],
         ),
       ),
     );
