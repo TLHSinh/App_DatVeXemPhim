@@ -1,7 +1,12 @@
+import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
+import '../presentation/screens/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -35,19 +40,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchUserData() async {
+    setState(() => isLoading = true);
     try {
-      final response = await Dio().get(
-        "http://localhost:5000/api/v1/user/$userId",
-        options: Options(headers: {"Authorization": "Bearer $token"}),
-      );
+      final response = await ApiService.get("/user/$userId");
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
+      if (response?.statusCode == 200 && response?.data['success'] == true) {
         setState(() {
-          userData = response.data['data'];
+          userData = response?.data['data'];
         });
       }
     } catch (e) {
-      print("Lỗi lấy dữ liệu: $e");
+      print("❌ Lỗi lấy dữ liệu: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -153,7 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildInfoButton('Thông tin', Icons.edit, () {
-                  context.push('/detailProfile');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DetailprofileScreen()),
+                  );
                 }),
                 Container(height: 40, width: 1, color: Colors.grey),
                 _buildInfoButton('Giao dịch', Icons.history, () {}),
@@ -211,9 +218,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
-              await StorageService.clearUserData();
-              if (mounted) {
-                context.go('/login'); // Điều hướng đến trang Home
+              bool? shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text("Xác nhận đăng xuất"),
+                  content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text("Hủy"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text("Đăng xuất"),
+                    ),
+                  ],
+                ),
+              );
+
+              // Nếu người dùng xác nhận đăng xuất
+              if (shouldLogout == true) {
+                // Xóa dữ liệu người dùng
+                await StorageService.clearUserData();
+
+                if (mounted) {
+                  // Điều hướng về màn hình Onboarding sau khi đăng xuất
+                  if (mounted) {
+                    context.go('/onboarding'); // Điều hướng về trang Onboarding
+                  }
+                }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

@@ -5,6 +5,7 @@ import '../presentation/screens/onboarding_screen.dart';
 import '../presentation/screens/login_screen.dart';
 import '../presentation/screens/register_screen.dart';
 import '../presentation/screens/home_screen.dart';
+import '../presentation/screens/account_screen.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -18,6 +19,7 @@ class AppRoutes {
       GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
+      GoRoute(path: '/profile', builder: (context, state) => ProfileScreen()),
     ],
   );
 }

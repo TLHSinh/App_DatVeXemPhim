@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:app_datvexemphim/data/services/storage_service.dart';
 
 class ApiService {
   static final Dio _dio = Dio(
@@ -26,10 +27,33 @@ class ApiService {
   static Future<Response?> get(String endpoint,
       {Map<String, dynamic>? params}) async {
     try {
-      Response response = await _dio.get(endpoint, queryParameters: params);
+      String? token =
+          await StorageService.getToken(); // Lấy token từ StorageService
+      Response response = await _dio.get(
+        endpoint,
+        queryParameters: params,
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
       return response;
     } catch (e) {
-      print("❌ API GET Error: $e");
+      print("❌ API GET Error ($endpoint): $e");
+      return null;
+    }
+  }
+
+  static Future<Response?> put(
+      String endpoint, Map<String, dynamic> data) async {
+    try {
+      String? token =
+          await StorageService.getToken(); // Lấy token từ StorageService
+      Response response = await _dio.put(
+        endpoint,
+        data: data,
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+      return response;
+    } catch (e) {
+      print("❌ API PUT Error ($endpoint): $e");
       return null;
     }
   }
