@@ -33,6 +33,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff9f9f9),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -59,7 +60,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               Expanded(
                 flex: 2, // Hiệu ứng loading ở giữa
                 child: SpinKitFadingCircle(
-                  color: Color(0xFF545454),
+                  color: Color(0xFFEE0033),
                   size: 70.0, // Tăng kích thước loading spinner
                 ),
               ),

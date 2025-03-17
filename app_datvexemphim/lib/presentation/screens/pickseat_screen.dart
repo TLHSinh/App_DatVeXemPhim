@@ -311,7 +311,9 @@ class _PickseatScreenState extends State<PickseatScreen> {
     Map<String, dynamic> selectedMovie = {
       "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
       "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-      "gio_chieu": widget.schedule["ngay_gio"] ?? "Không rõ",
+      "thoi_gian_chieu": widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+      "url_poster": widget.schedule["id_phim"]?["url_poster"],
+      "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
     };
     Navigator.push(
       context,

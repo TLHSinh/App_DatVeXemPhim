@@ -6,10 +6,12 @@ import 'package:app_datvexemphim/api/api_service.dart';
 class PickCinemaAndTimeScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
 
-  const PickCinemaAndTimeScreen({Key? key, required this.movie}) : super(key: key);
+  const PickCinemaAndTimeScreen({Key? key, required this.movie})
+      : super(key: key);
 
   @override
-  _PickCinemaAndTimeScreenState createState() => _PickCinemaAndTimeScreenState();
+  _PickCinemaAndTimeScreenState createState() =>
+      _PickCinemaAndTimeScreenState();
 }
 
 class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
@@ -26,7 +28,8 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
 
   Future<void> fetchShowtimes() async {
     try {
-      final response = await ApiService.get("/book/lich-chieu/${widget.movie['_id']}");
+      final response =
+          await ApiService.get("/book/lich-chieu/${widget.movie['_id']}");
       if (response?.statusCode == 200) {
         parseShowtimes(response?.data);
       }
@@ -65,7 +68,8 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.movie['ten_phim'] ?? "Chọn Giờ Chiếu",
-            style: TextStyle(color: Color(0xFF545454), fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                color: Color(0xFF545454), fontWeight: FontWeight.bold)),
         backgroundColor: const Color.fromARGB(255, 252, 234, 255),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
@@ -85,7 +89,9 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
             isLoading
                 ? Center(child: CircularProgressIndicator())
                 : showtimes.isEmpty
-                    ? Center(child: Text("Không có lịch chiếu", style: TextStyle(color: Colors.black54)))
+                    ? Center(
+                        child: Text("Không có lịch chiếu",
+                            style: TextStyle(color: Colors.black54)))
                     : Expanded(
                         child: ShowtimeList(
                           showtimes: showtimes,
@@ -116,7 +122,7 @@ class DatePickerHorizontal extends StatelessWidget {
 
   String getDayOfWeek(String date) {
     DateTime today = DateTime.now();
-    
+
     // Thêm năm hiện tại vào ngày/tháng để tránh lỗi parse sai
     DateTime dateTime = DateFormat('dd/MM/yyyy').parse("$date/${today.year}");
 
@@ -145,8 +151,14 @@ class DatePickerHorizontal extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected ? Colors.blue : Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: isSelected ? Colors.blue : Colors.black12),
-                boxShadow: isSelected ? [BoxShadow(color: Colors.blue.withOpacity(0.2), blurRadius: 5)] : [],
+                border: Border.all(
+                    color: isSelected ? Colors.blue : Colors.black12),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                            color: Colors.blue.withOpacity(0.2), blurRadius: 5)
+                      ]
+                    : [],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -174,14 +186,10 @@ class DatePickerHorizontal extends StatelessWidget {
             ),
           );
         }).toList(),
-        
       ),
     );
   }
-  
 }
-
-
 
 // ------------------------------------
 // Widget danh sách lịch chiếu theo rạp
@@ -190,7 +198,9 @@ class ShowtimeList extends StatelessWidget {
   final List<dynamic> showtimes;
   final String? selectedDate;
 
-  const ShowtimeList({Key? key, required this.showtimes, required this.selectedDate}) : super(key: key);
+  const ShowtimeList(
+      {Key? key, required this.showtimes, required this.selectedDate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -202,23 +212,37 @@ class ShowtimeList extends StatelessWidget {
       String? showtimeDate = _formatDate(s['thoi_gian_chieu']);
 
       if (selectedDate == showtimeDate) {
-        groupedShowtimes.putIfAbsent(cinema, () => {}).putIfAbsent(format, () => []).add(s);
+        groupedShowtimes
+            .putIfAbsent(cinema, () => {})
+            .putIfAbsent(format, () => [])
+            .add(s);
       }
     }
 
     return groupedShowtimes.isEmpty
-        ? Center(child: Text("Không có lịch chiếu", style: TextStyle(color: Color(0xFF545454), fontWeight: FontWeight.bold)))
+        ? Center(
+            child: Text("Không có lịch chiếu",
+                style: TextStyle(
+                    color: Color(0xFF545454), fontWeight: FontWeight.bold)))
         : ListView(
             children: groupedShowtimes.entries.map((entry) {
               return ExpansionTile(
-                title: Text(entry.key, style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+                title: Text(entry.key,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
                 children: entry.value.entries.map((formatEntry) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(formatEntry.key, style: TextStyle(color: Color(0xFF545454), fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(formatEntry.key,
+                            style: TextStyle(
+                                color: Color(0xFF545454),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold)),
                         SizedBox(height: 8),
                         ShowtimeGrid(showtimes: formatEntry.value),
                       ],
@@ -264,25 +288,29 @@ class ShowtimeGrid extends StatelessWidget {
         return ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[850],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
-onPressed: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => PickseatScreen(
-        schedule: showtimes[index], // Truyền dữ liệu lịch chiếu
-      ),
-    ),
-  );
-},
-          child: Text(formattedTime, style: TextStyle(color: Colors.white, fontSize: 16)),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PickseatScreen(
+                  schedule: showtimes[index], // Truyền dữ liệu lịch chiếu
+                ),
+              ),
+            );
+          },
+          child: Text(formattedTime,
+              style: TextStyle(color: Colors.white, fontSize: 16)),
         );
       },
     );
   }
 
   String _formatTime(String? time) {
-    return time?.isNotEmpty ?? false ? DateFormat('HH:mm').format(DateTime.parse(time!)) : "??:??";
+    return time?.isNotEmpty ?? false
+        ? DateFormat('HH:mm').format(DateTime.parse(time!))
+        : "??:??";
   }
 }

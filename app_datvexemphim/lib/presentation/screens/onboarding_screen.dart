@@ -50,13 +50,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: const Color(0xfff9f9f9), // AppBar màu trắng
         elevation: 0,
         title: Text(
           "ATSH CGV.",
           style: TextStyle(
-            color: const Color.fromARGB(255, 255, 0, 0), // Màu đỏ #c20077
+            color: Colors.red, // Màu đỏ
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -65,12 +66,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: TextButton(
+            child: ElevatedButton(
               onPressed: () => context.go('/login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[300], // Màu xám nhẹ
+                foregroundColor: Colors.black, // Màu chữ đen
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Bo góc nhẹ
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
               child: Text(
                 'Đăng nhập',
                 style: TextStyle(
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -120,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _pageController,
             count: onboardingData.length,
             effect: ExpandingDotsEffect(
-              activeDotColor: Color(0xFFC20077), // Màu #c20077
+              activeDotColor: Color(0xFFEE0033), // Màu #c20077
               dotHeight: 8,
               dotWidth: 8,
             ),
@@ -141,7 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ElevatedButton(
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFC20077), // Màu nền #c20077
+                    backgroundColor: Color(0xFFEE0033), // Màu nền #c20077
                     foregroundColor: Colors.white, // Màu chữ trắng
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30), // Bo tròn góc

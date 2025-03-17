@@ -144,11 +144,13 @@ ElevatedButton(
               context,
               MaterialPageRoute(
                 builder: (context) => DetailsTicket(
-                  selectedSeats: widget.selectedSeats,
-                  totalPrice: totalPrice,
-                  selectedFoods: selectedFoods,
-                  foods: foods,
-                  selectedMovie: widget.selectedMovie,
+                     selectedSeats: widget.selectedSeats,
+                      totalPrice: totalPrice,
+                      selectedFoods: selectedFoods,
+                      foods: foods,
+                      selectedMovie: widget.selectedMovie,
+                      movieId: widget.selectedMovie["_id"] ?? "", // Thêm ID phim nếu cần
+                      selectedShowtime: widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có", 
                 ),
               ),
             );

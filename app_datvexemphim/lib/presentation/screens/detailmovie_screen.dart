@@ -190,7 +190,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               ),
               child: const Text("Đặt Vé",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
             ),
