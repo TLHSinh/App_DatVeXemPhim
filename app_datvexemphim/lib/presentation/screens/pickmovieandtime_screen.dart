@@ -1,10 +1,8 @@
 import 'package:app_datvexemphim/presentation/screens/pickseat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 class PickMovieAndTimeScreen extends StatefulWidget {
   final Map<String, dynamic> cinema;
@@ -166,7 +164,8 @@ class MovieScheduleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String movieTitle = movie["id_phim"]?["ten_phim"] ?? "Không có tên";
     String imageBaseUrl = "https://rapchieuphim.com";
-    String fullImageUrl = imageBaseUrl + (movie["id_phim"]?["url_poster"] ?? "");
+    String fullImageUrl =
+        imageBaseUrl + (movie["id_phim"]?["url_poster"] ?? "");
     String scheduleTime = movie["thoi_gian_chieu"] ?? "Không có giờ";
 
     return Card(
@@ -197,16 +196,16 @@ class MovieScheduleCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-                              Text(
-                  movieTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                movieTitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
           Padding(

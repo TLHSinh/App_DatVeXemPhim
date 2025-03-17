@@ -4,15 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/splash_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/loading_screen.dart';
-import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/login_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/register_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
+
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+
   await initializeDateFormatting('vi_VN', null);
-  runApp(MyApp());
+
+  // Chờ Firebase khởi tạo trước khi chạy ứng dụng
+  {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  runApp(MyApp()); // Chạy app sau khi Firebase đã được khởi tạo
 }
 
 class MyApp extends StatelessWidget {
@@ -42,6 +54,10 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/home',
         builder: (context, state) => FinalView(),
+      ),
+      GoRoute(
+        path: '/detailProfile',
+        builder: (context, state) => DetailprofileScreen(),
       ),
     ],
   );
