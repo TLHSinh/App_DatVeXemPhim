@@ -5,8 +5,8 @@ class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
       baseUrl: //"http://localhost:5000/api/v1",
-          "http://10.21.14.252:5000/api/v1",
-      // "http://192.168.1.11:5000/api/v1",
+          // "http://10.21.14.252:5000/api/v1",
+      "http://192.168.1.6:5000/api/v1",
 
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),

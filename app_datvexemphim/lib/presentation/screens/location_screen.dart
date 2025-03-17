@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  const LocationScreen({super.key});
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -129,7 +129,7 @@ class _LocationScreenState extends State<LocationScreen> {
 class CinemaCard extends StatelessWidget {
   final Map<String, dynamic> cinema;
 
-  const CinemaCard({Key? key, required this.cinema}) : super(key: key);
+  const CinemaCard({super.key, required this.cinema});
 
   @override
   Widget build(BuildContext context) {

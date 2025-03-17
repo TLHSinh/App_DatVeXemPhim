@@ -132,10 +132,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Text('Star', style: TextStyle(color: Colors.orange)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.card_giftcard, color: Colors.orange, size: 18),
-              const SizedBox(width: 5),
-              const Text('0 Stars', style: TextStyle(color: Colors.grey)),
+            children: const [
+              Icon(Icons.card_giftcard, color: Colors.orange, size: 18),
+              SizedBox(width: 5),
+              Text('0 Stars', style: TextStyle(color: Colors.grey)),
             ],
           ),
           const SizedBox(height: 10),

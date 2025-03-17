@@ -76,7 +76,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                 _buildScreenIndicator(),
                 SizedBox(height: AppSizes.blockSizeVertical * 1),
                 Expanded(
-                  child: Container(
+                  child: SizedBox(
                     width: 100000,
                     child: InteractiveViewer(
                       boundaryMargin: EdgeInsets.all(20),
@@ -209,9 +209,10 @@ class _PickseatScreenState extends State<PickseatScreen> {
       }
     });
   }
+
   String formatCurrency(int amount) {
-  return NumberFormat("#,###", "vi_VN").format(amount);
-}
+    return NumberFormat("#,###", "vi_VN").format(amount);
+  }
 
   Widget _buildBottomNavBar() {
     int ticketPrice = widget.schedule["gia_ve"] ?? 0;
@@ -261,7 +262,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                     ),
                     TextSpan(
                       // text: "${totalPrice.toStringAsFixed(0)}đ",
-                               text: "${formatCurrency(totalPrice)}đ", // Cập nhật
+                      text: "${formatCurrency(totalPrice)}đ", // Cập nhật
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: AppSizes.blockSizeHorizontal * 4,

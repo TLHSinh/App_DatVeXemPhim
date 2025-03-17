@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AccountScreen extends StatelessWidget {
+  const AccountScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +28,7 @@ class AccountScreen extends StatelessWidget {
             Text('Star', style: TextStyle(color: Colors.orange)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Icon(Icons.card_giftcard, color: Colors.orange, size: 18),
                 SizedBox(width: 5),
                 Text('0 Stars', style: TextStyle(color: Colors.grey)),
@@ -66,7 +68,7 @@ class AccountScreen extends StatelessWidget {
                   LinearProgressIndicator(value: 0.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: const [
                       Text('0đ'),
                       Text('2,000,000đ'),
                       Text('4,000,000đ'),
@@ -108,7 +110,7 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.local_movies), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tài khoản'),
