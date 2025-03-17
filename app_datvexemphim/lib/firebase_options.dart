@@ -46,6 +46,11 @@ class DefaultFirebaseOptions {
     messagingSenderId: '557818924060',
     projectId: 'app-datvexemphim',
     storageBucket: 'app-datvexemphim.firebasestorage.app',
+    // apiKey: "AIzaSyA6VZwLnAp9RAvYyMculf1kqW05FD6pHJI",
+    // appId: "1:35934640622:android:fcd12bf46bebf4141d56ff",
+    // messagingSenderId: "35934640622",
+    // projectId: "fir-15597",
+    // storageBucket: "fir-15597.appspot.com",
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -65,6 +70,11 @@ class DefaultFirebaseOptions {
     authDomain: 'app-datvexemphim.firebaseapp.com',
     storageBucket: 'app-datvexemphim.firebasestorage.app',
     measurementId: 'G-QNQVGH161G',
+    // apiKey: "AIzaSyCWSVsnl9Vh-fsf2RjG2rioZjBw-M4X38s",
+    // appId: "1:35934640622:web:3b69657a3e63b4f01d56ff",
+    // messagingSenderId: "35934640622",
+    // projectId: "fir-15597",
+    // storageBucket: "fir-15597.appspot.com",
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -85,5 +95,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'app-datvexemphim.firebasestorage.app',
     measurementId: 'G-RB6G1R7ECJ',
   );
-
 }

@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
@@ -16,6 +21,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? userId;
   Map<String, dynamic>? userData;
   bool isLoading = true;
+  String? imageUrl;
+
+  // Chọn ảnh từ thư viện
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      await _uploadImage(imageFile);
+    }
+  }
+
+  // Upload ảnh lên Firebase Storage
+  Future<void> _uploadImage(File imageFile) async {
+    try {
+      String fileName = 'avatars/$userId.jpg'; // Lưu ảnh theo userId
+      Reference ref = FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      // Cập nhật Firestore với đường dẫn ảnh mới
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'hinhAnh': downloadUrl});
+
+      setState(() {
+        imageUrl = downloadUrl;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cập nhật ảnh thành công!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi tải ảnh: $e')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -117,12 +164,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 20),
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: userData?['hinhAnh'] != null
-                ? NetworkImage(userData!['hinhAnh'])
-                : null,
-            backgroundColor: Colors.grey,
+          Stack(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: userData?['hinhAnh'] != null
+                      ? Image.network(userData!['hinhAnh'], fit: BoxFit.cover)
+                      : Image.asset('assets/images/unknown.png',
+                          fit: BoxFit.cover),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: IconButton(
+                    onPressed: _pickImage,
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.grey,
+                    )),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           Text(

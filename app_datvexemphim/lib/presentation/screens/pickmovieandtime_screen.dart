@@ -70,6 +70,14 @@ class _PickMovieAndTimeScreenState extends State<PickMovieAndTimeScreen> {
       backgroundColor: const Color(0xff1B1B1B),
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
       ),
       body: Column(
         children: [
@@ -182,29 +190,33 @@ class MovieScheduleCard extends StatelessWidget {
                     const BorderRadius.vertical(top: Radius.circular(10)),
                 child: Image.network(
                   fullImageUrl,
-                  height: 100,
-                  width: 50,
+                  height: 180, // 3:4 -> width = height * 3/4
+                  width: 112.5,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.network(
-                      "https://via.placeholder.com/300",
-                      height: 50,
-                      width: double.infinity,
+                      "https://via.placeholder.com/300x400", // 3:4 ratio (width 300, height 400)
+                      height: 100,
+                      width: 75,
                       fit: BoxFit.cover,
                     );
                   },
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                movieTitle,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Container(
+                constraints: BoxConstraints(maxWidth: 230),
+                decoration: BoxDecoration(),
+                child: Text(
+                  movieTitle,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

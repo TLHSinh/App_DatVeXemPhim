@@ -68,10 +68,18 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
       appBar: AppBar(
         title: Text(widget.movie['ten_phim'] ?? "Chọn Giờ Chiếu",
             style: TextStyle(
-                color: Color(0xFF545454), fontWeight: FontWeight.bold)),
-        backgroundColor: const Color.fromARGB(255, 252, 234, 255),
+                color: Color(0xFF545454),
+                fontWeight: FontWeight.bold,
+                fontSize: 19)),
+        backgroundColor: Colors.white,
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
+        shape: Border(
+            bottom: BorderSide(
+          color: Colors.black.withValues(alpha: .5),
+          width: .1,
+          //
+        )),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -153,7 +161,7 @@ class DatePickerHorizontal extends StatelessWidget {
           return GestureDetector(
             onTap: () => onDateSelected(date),
             child: Container(
-              width: 70, // Đảm bảo kích thước đồng đều
+              width: 90, // Đảm bảo kích thước đồng đều
               margin: EdgeInsets.symmetric(horizontal: 8),
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(

@@ -190,7 +190,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.blockSizeHorizontal * 3),
+                      fontSize: AppSizes.blockSizeHorizontal * 2.0),
                 ),
               ),
             );

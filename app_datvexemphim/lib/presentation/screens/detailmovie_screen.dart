@@ -168,10 +168,10 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: SizedBox(
             width: double.infinity,
-            height: 56,
+            height: 100,
             child: ElevatedButton(
               onPressed: () => Navigator.push(
                 context,
@@ -181,7 +181,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFEE0033),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                // padding: const EdgeInsets.symmetric(vertical: 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -191,7 +191,7 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
               child: const Text("Đặt Vé",
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold)),
             ),
           ),
