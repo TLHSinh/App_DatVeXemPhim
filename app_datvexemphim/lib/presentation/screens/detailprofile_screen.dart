@@ -77,26 +77,25 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
 
   Future<void> _updateUserData(String? imageUrl) async {
     try {
-      final response = await Dio().put(
-        "http://localhost:5000/api/v1/user/$userId",
-        data: {
+      final response = await ApiService.put(
+        "/user/$userId",
+        {
           "hoTen": _nameController.text,
           "sodienthoai": _phoneController.text,
           "ngaySinh": _dobController.text,
           "cccd": _cccdController.text,
           "gioiTinh": _genderController.text,
           "diaChi": _addressController.text,
-          if (imageUrl != null) "hinhAnh": imageUrl, // Cập nhật URL ảnh
+          if (imageUrl != null) "hinhAnh": imageUrl,
         },
-        options: Options(headers: {"Authorization": "Bearer $token"}),
       );
-      if (response.statusCode == 200 && response.data['success'] == true) {
+      if (response?.statusCode == 200 && response?.data['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cập nhật thành công!")),
+          const SnackBar(content: Text("✅ Cập nhật thành công!")),
         );
       }
     } catch (e) {
-      print("Lỗi cập nhật dữ liệu: $e");
+      print("❌ Lỗi cập nhật dữ liệu: $e");
     }
   }
 //dùng cho máy  máy thật chọn file từ đt
