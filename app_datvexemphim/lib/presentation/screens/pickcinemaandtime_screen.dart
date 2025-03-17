@@ -124,7 +124,7 @@ class DatePickerHorizontal extends StatelessWidget {
       return "Hôm nay";
     }
 
-    List<String> weekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+    List<String> weekdays = ["","Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
     return weekdays[dateTime.weekday];
   }
 
