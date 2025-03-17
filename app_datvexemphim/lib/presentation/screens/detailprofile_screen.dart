@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:app_datvexemphim/data/services/storage_service.dart';
