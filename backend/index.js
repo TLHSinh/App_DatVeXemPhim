@@ -69,15 +69,15 @@ app.use('/api/v1/book', bookTicketsRoutes);
 app.use('/api/v1/advertise', advertiseRoutes);
 
 // Admin routes
-app.use('/api/admin', UserManagementRoutes);
-app.use('/api/admin', MovieManagementRoutes);
-app.use('/api/admin', CinemaManagementRoutes);
-app.use('/api/admin', SeatManagementRoutes);
-app.use('/api/admin', BookTicketManagementRoutes);
-app.use('/api/admin', VoucherManagementRoutes);
+app.use('/api/v1/admin', UserManagementRoutes);
+app.use('/api/v1/admin', MovieManagementRoutes);
+app.use('/api/v1/admin', CinemaManagementRoutes);
+app.use('/api/v1/admin', SeatManagementRoutes);
+app.use('/api/v1/admin', BookTicketManagementRoutes);
+app.use('/api/v1/admin', VoucherManagementRoutes);
 app.use('/api/v1', FoodManagementRoutes);
-app.use('/api/admin', AdsManagementRoutes);
-app.use('/api/admin', RevenueManagementRoutes);
+app.use('/api/v1/admin', AdsManagementRoutes);
+app.use('/api/v1/admin', RevenueManagementRoutes);
 
 // Start server
 app.listen(port, () => {

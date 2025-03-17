@@ -1,12 +1,8 @@
 import 'package:app_datvexemphim/api/api_service.dart';
-import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
-import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
-import '../presentation/screens/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
