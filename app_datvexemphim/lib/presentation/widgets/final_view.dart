@@ -20,10 +20,14 @@ class _FinalViewState extends State<FinalView> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
     HomeScreen(),
+    
     const LocationScreen(),
+    
     const TicketScreen(),
-    AccountScreen(),
-    //const GiftScreen(),
+
+    const GiftScreen(),
+
+    //AccountScreen(),
     ProfileScreen()
   ];
 
