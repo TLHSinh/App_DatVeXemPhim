@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SelectSeatScreen extends StatelessWidget {
   final Map<String, dynamic> showtime;
 
-  const SelectSeatScreen({Key? key, required this.showtime}) : super(key: key);
+  const SelectSeatScreen({super.key, required this.showtime});
 
   @override
   Widget build(BuildContext context) {

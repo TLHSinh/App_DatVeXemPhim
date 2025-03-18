@@ -165,7 +165,6 @@ class _VouchersTabState extends State<VouchersTab>
 
   @override
   Widget build(BuildContext context) {
-    
     super.build(context);
     return _isLoading
         ? Center(child: CircularProgressIndicator())

@@ -6,10 +6,12 @@ import 'package:app_datvexemphim/api/api_service.dart';
 class PickCinemaAndTimeScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
 
-  const PickCinemaAndTimeScreen({Key? key, required this.movie}) : super(key: key);
+  const PickCinemaAndTimeScreen({Key? key, required this.movie})
+      : super(key: key);
 
   @override
-  _PickCinemaAndTimeScreenState createState() => _PickCinemaAndTimeScreenState();
+  _PickCinemaAndTimeScreenState createState() =>
+      _PickCinemaAndTimeScreenState();
 }
 
 class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
@@ -34,7 +36,8 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
 
   Future<void> fetchShowtimes() async {
     try {
-      final response = await ApiService.get("/book/lich-chieu/${widget.movie['_id']}");
+      final response =
+          await ApiService.get("/book/lich-chieu/${widget.movie['_id']}");
       if (response?.statusCode == 200) {
         setState(() => showtimes = response?.data['lich_chieu'] ?? []);
       }
@@ -52,7 +55,8 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(widget.movie['ten_phim'] ?? "Chọn Giờ Chiếu",
-            style: TextStyle(color: Color(0xFF545454), fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                color: Color(0xFF545454), fontWeight: FontWeight.bold)),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
       ),
@@ -71,14 +75,16 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
                 ? Center(child: CircularProgressIndicator())
                 : Expanded(
                     child: showtimes.isEmpty || !_hasShowtimesForSelectedDate()
-                        ? Center(child: Text("Không có lịch chiếu cho ngày này"))
+                        ? Center(
+                            child: Text("Không có lịch chiếu cho ngày này"))
                         : ShowtimeList(
                             showtimes: showtimes,
                             selectedDate: selectedDate,
                             expandedCinemas: expandedCinemas,
                             toggleCinema: (cinema) {
                               setState(() {
-                                expandedCinemas[cinema] = !(expandedCinemas[cinema] ?? false);
+                                expandedCinemas[cinema] =
+                                    !(expandedCinemas[cinema] ?? false);
                               });
                             },
                           ),
@@ -135,12 +141,18 @@ class DatePickerHorizontal extends StatelessWidget {
                 children: [
                   Text(
                     DateFormat('E', 'vi').format(date),
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black54),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : Colors.black54),
                   ),
                   SizedBox(height: 5),
                   Text(
                     DateFormat('dd').format(date),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : Colors.black),
                   ),
                 ],
               ),
@@ -194,7 +206,9 @@ class ShowtimeList extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(entry.key, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(entry.key,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
                 ],
               ),
@@ -209,12 +223,18 @@ class ShowtimeList extends StatelessWidget {
                         runSpacing: 10,
                         children: entry.value.map((s) {
                           return ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
                             onPressed: () => Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PickseatScreen(schedule: s)),
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PickseatScreen(schedule: s)),
                             ),
-                            child: Text(DateFormat('HH:mm').format(DateTime.parse(s['thoi_gian_chieu'])), style: TextStyle(color: Colors.white)),
+                            child: Text(
+                                DateFormat('HH:mm').format(
+                                    DateTime.parse(s['thoi_gian_chieu'])),
+                                style: TextStyle(color: Colors.white)),
                           );
                         }).toList(),
                       ),

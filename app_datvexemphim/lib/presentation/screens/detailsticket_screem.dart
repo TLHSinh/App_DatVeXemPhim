@@ -9,7 +9,7 @@ class DetailsTicket extends StatelessWidget {
   final Map<String, dynamic> selectedMovie;
 
   const DetailsTicket({
-    Key? key,
+    super.key,
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedFoods,
@@ -17,7 +17,7 @@ class DetailsTicket extends StatelessWidget {
     required this.selectedMovie,
     required String movieId,
     required selectedShowtime,
-  }) : super(key: key);
+  });
 
   String formatCurrency(double amount) {
     return NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(amount);
@@ -73,7 +73,7 @@ class DetailsTicket extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                       color: Colors.black26,
                       blurRadius: 5,
@@ -140,7 +140,7 @@ class DetailsTicket extends StatelessWidget {
                       Text(formatCurrency((food["gia"] ?? 0) * entry.value)),
                   trailing: Text("x${entry.value}"),
                 );
-              }).toList(),
+              }),
               const Divider(),
             ],
           ],
@@ -150,7 +150,7 @@ class DetailsTicket extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 5)]),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)]),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
