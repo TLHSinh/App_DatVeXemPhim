@@ -21,8 +21,6 @@ class PaymentScreen extends StatefulWidget {
   _PaymentScreenState createState() => _PaymentScreenState();
 }
 
-
-
 class _PaymentScreenState extends State<PaymentScreen> {
   String selectedPaymentMethod = "Ví điện tử MoMo"; // Mặc định
   final TextEditingController _promoCodeController = TextEditingController();
@@ -325,7 +323,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       title: Text(method),
     );
   }
-  
+
   ////
   Widget _buildPaymentButton() {
     return Container(
