@@ -52,7 +52,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
   Widget build(BuildContext context) {
     AppSizes().init(context); // Khởi tạo AppSizes
     return Scaffold(
-      backgroundColor: const Color(0xfff9f9f9),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 3,
         backgroundColor: Colors.white,
@@ -209,9 +209,10 @@ class _PickseatScreenState extends State<PickseatScreen> {
       }
     });
   }
+
   String formatCurrency(int amount) {
-  return NumberFormat("#,###", "vi_VN").format(amount);
-}
+    return NumberFormat("#,###", "vi_VN").format(amount);
+  }
 
   Widget _buildBottomNavBar() {
     int ticketPrice = widget.schedule["gia_ve"] ?? 0;
@@ -261,7 +262,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                     ),
                     TextSpan(
                       // text: "${totalPrice.toStringAsFixed(0)}đ",
-                               text: "${formatCurrency(totalPrice)}đ", // Cập nhật
+                      text: "${formatCurrency(totalPrice)}đ", // Cập nhật
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: AppSizes.blockSizeHorizontal * 4,
@@ -311,7 +312,9 @@ class _PickseatScreenState extends State<PickseatScreen> {
     Map<String, dynamic> selectedMovie = {
       "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
       "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-      "gio_chieu": widget.schedule["ngay_gio"] ?? "Không rõ",
+      "thoi_gian_chieu": widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+      "url_poster": widget.schedule["id_phim"]?["url_poster"],
+      "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
     };
     Navigator.push(
       context,
