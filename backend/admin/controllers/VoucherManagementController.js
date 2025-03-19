@@ -32,7 +32,7 @@ export const getAllVouchersExpired = async (req, res) => {
 // Tạo voucher
 export const addVoucher = async (req, res) => {
     try {
-        const { ma_voucher, loai_giam_gia, gia_tri_giam, don_hang_toi_thieu, gioi_han_su_dung, ngay_het_han } = req.body;
+        const { ma_voucher, loai_giam_gia, gia_tri_giam, don_hang_toi_thieu, gioi_han_su_dung, ngay_het_han,  url_dich } = req.body;
 
         // Kiểm tra thông tin bắt buộc
         if (!ma_voucher || !loai_giam_gia || !gia_tri_giam) {
@@ -52,7 +52,8 @@ export const addVoucher = async (req, res) => {
             gia_tri_giam,
             don_hang_toi_thieu,
             gioi_han_su_dung,
-            ngay_het_han
+            ngay_het_han,
+            url_hinh
         });
 
         await newVoucher.save();

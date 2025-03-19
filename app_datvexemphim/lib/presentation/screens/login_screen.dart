@@ -71,12 +71,12 @@ class LoginScreenState extends State<LoginScreen> {
         fillColor: Colors.white,
         labelText: hint,
         labelStyle: const TextStyle(color: Color(0xFF545454)),
-        prefixIcon: Icon(icon, color: Color(0xFFC20077)),
+        prefixIcon: Icon(icon, color: Color(0xFFee0033)),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Color(0xFFC20077),
+                  color: Color(0xFFee0033),
                 ),
                 onPressed: () {
                   setState(() {
@@ -96,6 +96,17 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => GoRouter.of(context).go('/home'),
+        ),
+        //title: Text("Đăng nhập", style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -146,7 +157,7 @@ class LoginScreenState extends State<LoginScreen> {
               child: ElevatedButton(
                 onPressed: _login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.redAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

@@ -17,13 +17,21 @@ class PickCinemaAndTimeScreen extends StatefulWidget {
 class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
   List<dynamic> showtimes = [];
   bool isLoading = true;
-  List<String> dates = [];
-  String? selectedDate;
+  List<DateTime> dates = [];
+  DateTime? selectedDate;
+  Map<String, bool> expandedCinemas = {}; // Track expanded cinemas
 
   @override
   void initState() {
     super.initState();
+    _initializeDates();
     fetchShowtimes();
+  }
+
+  void _initializeDates() {
+    DateTime today = DateTime.now();
+    dates = List.generate(7, (index) => today.add(Duration(days: index)));
+    selectedDate = dates.first;
   }
 
   Future<void> fetchShowtimes() async {
@@ -31,7 +39,7 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
       final response =
           await ApiService.get("/book/lich-chieu/${widget.movie['_id']}");
       if (response?.statusCode == 200) {
-        parseShowtimes(response?.data);
+        setState(() => showtimes = response?.data['lich_chieu'] ?? []);
       }
     } catch (e) {
       print("❌ Lỗi khi lấy lịch chiếu: $e");
@@ -40,37 +48,15 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
     }
   }
 
-  void parseShowtimes(Map<String, dynamic>? data) {
-    if (data == null || data['lich_chieu'] == null) return;
-
-    showtimes = data['lich_chieu'];
-    dates = showtimes
-        .map<String?>((s) => _formatDate(s['thoi_gian_chieu']))
-        .whereType<String>()
-        .toSet()
-        .toList();
-
-    if (dates.isNotEmpty) {
-      selectedDate = dates.first;
-    }
-  }
-
-  String? _formatDate(String? dateTime) {
-    if (dateTime?.isNotEmpty ?? false) {
-      return DateFormat('dd/MM').format(DateTime.parse(dateTime!));
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text(widget.movie['ten_phim'] ?? "Chọn Giờ Chiếu",
             style: TextStyle(
                 color: Color(0xFF545454), fontWeight: FontWeight.bold)),
-        backgroundColor: const Color.fromARGB(255, 252, 234, 255),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
       ),
@@ -79,39 +65,51 @@ class _PickCinemaAndTimeScreenState extends State<PickCinemaAndTimeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (dates.isNotEmpty)
-              DatePickerHorizontal(
-                dates: dates,
-                selectedDate: selectedDate,
-                onDateSelected: (date) => setState(() => selectedDate = date),
-              ),
+            DatePickerHorizontal(
+              dates: dates,
+              selectedDate: selectedDate,
+              onDateSelected: (date) => setState(() => selectedDate = date),
+            ),
             SizedBox(height: 20),
             isLoading
                 ? Center(child: CircularProgressIndicator())
-                : showtimes.isEmpty
-                    ? Center(
-                        child: Text("Không có lịch chiếu",
-                            style: TextStyle(color: Colors.black54)))
-                    : Expanded(
-                        child: ShowtimeList(
-                          showtimes: showtimes,
-                          selectedDate: selectedDate,
-                        ),
-                      ),
+                : Expanded(
+                    child: showtimes.isEmpty || !_hasShowtimesForSelectedDate()
+                        ? Center(
+                            child: Text("Không có lịch chiếu cho ngày này"))
+                        : ShowtimeList(
+                            showtimes: showtimes,
+                            selectedDate: selectedDate,
+                            expandedCinemas: expandedCinemas,
+                            toggleCinema: (cinema) {
+                              setState(() {
+                                expandedCinemas[cinema] =
+                                    !(expandedCinemas[cinema] ?? false);
+                              });
+                            },
+                          ),
+                  ),
           ],
         ),
       ),
     );
   }
+
+  bool _hasShowtimesForSelectedDate() {
+    return showtimes.any((s) {
+      DateTime showDate = DateTime.parse(s['thoi_gian_chieu']);
+      return selectedDate != null &&
+          showDate.year == selectedDate!.year &&
+          showDate.month == selectedDate!.month &&
+          showDate.day == selectedDate!.day;
+    });
+  }
 }
 
-// ------------------------------------
-// Widget chọn ngày ngang
-// ------------------------------------
 class DatePickerHorizontal extends StatelessWidget {
-  final List<String> dates;
-  final String? selectedDate;
-  final Function(String) onDateSelected;
+  final List<DateTime> dates;
+  final DateTime? selectedDate;
+  final Function(DateTime) onDateSelected;
 
   const DatePickerHorizontal({
     Key? key,
@@ -120,33 +118,10 @@ class DatePickerHorizontal extends StatelessWidget {
     required this.onDateSelected,
   }) : super(key: key);
 
-  String getDayOfWeek(String date) {
-    DateTime today = DateTime.now();
-
-    // Thêm năm hiện tại vào ngày/tháng để tránh lỗi parse sai
-    DateTime dateTime = DateFormat('dd/MM/yyyy').parse("$date/${today.year}");
-
-    if (dateTime.day == today.day && dateTime.month == today.month) {
-      return "Hôm nay";
-    }
-
-    List<String> weekdays = [
-      " ",
-      "Chủ Nhật",
-      "Thứ Hai",
-      "Thứ Ba",
-      "Thứ Tư",
-      "Thứ Năm",
-      "Thứ Sáu",
-      "Thứ Bảy"
-    ];
-    return weekdays[dateTime.weekday];
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 80, // Tăng chiều cao để hiển thị ngày trong tuần
+      height: 80,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: dates.map((date) {
@@ -154,41 +129,30 @@ class DatePickerHorizontal extends StatelessWidget {
           return GestureDetector(
             onTap: () => onDateSelected(date),
             child: Container(
-              width: 70, // Đảm bảo kích thước đồng đều
-              margin: EdgeInsets.symmetric(horizontal: 8),
-              padding: EdgeInsets.all(8),
+              width: 55,
+              margin: EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.blue : Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.black12),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                            color: Colors.blue.withOpacity(0.2), blurRadius: 5)
-                      ]
-                    : [],
+                color: isSelected ? Colors.red : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.black12),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    getDayOfWeek(date),
+                    DateFormat('E', 'vi').format(date),
                     style: TextStyle(
-                      fontSize: 12,
-                      color: isSelected ? Colors.white : Colors.black54,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : Colors.black54),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    date,
+                    DateFormat('dd').format(date),
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.white : Colors.black,
-                    ),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : Colors.black),
                   ),
                 ],
               ),
@@ -200,126 +164,98 @@ class DatePickerHorizontal extends StatelessWidget {
   }
 }
 
-// ------------------------------------
-// Widget danh sách lịch chiếu theo rạp
-// ------------------------------------
 class ShowtimeList extends StatelessWidget {
   final List<dynamic> showtimes;
-  final String? selectedDate;
+  final DateTime? selectedDate;
+  final Map<String, bool> expandedCinemas;
+  final Function(String) toggleCinema;
 
-  const ShowtimeList(
-      {Key? key, required this.showtimes, required this.selectedDate})
-      : super(key: key);
+  const ShowtimeList({
+    Key? key,
+    required this.showtimes,
+    required this.selectedDate,
+    required this.expandedCinemas,
+    required this.toggleCinema,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final groupedShowtimes = <String, Map<String, List<dynamic>>>{};
-
+    Map<String, List<dynamic>> groupedShowtimes = {};
     for (var s in showtimes) {
-      String cinema = s['id_rap']?['ten_rap'] ?? "Không rõ rạp";
-      String format = s['dinh_dang'] ?? "2D Phụ Đề";
-      String? showtimeDate = _formatDate(s['thoi_gian_chieu']);
-
-      if (selectedDate == showtimeDate) {
-        groupedShowtimes
-            .putIfAbsent(cinema, () => {})
-            .putIfAbsent(format, () => [])
-            .add(s);
+      DateTime showDate = DateTime.parse(s['thoi_gian_chieu']);
+      if (selectedDate != null &&
+          showDate.year == selectedDate!.year &&
+          showDate.month == selectedDate!.month &&
+          showDate.day == selectedDate!.day) {
+        String cinemaName = s['id_rap']['ten_rap'] ?? "Không rõ rạp";
+        if (!groupedShowtimes.containsKey(cinemaName)) {
+          groupedShowtimes[cinemaName] = [];
+        }
+        groupedShowtimes[cinemaName]!.add(s);
       }
     }
 
-    return groupedShowtimes.isEmpty
-        ? Center(
-            child: Text("Không có lịch chiếu",
-                style: TextStyle(
-                    color: Color(0xFF545454), fontWeight: FontWeight.bold)))
-        : ListView(
-            children: groupedShowtimes.entries.map((entry) {
-              return ExpansionTile(
-                title: Text(entry.key,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                children: entry.value.entries.map((formatEntry) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(formatEntry.key,
-                            style: TextStyle(
-                                color: Color(0xFF545454),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        ShowtimeGrid(showtimes: formatEntry.value),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              );
-            }).toList(),
-          );
-  }
-
-  String? _formatDate(String? dateTime) {
-    if (dateTime?.isNotEmpty ?? false) {
-      return DateFormat('dd/MM').format(DateTime.parse(dateTime!));
-    }
-    return null;
-  }
-}
-
-// ------------------------------------
-// Widget giờ chiếu (xếp 3 cột)
-// ------------------------------------
-class ShowtimeGrid extends StatelessWidget {
-  final List<dynamic> showtimes;
-
-  const ShowtimeGrid({Key? key, required this.showtimes}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 2.5,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: showtimes.length,
-      itemBuilder: (context, index) {
-        String formattedTime = _formatTime(showtimes[index]['thoi_gian_chieu']);
-
-        return ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[850],
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PickseatScreen(
-                  schedule: showtimes[index], // Truyền dữ liệu lịch chiếu
-                ),
+    return ListView(
+      children: groupedShowtimes.entries.map((entry) {
+        bool isExpanded = expandedCinemas[entry.key] ?? false;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => toggleCinema(entry.key),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(entry.key,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                ],
               ),
-            );
-          },
-          child: Text(formattedTime,
-              style: TextStyle(color: Colors.white, fontSize: 16)),
+            ),
+            AnimatedSize(
+              duration: Duration(milliseconds: 300),
+              child: isExpanded
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: GridView.builder(
+                        shrinkWrap:
+                            true, // Đảm bảo GridView không chiếm toàn bộ không gian
+                        physics:
+                            NeverScrollableScrollPhysics(), // Tránh cuộn bên trong ListView
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4, // Mỗi hàng chứa 4 suất chiếu
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 2, // Điều chỉnh tỉ lệ phù hợp
+                        ),
+                        itemCount: entry.value.length,
+                        itemBuilder: (context, index) {
+                          var s = entry.value[index];
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PickseatScreen(schedule: s)),
+                            ),
+                            child: Text(
+                              DateFormat('HH:mm')
+                                  .format(DateTime.parse(s['thoi_gian_chieu'])),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : SizedBox(),
+            ),
+            SizedBox(height: 15),
+          ],
         );
-      },
+      }).toList(),
     );
-  }
-
-  String _formatTime(String? time) {
-    return time?.isNotEmpty ?? false
-        ? DateFormat('HH:mm').format(DateTime.parse(time!))
-        : "??:??";
   }
 }
