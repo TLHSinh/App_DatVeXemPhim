@@ -1,9 +1,11 @@
+import 'package:app_datvexemphim/presentation/screens/payment_screen.dart'
+    show PaymentScreen;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DetailsTicket extends StatelessWidget {
   final List<String> selectedSeats;
-  final double totalPrice;
+  final int totalPrice;
   final Map<String, int> selectedFoods;
   final List<dynamic> foods;
   final Map<String, dynamic> selectedMovie;
@@ -19,7 +21,7 @@ class DetailsTicket extends StatelessWidget {
     required selectedShowtime,
   });
 
-  String formatCurrency(double amount) {
+  String formatCurrency(int amount) {
     return NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(amount);
   }
 
@@ -36,7 +38,7 @@ class DetailsTicket extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String cinema = selectedMovie['ten_rap'] ?? "Không rõ rạp";
+    String cinema = selectedMovie["ten_rap"] ?? "Không rõ rạp";
     String movieTitle = selectedMovie["ten_phim"] ?? "Không có tên";
     String format = selectedMovie['dinh_dang'] ?? "2D Phụ Đề";
     String showtimeDate = formatShowtime(selectedMovie['thoi_gian_chieu']);
@@ -45,8 +47,14 @@ class DetailsTicket extends StatelessWidget {
     String fullImageUrl = imageBaseUrl + (selectedMovie["url_poster"] ?? "");
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Thông tin thanh toán")),
-      backgroundColor: const Color(0xfff9f9f9),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Thông tin thanh toán",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -146,6 +154,7 @@ class DetailsTicket extends StatelessWidget {
           ],
         ),
       ),
+      
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
@@ -168,18 +177,48 @@ class DetailsTicket extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {},
+            //     style: ElevatedButton.styleFrom(
+            //         backgroundColor: const Color(0xffb81d24),
+            //         minimumSize: const Size(double.infinity, 50)),
+            //     child: const Text("Tiếp theo",
+            //         style: TextStyle(
+            //             fontSize: 18,
+            //             fontWeight: FontWeight.bold,
+            //             color: Colors.white)),
+            //   ),
+            // ),
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentScreen(
+                        selectedSeats: selectedSeats,
+                        totalPrice: totalPrice,
+                        selectedFoods: selectedFoods,
+                        foods: foods,
+                        selectedMovie: selectedMovie,
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
                     minimumSize: const Size(double.infinity, 50)),
-                child: const Text("Tiếp theo",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
+                child: const Text(
+                  "Tiếp theo",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             ),
           ],

@@ -7,7 +7,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
-  const DetailMovieScreen({super.key, required this.movie});
+  const DetailMovieScreen({Key? key, required this.movie}) : super(key: key);
 
   @override
   _DetailMovieScreenState createState() => _DetailMovieScreenState();
@@ -96,13 +96,20 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        //title: Text(
+        //movie['ten_phim'] ?? "Chọn Giờ Chiếu",
+        //style: const TextStyle(
+        //color: Color(0xFF545454), fontWeight: FontWeight.bold),
+        //),
         title: Text(
-          movie['ten_phim'] ?? "Chọn Giờ Chiếu",
+          "Chi tiết Phim",
           style: const TextStyle(
-              color: Color(0xFF545454), fontWeight: FontWeight.bold),
+            color: Color(0xFF545454),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Color.fromARGB(255, 255, 255, 255),
-        centerTitle: true,
+        //centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
@@ -165,36 +172,28 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: SizedBox(
-            width: double.infinity,
-            height: 100,
-            child: ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PickCinemaAndTimeScreen(movie: movie),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFEE0033),
-                // padding: const EdgeInsets.symmetric(vertical: 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                elevation: 6,
-                shadowColor: Colors.black26,
-              ),
-              child: const Text("Đặt Vé",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold)),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ElevatedButton.icon(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PickCinemaAndTimeScreen(movie: movie),
             ),
           ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            elevation: 10,
+          ),
+          icon: const Icon(Icons.movie, color: Colors.white),
+          label: const Text("Đặt Vé",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
         ),
       ),
     );

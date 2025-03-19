@@ -1,10 +1,5 @@
-import 'dart:io';
-
 import 'package:app_datvexemphim/api/api_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
@@ -21,48 +16,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? userId;
   Map<String, dynamic>? userData;
   bool isLoading = true;
-  String? imageUrl;
-
-  // Chọn ảnh từ thư viện
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      await _uploadImage(imageFile);
-    }
-  }
-
-  // Upload ảnh lên Firebase Storage
-  Future<void> _uploadImage(File imageFile) async {
-    try {
-      String fileName = 'avatars/$userId.jpg'; // Lưu ảnh theo userId
-      Reference ref = FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = ref.putFile(imageFile);
-
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-
-      // Cập nhật Firestore với đường dẫn ảnh mới
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'hinhAnh': downloadUrl});
-
-      setState(() {
-        imageUrl = downloadUrl;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cập nhật ảnh thành công!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi tải ảnh: $e')),
-      );
-    }
-  }
 
   @override
   void initState() {
@@ -102,9 +55,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Tài khoản',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        // title: const Text('Tài khoản',
+        //     style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: token != null
             ? [
@@ -131,94 +86,173 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// Giao diện nếu chưa đăng nhập
+  /// Giao diện Chưa đăng nhập
   Widget _buildGuestView(BuildContext context) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.person_outline, size: 100, color: Colors.grey),
-          const SizedBox(height: 10),
-          const Text(
-            "Bạn chưa đăng nhập",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          const SizedBox(height: 30),
+
+          // Logo
+          Image.asset('assets/images/logofull2.png', height: 200),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => context.push('/login'),
-            child: const Text("Đăng nhập"),
+
+          // Tiêu đề
+          const Text(
+            "Ohh, bạn chưa Đăng nhập !!\n Đăng Ký Thành Viên Star\nNhận Ngay Ưu Đãi!",
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 0, 0, 0)),
+            textAlign: TextAlign.center,
           ),
-          TextButton(
-            onPressed: () => context.push('/register'),
-            child: const Text("Chưa có tài khoản? Đăng ký ngay"),
+          const SizedBox(height: 24),
+
+          // Danh sách lợi ích
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFeatureItem(Icons.star, "Stars"),
+              _buildFeatureItem(Icons.card_giftcard, "Quà tặng"),
+              _buildFeatureItem(Icons.emoji_events, "Ưu đãi"),
+            ],
+          ),
+          const SizedBox(height: 40),
+
+          // Nút Đăng ký & Đăng nhập
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => context.push('/register'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    "Đăng ký",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => context.push('/login'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    side: const BorderSide(color: Colors.red, width: 2),
+                  ),
+                  child: const Text(
+                    "Đăng nhập",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
+// Widget hiển thị từng lợi ích
+  Widget _buildFeatureItem(IconData icon, String label) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.red.withOpacity(0.2),
+          ),
+          child: Icon(icon, size: 32, color: Colors.red),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
+
   /// Giao diện nếu đã đăng nhập
   Widget _buildUserView(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 20),
-          Stack(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: userData?['hinhAnh'] != null
-                      ? Image.network(userData!['hinhAnh'], fit: BoxFit.cover)
-                      : Image.asset('assets/images/unknown.png',
-                          fit: BoxFit.cover),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: IconButton(
-                    onPressed: _pickImage,
-                    icon: Icon(
-                      Icons.edit,
-                      color: Colors.grey,
-                    )),
-              ),
-            ],
+          // Avatar & Thông tin user
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: userData?['hinhAnh'] != null
+                ? NetworkImage(userData!['hinhAnh'])
+                : null,
+            backgroundColor: Colors.grey.shade300,
+            child: userData?['hinhAnh'] == null
+                ? const Icon(Icons.person, size: 50, color: Colors.white)
+                : null,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             userData?['hoTen'] ?? 'Người dùng',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const Text('Star', style: TextStyle(color: Colors.orange)),
+          const Text('Star Member',
+              style: TextStyle(color: Colors.orange, fontSize: 16)),
+          const SizedBox(height: 10),
+
+          // Stars + Mã thành viên
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.card_giftcard, color: Colors.orange, size: 18),
-              SizedBox(width: 5),
-              Text('0 Stars', style: TextStyle(color: Colors.grey)),
+            children: [
+              const Icon(Icons.star, color: Colors.orange, size: 20),
+              const SizedBox(width: 5),
+              const Text('0 Stars',
+                  style: TextStyle(color: Colors.grey, fontSize: 16)),
             ],
           ),
-          const SizedBox(height: 10),
-          OutlinedButton.icon(
+          const SizedBox(height: 15),
+          ElevatedButton.icon(
             onPressed: () {},
-            icon: const Icon(Icons.qr_code, color: Colors.orange),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade100,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30)),
+            ),
+            icon: const Icon(Icons.qr_code, color: Colors.red),
             label: const Text('Mã thành viên',
-                style: TextStyle(color: Colors.orange)),
+                style: TextStyle(color: Colors.red)),
           ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+          const SizedBox(height: 25),
+
+          // Tính năng cá nhân
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildInfoButton('Thông tin', Icons.edit, () {
                   Navigator.push(
@@ -227,126 +261,214 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (context) => const DetailprofileScreen()),
                   );
                 }),
-                Container(height: 40, width: 1, color: Colors.grey),
                 _buildInfoButton('Giao dịch', Icons.history, () {}),
-                Container(height: 40, width: 1, color: Colors.grey),
                 _buildInfoButton('Thông báo', Icons.notifications, () {}),
               ],
             ),
           ),
-          const Divider(thickness: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Tổng chi tiêu 2025',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const LinearProgressIndicator(value: 0.0),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('0đ'),
-                    Text('2,000,000đ'),
-                    Text('4,000,000đ'),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildFeatureButton('Đổi Quà', Icons.card_giftcard),
-                    _buildFeatureButton('My Rewards', Icons.redeem),
-                    _buildFeatureButton('Gói Hội Viên', Icons.diamond),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const Divider(),
-                ListTile(
-                  title: const Text('Gọi ĐƯỜNG DÂY NÓNG: 19002224',
-                      style: TextStyle(color: Colors.blue)),
-                  onTap: () {},
-                ),
-                ListTile(
-                  title: const Text('Email: hotro@atsh.vn',
-                      style: TextStyle(color: Colors.blue)),
-                  onTap: () {},
-                ),
-                ListTile(title: const Text('Thông Tin Công Ty'), onTap: () {}),
-                ListTile(title: const Text('Điều Khoản Sử Dụng'), onTap: () {}),
-              ],
-            ),
+          const SizedBox(height: 25),
+
+          // Tổng chi tiêu
+          const Text(
+            'Tổng chi tiêu 2025',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          LinearProgressIndicator(
+            value: 0.0,
+            backgroundColor: Colors.grey.shade300,
+            color: Colors.red,
+            minHeight: 8,
+          ),
+          const SizedBox(height: 5),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('0đ', style: TextStyle(fontSize: 14)),
+              Text('2,000,000đ', style: TextStyle(fontSize: 14)),
+              Text('4,000,000đ', style: TextStyle(fontSize: 14)),
+            ],
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () async {
-              bool? shouldLogout = await showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text("Xác nhận đăng xuất"),
-                  content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text("Hủy"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text("Đăng xuất"),
-                    ),
-                  ],
-                ),
-              );
 
-              // Nếu người dùng xác nhận đăng xuất
-              if (shouldLogout == true) {
-                // Xóa dữ liệu người dùng
-                await StorageService.clearUserData();
-
-                if (mounted) {
-                  // Điều hướng về màn hình Onboarding sau khi đăng xuất
-                  if (mounted) {
-                    context.go('/onboarding'); // Điều hướng về trang Onboarding
-                  }
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text(
-              "Đăng xuất",
-              style: TextStyle(color: Colors.black),
-            ),
+          // Chức năng khác
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFeatureButton('Đổi Quà', Icons.card_giftcard, Colors.red),
+              _buildFeatureButton('My Rewards', Icons.redeem, Colors.green),
+              _buildFeatureButton(
+                  'Gói Hội Viên', Icons.workspace_premium, Colors.blue),
+            ],
           ),
+          const SizedBox(height: 20),
+
+          // Hỗ trợ & thông tin
+          ListTile(
+            leading: const Icon(Icons.phone, color: Colors.blue),
+            title: const Text('Đường dây nóng: 19002224'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.email, color: Colors.blue),
+            title: const Text('Email: hotro@atsh.vn'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.info, color: Colors.grey),
+            title: const Text('Thông tin công ty'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.article, color: Colors.grey),
+            title: const Text('Điều khoản sử dụng'),
+            onTap: () {},
+          ),
+          const Divider(),
+
+          Column(
+            children: [
+              // Nút Đăng Xuất
+              SizedBox(
+                width: double.infinity, // Kéo dài ngang màn hình
+                child: OutlinedButton(
+                  onPressed: () async {
+                    bool? shouldLogout = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("Xác nhận đăng xuất"),
+                        content: const Text(
+                            "Bạn có chắc chắn muốn đăng xuất không?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text("Hủy"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text("Đăng xuất"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldLogout == true) {
+                      await StorageService.clearUserData();
+                      if (mounted) {
+                        context.go('/onboarding');
+                      }
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    side: const BorderSide(color: Colors.red), // Viền đỏ
+                  ),
+                  child: const Text(
+                    "Đăng xuất",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red, // Màu chữ đỏ
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10), // Khoảng cách giữa hai nút
+
+              // Nút Xóa Tài Khoản
+              SizedBox(
+                width: double.infinity, // Kéo dài ngang màn hình
+                child: ElevatedButton(
+                  onPressed: () async {
+                    bool? shouldDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text("Xác nhận xóa tài khoản"),
+                        content: const Text(
+                            "Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác!"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text("Hủy"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text(
+                              "Xóa tài khoản",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldDelete == true) {
+                      // Gọi API hoặc xử lý logic xóa tài khoản
+                      //await StorageService.deleteUserAccount();
+
+                      if (mounted) {
+                        context.go(
+                            '/onboarding'); // Chuyển về trang khởi động sau khi xóa tài khoản
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade900, // Màu đỏ đậm hơn
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    "Xóa tài khoản",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Màu chữ trắng
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  static Widget _buildFeatureButton(String label, IconData icon) {
-    return Column(
-      children: [
-        CircleAvatar(radius: 30, child: Icon(icon, size: 30)),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(fontSize: 14)),
-      ],
-    );
-  }
-
+// Widget chức năng cá nhân
   Widget _buildInfoButton(String label, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
         children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-          Text(label),
+          Icon(icon, size: 26, color: Colors.red),
+          const SizedBox(height: 6),
+          Text(label, style: const TextStyle(fontSize: 14)),
         ],
       ),
+    );
+  }
+
+// Widget chức năng đổi quà, gói hội viên
+  Widget _buildFeatureButton(String label, IconData icon, Color color) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 30,
+          backgroundColor: color.withOpacity(0.2),
+          child: Icon(icon, size: 30, color: color),
+        ),
+        const SizedBox(height: 6),
+        Text(label,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+      ],
     );
   }
 }

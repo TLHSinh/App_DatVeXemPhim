@@ -1,6 +1,7 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/detailsticket_screem.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
@@ -8,11 +9,11 @@ class ComboSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> selectedMovie;
 
   const ComboSelectionScreen({
-    super.key,
+    Key? key,
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedMovie,
-  });
+  }) : super(key: key);
 
   @override
   _ComboSelectionScreenState createState() => _ComboSelectionScreenState();
@@ -46,7 +47,8 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffe6e6e6),
-      appBar: AppBar(title: const Text("Chọn Bắp Nước")),
+      appBar: AppBar(
+          backgroundColor: Colors.white, title: const Text("Chọn Bắp Nước")),
       body: Column(
         children: [
           Expanded(
@@ -80,9 +82,13 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     );
   }
 
+  String formatCurrency(int amount) {
+    return NumberFormat("#,###", "vi_VN").format(amount);
+  }
+
   /// 🍿 Hiển thị danh sách bắp nước đã chọn trong BottomNavBar
   Widget _buildBottomNavBar() {
-    double totalPrice = _calculateTotalPrice();
+    int totalPrice = _calculateTotalPrice();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -103,8 +109,9 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // const SizedBox(height: 8),
                 SizedBox(
-                  height: 70,
+                  height: 70, // Giới hạn chiều cao
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: selectedFoods.length,
@@ -125,44 +132,42 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
               const Icon(Icons.event_seat, color: Colors.black, size: 20),
               const SizedBox(width: 8),
               Text(
-                "Ghế đã đặt: ${widget.selectedSeats.length} ghế",
+                "Ghế đã đặt: ${widget.selectedSeats.length} ghế ",
                 style:
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 10),
+          // Hiển thị tổng tiền và nút thanh toán
           Text(
-            "Tổng tiền: ${totalPrice.toStringAsFixed(0)}đ",
+            "Tổng tiền: ${formatCurrency(totalPrice)}đ",
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
+              // Chuyển hướng sang màn hình DetailsTicket
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) {
-                    return DetailsTicket(
-                      selectedSeats: widget.selectedSeats,
-                      totalPrice: totalPrice,
-                      selectedFoods: selectedFoods,
-                      foods: foods,
-                      selectedMovie: widget.selectedMovie,
-                      movieId: widget.selectedMovie["_id"] ??
-                          "", // Thêm ID phim nếu cần
-                      selectedShowtime:
-                          widget.selectedMovie["thoi_gian_chieu"] ??
-                              "Chưa có", // Sửa lỗi thiếu biến
-                    );
-                  },
+                  builder: (context) => DetailsTicket(
+                    selectedSeats: widget.selectedSeats,
+                    totalPrice: totalPrice,
+                    selectedFoods: selectedFoods,
+                    foods: foods,
+                    selectedMovie: widget.selectedMovie,
+                    movieId: widget.selectedMovie["_id"] ??
+                        "", // Thêm ID phim nếu cần
+                    selectedShowtime:
+                        widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
+                  ),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xffb81d24),
-              minimumSize: const Size(double.infinity, 50),
-            ),
+                backgroundColor: const Color(0xffb81d24),
+                minimumSize: const Size(double.infinity, 50)),
             child: const Text("Tiếp theo",
                 style: TextStyle(
                     fontSize: 18,
@@ -232,13 +237,23 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
   }
 
   /// 🎟 Tính tổng tiền bao gồm giá vé và bắp nước
-  double _calculateTotalPrice() {
-    double total = widget.totalPrice.toDouble();
+  // int _calculateTotalPrice() {
+  //   int total = widget.totalPrice.toInt();
+  //   selectedFoods.forEach((foodId, quantity) {
+  //     var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
+  //     if (food.isNotEmpty) {
+  //       total += food["gia"] * quantity;
+  //     }
+  //   });
+  //   return total;
+  // }
+  int _calculateTotalPrice() {
+    int total = widget.totalPrice;
     selectedFoods.forEach((foodId, quantity) {
       var food =
           foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
       if (food.isNotEmpty) {
-        total += food["gia"] * quantity;
+        total += ((food["gia"] as num?)?.toInt() ?? 0) * quantity;
       }
     });
     return total;

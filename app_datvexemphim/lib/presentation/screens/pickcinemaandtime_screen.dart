@@ -218,10 +218,20 @@ class ShowtimeList extends StatelessWidget {
               child: isExpanded
                   ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Wrap(
-                        spacing: 15,
-                        runSpacing: 10,
-                        children: entry.value.map((s) {
+                      child: GridView.builder(
+                        shrinkWrap:
+                            true, // Đảm bảo GridView không chiếm toàn bộ không gian
+                        physics:
+                            NeverScrollableScrollPhysics(), // Tránh cuộn bên trong ListView
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4, // Mỗi hàng chứa 4 suất chiếu
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 2, // Điều chỉnh tỉ lệ phù hợp
+                        ),
+                        itemCount: entry.value.length,
+                        itemBuilder: (context, index) {
+                          var s = entry.value[index];
                           return ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red),
@@ -232,11 +242,12 @@ class ShowtimeList extends StatelessWidget {
                                       PickseatScreen(schedule: s)),
                             ),
                             child: Text(
-                                DateFormat('HH:mm').format(
-                                    DateTime.parse(s['thoi_gian_chieu'])),
-                                style: TextStyle(color: Colors.white)),
+                              DateFormat('HH:mm')
+                                  .format(DateTime.parse(s['thoi_gian_chieu'])),
+                              style: TextStyle(color: Colors.white),
+                            ),
                           );
-                        }).toList(),
+                        },
                       ),
                     )
                   : SizedBox(),

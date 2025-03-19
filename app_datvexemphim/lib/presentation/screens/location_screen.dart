@@ -68,8 +68,10 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        title: const Text("Danh Sách Rạp"),
+        title: const Text('Danh Sách Rạp',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xfff9f9f9),
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(
@@ -108,7 +110,10 @@ class _LocationScreenState extends State<LocationScreen> {
                       ? const Center(
                           child: Text(
                             "Không có rạp nào trong tỉnh/thành này",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
                           ),
                         )
                       : ListView.builder(

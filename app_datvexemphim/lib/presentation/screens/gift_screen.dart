@@ -24,8 +24,10 @@ class _GiftScreenState extends State<GiftScreen>
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('Ưu đãi & Voucher',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -115,7 +117,12 @@ class _AdsTabState extends State<AdsTab> with AutomaticKeepAliveClientMixin {
                           ad['url_hinh'],
                           width: double.infinity,
                           height: 200,
-                          fit: BoxFit.contain,
+                          fit: BoxFit
+                              .cover, // Đảm bảo ảnh luôn fit vào khung, không bị méo
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset("assets/images/placeholder.jpg",
+                                fit: BoxFit.cover);
+                          },
                         ),
                       ),
                     ),
@@ -196,7 +203,11 @@ class _VouchersTabState extends State<VouchersTab>
                           voucher['url_hinh'],
                           width: double.infinity,
                           height: 200,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset("assets/images/placeholder.jpg",
+                                fit: BoxFit.cover);
+                          },
                         ),
                       ),
                     ),
@@ -221,7 +232,8 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: Text(title),backgroundColor: Colors.white,),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

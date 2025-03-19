@@ -194,7 +194,13 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Chỉnh sửa thông tin")),
+      backgroundColor: const Color(0xfff9f9f9),
+      appBar: AppBar(
+        title: const Text("Chỉnh sửa thông tin",
+            style: TextStyle(
+                color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xfff9f9f9),
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : _buildUserView(),
