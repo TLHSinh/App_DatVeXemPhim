@@ -115,18 +115,10 @@ const Appointment = () => {
   const sortedDoctors = [...currentDoctors].sort((a, b) => {
     if (!sortColumn) return 0;
     const direction = sortDirection === 'asc' ? 1 : -1;
-
-    if (sortColumn === 'ngayHen' || sortColumn === 'thoiGianBatDau') {
-      const dateA = new Date(a[sortColumn]);
-      const dateB = new Date(b[sortColumn]);
-      return dateA - dateB > 0 ? direction : -direction;
-    }
-
     if (a[sortColumn] < b[sortColumn]) return -1 * direction;
     if (a[sortColumn] > b[sortColumn]) return 1 * direction;
     return 0;
   });
-
 
 
 
@@ -170,7 +162,7 @@ const Appointment = () => {
             <table className="user-table">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort('benhNhan')}>
+                <th onClick={() => handleSort('benhNhan')}>
                     <div className='nameandsort'>
                       <span>Tên khách hàng</span>
                       <span className="sort-icon">{getSortIcon('ten')}</span>
@@ -182,18 +174,8 @@ const Appointment = () => {
                       <span className="sort-icon">{getSortIcon('ten')}</span>
                     </div>
                   </th>
-                  <th onClick={() => handleSort('ngayHen')}>
-                    <div className="nameandsort">
-                      <span>Ngày hẹn</span>
-                      <span className="sort-icon">{getSortIcon('ngayHen')}</span>
-                    </div>
-                  </th>
-                  <th onClick={() => handleSort('thoiGianBatDau')}>
-                    <div className="nameandsort">
-                      <span>Thời gian bắt đầu</span>
-                      <span className="sort-icon">{getSortIcon('thoiGianBatDau')}</span>
-                    </div>
-                  </th>
+                  <th>Ngày hẹn</th>
+                  <th>Thời gian bắt đầu</th>
                   <th>Trạng thái</th>
                 </tr>
               </thead>

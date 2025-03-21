@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { BASE_URL } from '../../../config';
-import { AuthContext } from '../../../context/AuthContext.jsx'; // Để lấy token
-import './ChiTiet.css'; // Tạo file CSS riêng cho chi tiết người dùng
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { BASE_URL } from "../../../config";
+import { AuthContext } from "../../../context/AuthContext.jsx"; // Để lấy token
+import "./ChiTiet.css"; // Tạo file CSS riêng cho chi tiết người dùng
 import { FaChevronLeft } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
@@ -18,10 +18,10 @@ const CTKhachHang = () => {
   // Hàm lấy thông tin chi tiết người dùng
   const fetchUserDetail = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/users/${id}`, {
-        method: 'GET',
+      const res = await fetch(`${BASE_URL}/api/v1/user/${id}`, {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -31,7 +31,7 @@ const CTKhachHang = () => {
       if (result.success) {
         setUser(result.data);
       } else {
-        throw new Error(result.message || 'Không tìm thấy người dùng');
+        throw new Error(result.message || "Không tìm thấy người dùng");
       }
     } catch (err) {
       setError(err.message);
@@ -49,72 +49,55 @@ const CTKhachHang = () => {
 
   return (
     <div className="detail-container">
-      <div className='title-ad'>
-        <div className='icon-back'>
+      <div className="title-ad">
+        <div className="icon-back">
           <Link to="/admin/danhsachkhachhang">
-            <FaChevronLeft color='#66B5A3' />
+            <FaChevronLeft color="#66B5A3" />
           </Link>
         </div>
         <h1>CHI TIẾT KHÁCH HÀNG</h1>
       </div>
       {user && (
         <div className="user-info">
-          <div className='avt-name-detail'>
+          <div className="avt-name-detail">
             <img
               src={user.hinhAnh}
               alt={`Hình của ${user.ten}`}
-              style={{ width: '150px', height: '150px', borderRadius: '50%' }}
+              style={{ width: "150px", height: "150px", borderRadius: "50%" }}
             />
-
           </div>
-          <h2 style={{textAlign:"center", color:"#66B5A3"}}>{user.ten}</h2>
+          <h2 style={{ textAlign: "center", color: "#66B5A3" }}>
+            {user.hoTen}
+          </h2>
           <form action="#" class="form">
             <div class="column">
               <div class="input-box">
                 <label>CCCD</label>
-                <div className='item-detail'>
-                  {user.cccd}
-                </div>
+                <div className="item-detail">{user.cccd}</div>
               </div>
               <div class="input-box">
                 <label>Ngày sinh</label>
-                <div className='item-detail'>
-                  {user.ngaySinh}
-                </div>
+                <div className="item-detail">{user.ngaySinh}</div>
               </div>
               <div class="input-box">
                 <label>Giới tính</label>
-                <div className='item-detail'>
-                  {user.gioiTinh}
-                </div>
+                <div className="item-detail">{user.gioiTinh}</div>
               </div>
             </div>
             <div class="column">
               <div class="input-box">
                 <label>Email</label>
-                <div className='item-detail'>
-                  {user.email}
-                </div>
+                <div className="item-detail">{user.email}</div>
               </div>
               <div class="input-box">
                 <label>Số điện thoại</label>
-                <div className='item-detail'>
-                  {user.soDienThoai}
-                </div>
-              </div>
-              <div class="input-box">
-                <label>Nhóm máu</label>
-                <div className='item-detail'>
-                  {user.nhomMau}
-                </div>
+                <div className="item-detail">{user.sodienthoai}</div>
               </div>
             </div>
             <div class="column">
               <div class="input-box">
                 <label>Địa chỉ</label>
-                <div className='item-detail'>
-                  {user.diaChi}
-                </div>
+                <div className="item-detail">{user.diaChi}</div>
               </div>
             </div>
           </form>

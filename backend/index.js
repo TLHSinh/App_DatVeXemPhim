@@ -26,6 +26,10 @@ import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 import FeedbackManagementRoutes from './admin/routes/FeedbackManagementRoutes.js';
 
+//EmloyeeRoutes
+import emloyeeRoutes from "./routes/employeeRoutes.js";;
+
+
 //Kiểm tra huỷ vé nếu chưa thanh toán
 //import "./controllers/paymentTime.js"; // Import cron job
 
@@ -63,7 +67,7 @@ app.use(cors(corsOptions));
 
 // User routes
 app.use('/api/v1/auth', authRoute);
-app.use('/api/v1', movieRoutes);
+app.use('/api/v1/movie', movieRoutes);
 app.use('/api/v1', cinemaRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/seat', seatRoutes);
@@ -82,6 +86,11 @@ app.use('/api/v1', FoodManagementRoutes);
 app.use('/api/v1/admin', AdsManagementRoutes);
 app.use('/api/v1/admin', RevenueManagementRoutes);
 app.use('/api/v1/admin', FeedbackManagementRoutes);
+
+
+//EmloyeeRoutes
+app.use('/api/v1/employee', emloyeeRoutes);
+
 
 // Start server
 app.listen(port, () => {
