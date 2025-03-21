@@ -20,9 +20,9 @@ const Sidebar = ({ isActive }) => {
           <FaUserDoctor className="icon" size={"1.25em"} />
           {!isActive && <span className="menu-text">Nhân Viên</span>}
         </Link>
-        <Link to="/admin/danhsachlichhen" className="item-ad">
+        <Link to="/admin/ListCinemas" className="item-ad">
           <MdOutlineSpaceDashboard className="icon" size={"1.25em"} />
-          {!isActive && <span className="menu-text">Lịch Hẹn</span>}
+          {!isActive && <span className="menu-text">Danh sách rạp</span>}
         </Link>
         <Link to="/admin/ListMovies" className="item-ad">
           <FaCapsules className="icon" size={"1.25em"} />

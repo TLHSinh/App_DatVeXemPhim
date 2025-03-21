@@ -19,6 +19,9 @@ import ChiTietKhachHang from "../Pages/Admin/Details/CTKhachHang";
 import ListMovies from "../Pages/Admin/Movie/ListMovie";
 import ListUser from "../Pages/Admin/Users/ListUser";
 import ListEmployees from "../Pages/Admin/Employee/ListEmployees";
+import ListCinema from "../Pages/Admin/Cinema/ListCinema";
+import ListRoom from "../Pages/Admin/Room/ListRoom";
+import ListSeat from "../Pages/Admin/Seat/ListSeat";
 
 import DetailUser from "../Pages/Admin/Users/DetailUser";
 import DetailEmployees from "../Pages/Admin/Employee/DetailEmployee";
@@ -53,6 +56,9 @@ const AdminRouter = () => (
       <Route path="ListMovies" element={<ListMovies />} />
       <Route path="ListUsers" element={<ListUser />} />
       <Route path="ListEmployees" element={<ListEmployees />} />
+      <Route path="ListCinemas" element={<ListCinema />} />
+      <Route path="ListRooms/:theaterId/rooms" element={<ListRoom />} />
+      <Route path="ListSeats/:roomId/seats" element={<ListSeat />} />
 
       {/* details */}
       <Route path="DetailUser/:id" element={<DetailUser />} />

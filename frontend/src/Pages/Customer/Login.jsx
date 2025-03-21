@@ -49,8 +49,8 @@ const Login = () => {
       toast.success(data.message);
 
       // Điều hướng dựa trên role
-      if (data.role === "nhanvien") {
-        navigate("/admin/ListUsers"); // Điều hướng đến trang admin
+      if (data.data.role === "nhanvien") {
+        navigate("/admin/Dashboard");
       }
     } catch (err) {
       toast.error(err.message);
@@ -91,7 +91,7 @@ const Login = () => {
               type="password"
               placeholder="Mật Khẩu"
               name="matKhau"
-              value={formData.password}
+              value={formData.matKhau}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-6 text-headingColor placeholder:text-textColor rounded-md cursor-pointer"
               required

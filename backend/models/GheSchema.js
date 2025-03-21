@@ -5,7 +5,7 @@ const GheSchema = new mongoose.Schema({
   so_ghe: { type: String, required: true },
   trang_thai: { 
     type: String, 
-    enum: ["có sẵn", "đã đặt trước"], 
+    enum: ["có sẵn", "đã đặt trước", "hư hỏng", "bảo trì"], 
     default: "có sẵn" 
   },
 }, { timestamps: true });
