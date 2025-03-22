@@ -13,6 +13,8 @@ import seatRoutes from "./routes/seatRoutes.js";
 import bookTicketsRoutes from "./routes/bookTicketsRoutes.js";
 import advertiseRoutes from "./routes/advertiseRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+
 
 // Admin routes
 import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
@@ -74,6 +76,7 @@ app.use('/api/v1/seat', seatRoutes);
 app.use('/api/v1/book', bookTicketsRoutes);
 app.use('/api/v1/advertise', advertiseRoutes);
 app.use('/api/v1/reviews', feedbackRoutes);
+app.use('/api/v1/ticket', ticketRoutes);
 
 // Admin routes
 app.use('/api/v1/admin', UserManagementRoutes);
