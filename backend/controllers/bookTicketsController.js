@@ -166,12 +166,95 @@ export const datGhe = async (req, res) => {
   };
   
 
+  // export const xacNhanDatVe = async (req, res) => {
+  //   const session = await mongoose.startSession();
+  //   session.startTransaction();
+  
+  //   try {
+  //     const { idNguoiDung, idLichChieu, danhSachGhe, idVoucher  } = req.body;
+  
+  //     if (!Array.isArray(danhSachGhe) || danhSachGhe.length === 0) {
+  //       return res.status(400).json({ message: "Danh sách ghế không hợp lệ!" });
+  //     }
+  
+  //     const lichChieu = await LichChieu.findById(idLichChieu);
+  //     if (!lichChieu) {
+  //       return res.status(404).json({ message: "Suất chiếu không tồn tại!" });
+  //     }
+  
+  //     // Kiểm tra ghế đã bị đặt trước chưa
+  //     const gheDaDat = await TrangThaiGhe.find({
+  //       id_lich_chieu: idLichChieu,
+  //       id_ghe: { $in: danhSachGhe },
+  //       trang_thai: "đã đặt",
+  //     });
+  
+  //     if (gheDaDat.length > 0) {
+  //       return res.status(400).json({
+  //         message: "Một hoặc nhiều ghế đã bị đặt trước!",
+  //         ghe_da_dat: gheDaDat.map(ghe => ghe.id_ghe),
+  //       });
+  //     }
+  
+  //     // Tính tiền
+  //     const giaVe = lichChieu.gia_ve;
+  //     let tongTien = giaVe * danhSachGhe.length;
+  //     let tienGiam = 0;
+  //     let tienThanhToan = tongTien;
+  
+  //     if (idVoucher) {
+  //       const voucher = await Voucher.findById(idVoucher);
+  //       if (voucher && voucher.gia_tri_giam) {
+  //         tienGiam = Math.min(voucher.gia_tri_giam, tongTien);
+  //         tienThanhToan = tongTien - tienGiam;
+  //       }
+  //     }
+  
+  //     // Tạo đơn đặt vé với danh sách ghế
+  //     const donDatVe = new DonDatVe({
+  //       id_nguoi_dung: idNguoiDung,
+  //       id_lich_chieu: idLichChieu,
+  //       danh_sach_ghe: danhSachGhe, // Lưu danh sách ghế
+  //       id_voucher: idVoucher || null,
+  //       gia_tri_giam_ap_dung: idVoucher ? tienGiam : 0,
+  //       tong_tien: tongTien,
+  //       tien_giam: tienGiam,
+  //       tien_thanh_toan: tienThanhToan,
+  //       trang_thai: "đang chờ",
+  //     });
+  
+  //     const donDatVeSaved = await donDatVe.save({ session });
+  
+  //     // Cập nhật trạng thái ghế thành "đã đặt trước"
+  //     const updates = danhSachGhe.map(idGhe => ({
+  //       updateOne: {
+  //         filter: { id_lich_chieu: idLichChieu, id_ghe: idGhe },
+  //         update: { trang_thai: "đã đặt" },
+  //         upsert: true,
+  //       },
+  //     }));
+  
+  //     await TrangThaiGhe.bulkWrite(updates, { session });
+  
+  //     await session.commitTransaction();
+  //     session.endSession();
+  
+  //     res.status(200).json({ message: "Đặt vé thành công!", donDatVe: donDatVeSaved });
+  //   } catch (error) {
+  //     await session.abortTransaction();
+  //     session.endSession();
+  //     res.status(500).json({ message: "Lỗi server!", error: error.message });
+  //   }
+  // };
+
+
+
   export const xacNhanDatVe = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
   
     try {
-      const { idNguoiDung, idLichChieu, danhSachGhe, idVoucher  } = req.body;
+      const { idNguoiDung, idLichChieu, danhSachGhe, danhSachDoAn, idVoucher, idNhanVien } = req.body;
   
       if (!Array.isArray(danhSachGhe) || danhSachGhe.length === 0) {
         return res.status(400).json({ message: "Danh sách ghế không hợp lệ!" });
@@ -196,7 +279,7 @@ export const datGhe = async (req, res) => {
         });
       }
   
-      // Tính tiền
+      // Tính tổng tiền
       const giaVe = lichChieu.gia_ve;
       let tongTien = giaVe * danhSachGhe.length;
       let tienGiam = 0;
@@ -210,22 +293,32 @@ export const datGhe = async (req, res) => {
         }
       }
   
-      // Tạo đơn đặt vé với danh sách ghế
+      // Nếu có danh sách đồ ăn, tính thêm tiền
+      if (Array.isArray(danhSachDoAn) && danhSachDoAn.length > 0) {
+        const doAnList = await DoAn.find({ _id: { $in: danhSachDoAn } });
+        const tongTienDoAn = doAnList.reduce((sum, item) => sum + item.gia, 0);
+        tongTien += tongTienDoAn;
+        tienThanhToan += tongTienDoAn;
+      }
+  
+      // Tạo đơn đặt vé
       const donDatVe = new DonDatVe({
         id_nguoi_dung: idNguoiDung,
         id_lich_chieu: idLichChieu,
-        danh_sach_ghe: danhSachGhe, // Lưu danh sách ghế
+        danh_sach_ghe: danhSachGhe,
+        danh_sach_do_ăn: danhSachDoAn || [],
         id_voucher: idVoucher || null,
         gia_tri_giam_ap_dung: idVoucher ? tienGiam : 0,
         tong_tien: tongTien,
         tien_giam: tienGiam,
         tien_thanh_toan: tienThanhToan,
         trang_thai: "đang chờ",
+        nhanVienXuatVeGiay: idNhanVien || null,
       });
   
       const donDatVeSaved = await donDatVe.save({ session });
   
-      // Cập nhật trạng thái ghế thành "đã đặt trước"
+      // Cập nhật trạng thái ghế thành "đã đặt"
       const updates = danhSachGhe.map(idGhe => ({
         updateOne: {
           filter: { id_lich_chieu: idLichChieu, id_ghe: idGhe },
@@ -246,7 +339,6 @@ export const datGhe = async (req, res) => {
       res.status(500).json({ message: "Lỗi server!", error: error.message });
     }
   };
-
 
 
 export const thanhToan = async (req, res) => {
