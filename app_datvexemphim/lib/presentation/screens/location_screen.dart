@@ -2,6 +2,10 @@ import 'package:app_datvexemphim/presentation/screens/pickmovieandtime_screen.da
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:geolocator/geolocator.dart'; // Thêm import này
+import 'package:icons_plus/icons_plus.dart';
+import 'package:url_launcher/url_launcher.dart'; // Thêm import này
+import 'dart:math';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -16,6 +20,7 @@ class _LocationScreenState extends State<LocationScreen> {
   List<String> provinces = []; // Danh sách tỉnh/thành
   String? selectedProvince; // Tỉnh/thành được chọn
   bool isLoading = true;
+  bool isLocationLoading = false; // Biến để theo dõi trạng thái lấy vị trí
 
   @override
   void initState() {
@@ -52,6 +57,55 @@ class _LocationScreenState extends State<LocationScreen> {
     }
   }
 
+  // Tính khoảng cách giữa hai điểm
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadius = 6371; // Bán kính trái đất tính bằng km
+    double dLat = _degreesToRadians(lat2 - lat1);
+    double dLon = _degreesToRadians(lon2 - lon1);
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) *
+            cos(_degreesToRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return earthRadius * c; // Khoảng cách tính bằng km
+  }
+
+  double _degreesToRadians(double degrees) {
+    return degrees * pi / 180;
+  }
+
+  // Tìm kiếm 5 rạp gần nhất
+  void findNearestCinemas(double userLat, double userLon) {
+    List<dynamic> nearestCinemas = [];
+    for (var cinema in cinemas) {
+      double? lat = cinema["geo_lat"];
+      double? lon = cinema["geo_long"];
+
+      // Kiểm tra xem lat và lon có phải là null không
+      if (lat != null && lon != null) {
+        double distance = calculateDistance(
+          userLat,
+          userLon,
+          lat,
+          lon,
+        );
+        nearestCinemas.add({"cinema": cinema, "distance": distance});
+      }
+    }
+    nearestCinemas.sort((a, b) => a["distance"].compareTo(b["distance"]));
+    setState(() {
+      filteredCinemas = nearestCinemas.take(5).map((e) => e["cinema"]).toList();
+    });
+
+    // In ra thông báo về 5 rạp gần nhất
+    print("📍 Vị trí hiện tại: ($userLat, $userLon)");
+    print("🎬 5 rạp gần nhất:");
+    for (var cinema in filteredCinemas) {
+      print("- ${cinema['ten_rap']} tại ${cinema['dia_chi']}");
+    }
+  }
+
   // Lọc rạp theo tỉnh/thành được chọn
   void filterCinemas(String province) {
     setState(() {
@@ -61,6 +115,51 @@ class _LocationScreenState extends State<LocationScreen> {
         return diaChi.contains(province);
       }).toList();
     });
+  }
+
+  // Lấy vị trí hiện tại của người dùng
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      isLocationLoading = true; // Bắt đầu quá trình lấy vị trí
+    });
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Nếu quyền bị từ chối vĩnh viễn, hiển thị thông báo
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng cấp quyền vị trí")),
+      );
+      setState(() {
+        isLocationLoading = false; // Kết thúc quá trình lấy vị trí
+      });
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    findNearestCinemas(position.latitude, position.longitude);
+
+    // In ra thông báo đã lấy được vị trí
+    print(
+        "✅ Đã lấy vị trí hiện tại: ($position.latitude, $position.longitude)");
+
+    setState(() {
+      isLocationLoading = false; // Kết thúc quá trình lấy vị trí
+    });
+  }
+
+  // Mở Google Maps chỉ đường đến rạp
+  void _openMaps(double lat, double lon) async {
+    final url = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -104,6 +203,17 @@ class _LocationScreenState extends State<LocationScreen> {
                   ),
                 ),
 
+                // Nút tìm kiếm 5 rạp gần nhất
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ElevatedButton(
+                    onPressed: isLocationLoading ? null : _getCurrentLocation,
+                    child: isLocationLoading
+                        ? const CircularProgressIndicator() // Hiển thị vòng xoay khi đang lấy vị trí
+                        : const Text("Tìm 5 rạp gần nhất"),
+                  ),
+                ),
+
                 // Danh sách rạp
                 Expanded(
                   child: filteredCinemas.isEmpty
@@ -118,13 +228,25 @@ class _LocationScreenState extends State<LocationScreen> {
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.all(16),
-                          itemCount: filteredCinemas.length,
+                          itemCount: filteredCinemas.length +
+                              1, // Tăng itemCount lên 1
                           itemBuilder: (context, index) {
+                            if (index == filteredCinemas.length) {
+                              return const SizedBox(
+                                  height:
+                                      50); // Thêm khoảng trống cuối danh sách
+                            }
                             var cinema = filteredCinemas[index];
-                            return CinemaCard(cinema: cinema);
+                            return CinemaCard(
+                              cinema: cinema,
+                              onNavigate: () {
+                                _openMaps(
+                                    cinema["geo_lat"], cinema["geo_long"]);
+                              },
+                            );
                           },
                         ),
-                ),
+                )
               ],
             ),
     );
@@ -133,8 +255,9 @@ class _LocationScreenState extends State<LocationScreen> {
 
 class CinemaCard extends StatelessWidget {
   final Map<String, dynamic> cinema;
+  final VoidCallback onNavigate; // Thêm tham số cho hàm chỉ đường
 
-  const CinemaCard({super.key, required this.cinema});
+  const CinemaCard({super.key, required this.cinema, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -184,16 +307,25 @@ class CinemaCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tên rạp
-                  Text(
-                    cinema["ten_rap"] ?? "Không có tên",
-                    style: const TextStyle(
-                      color: Colors.black, // Màu chữ đen
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        cinema["ten_rap"] ?? "Không có tên",
+                        style: const TextStyle(
+                          color: Colors.black, // Màu chữ đen
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      IconButton(
+                        icon: const Icon(LineAwesome.directions_solid),
+                        color: Colors.blueAccent,
+                        onPressed: onNavigate,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 6),
 
@@ -229,6 +361,7 @@ class CinemaCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 6),
                 ],
               ),
             ),
@@ -238,7 +371,3 @@ class CinemaCard extends StatelessWidget {
     );
   }
 }
-
-
-
-

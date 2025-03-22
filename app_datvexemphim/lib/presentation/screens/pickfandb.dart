@@ -236,17 +236,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     );
   }
 
-  /// 🎟 Tính tổng tiền bao gồm giá vé và bắp nước
-  // int _calculateTotalPrice() {
-  //   int total = widget.totalPrice.toInt();
-  //   selectedFoods.forEach((foodId, quantity) {
-  //     var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
-  //     if (food.isNotEmpty) {
-  //       total += food["gia"] * quantity;
-  //     }
-  //   });
-  //   return total;
-  // }
   int _calculateTotalPrice() {
     int total = widget.totalPrice;
     selectedFoods.forEach((foodId, quantity) {

@@ -5,6 +5,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:dio/dio.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
@@ -17,12 +18,13 @@ class DetailMovieScreen extends StatefulWidget {
 class _DetailMovieScreenState extends State<DetailMovieScreen> {
   YoutubePlayerController? _youtubeController;
   bool _isExpanded = false;
-    List<dynamic> _reviews = [];
+  List<dynamic> _reviews = []; // Danh sách bình luận
 
   @override
   void initState() {
     super.initState();
     _initYouTubeController();
+    _fetchReviews(); // Gọi hàm để lấy bình luận
   }
 
   void _initYouTubeController() {
@@ -37,17 +39,20 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       }
     }
   }
-Future<void> _fetchReviews() async {
+
+  Future<void> _fetchReviews() async {
     try {
-      final response = await ApiService.get(
-          'https://your-api.com/reviews/movie/${widget.movie["_id"]}');
-      setState(() {
-        _reviews = response?.data;
-      });
+      final response = await ApiService.get('/reviews/movie/${widget.movie["_id"]}');
+      if (response != null && response.statusCode == 200) {
+        setState(() {
+          _reviews = response.data; // Lưu bình luận vào danh sách
+        });
+      }
     } catch (e) {
-      print("Error fetching reviews: $e");
+      print("❌ Lỗi khi lấy bình luận: $e");
     }
   }
+
   @override
   void dispose() {
     _youtubeController?.dispose();
@@ -105,18 +110,40 @@ Future<void> _fetchReviews() async {
 
   Widget _buildReviewCard(Map<String, dynamic> review) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(review['id_nguoi_dung']['hinhAnh']),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Hình ảnh người bình luận
+            CircleAvatar(
+              backgroundImage: NetworkImage(review["id_nguoi_dung"]?["hinhAnh"] ?? "https://via.placeholder.com/150"),
+              radius: 25,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    review["id_nguoi_dung"]?["hoTen"] ?? "Người dùng",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(review["binh_luan"] ?? "Không có bình luận"),
+                  const SizedBox(height: 5),
+                  Text(
+                    _formatDate(review["createdAt"]),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text(review['id_nguoi_dung']['hoTen'],
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(review['binh_luan']),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +162,6 @@ Future<void> _fetchReviews() async {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
-        // padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -226,22 +252,13 @@ Future<void> _fetchReviews() async {
               ),
             ),
             const SizedBox(height: 5),
-                        Card(
-              color: Color(0xffffffff),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Bình luận",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
-                    ..._reviews.map((review) => _buildReviewCard(review)).toList(),
-                  ],
-                ),
-              ),
-            )
+
+            // Hiển thị bình luận
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text("Bình luận", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            ..._reviews.map((review) => _buildReviewCard(review)).toList(), // Hiển thị danh sách bình luận
           ],
         ),
       ),
@@ -272,4 +289,6 @@ Future<void> _fetchReviews() async {
       ),
     );
   }
+
+
 }

@@ -1,3 +1,4 @@
+import { Double } from "mongodb";
 import mongoose from "mongoose";
 
 const RapPhimSchema = new mongoose.Schema({
@@ -6,6 +7,8 @@ const RapPhimSchema = new mongoose.Schema({
   dia_chi: { type: String, required: true },
   anh: { type: String },
   so_dien_thoai: { type: String },
+  geo_lat: { type: Double },
+  geo_long: { type: Double },
   location: {
     type: { type: String, enum: ["Point"], required: true, default: "Point" }, // Kiểu dữ liệu GeoJSON
     coordinates: { type: [Number], required: true } // [longitude, latitude]
