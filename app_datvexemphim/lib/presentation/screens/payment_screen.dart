@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app_datvexemphim/presentation/screens/web_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -75,7 +76,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
 
     final Map<String, dynamic> body = {
-      "amount": _finalPrice, // Thay bằng giá trị thực tế
+      "amount": _finalPrice,
       "orderInfo": "Thanh toán MoMo test"
     };
 
@@ -90,19 +91,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final Map<String, dynamic> result = jsonDecode(response.body);
         final String payUrl = result['payUrl'];
 
-        // Hiển thị thông báo
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}")),
+          SnackBar(content: Text("Mở trang thanh toán...")),
         );
 
-        // Điều hướng tới `payUrl`
-        if (await canLaunch(payUrl)) {
-          await launch(payUrl);
-        } else {
-          throw 'Không thể mở URL: $payUrl';
-        }
+        // Điều hướng vào WebView
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => WebViewScreen(url: payUrl)),
+        );
       } else {
         throw 'Lỗi khi thanh toán: ${response.body}';
       }

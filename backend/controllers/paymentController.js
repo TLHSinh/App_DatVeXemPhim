@@ -8,7 +8,7 @@ export const createPayment = async (req, res) => {
     const { amount, orderInfo } = req.body;
 
     var redirectUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
-    var ipnUrl = 'https://2422-2405-4802-9112-b2d0-75c9-ab89-3374-da51.ngrok-free.app/api/v1/callback';
+    var ipnUrl = 'https://fb29-2405-4802-9112-b2d0-75c9-ab89-3374-da51.ngrok-free.app/api/v1/callback';
     var requestType = "payWithMethod";
     var orderId = partnerCode + new Date().getTime();
     var requestId = orderId;
