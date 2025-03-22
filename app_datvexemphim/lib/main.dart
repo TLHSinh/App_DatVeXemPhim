@@ -1,5 +1,7 @@
 import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
 import 'package:app_datvexemphim/presentation/widgets/final_view.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/splash_screen.dart';
@@ -24,45 +26,58 @@ Future<void> main() async {
     );
   }
 
+  final uri = Uri.base; // Nhận deep link từ hệ thống
+  if (uri.scheme == "appdatvexemphim" && uri.host == "payment-success") {
+    print("Nhận deep link: ${uri.queryParameters}");
+  }
   runApp(MyApp()); // Chạy app sau khi Firebase đã được khởi tạo
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppLinks _appLinks;
   final GoRouter _router = GoRouter(
     initialLocation: '/splash',
     routes: [
+      GoRoute(path: '/splash', builder: (context, state) => SplashScreen()),
+      GoRoute(path: '/loading', builder: (context, state) => LoadingScreen()),
       GoRoute(
-        path: '/splash',
-        builder: (context, state) => SplashScreen(),
-      ),
+          path: '/onboarding', builder: (context, state) => OnboardingScreen()),
+      GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
+      GoRoute(path: '/register', builder: (context, state) => RegisterScreen()),
+      GoRoute(path: '/home', builder: (context, state) => FinalView()),
       GoRoute(
-        path: '/loading',
-        builder: (context, state) => LoadingScreen(),
-      ),
+          path: '/payment-success',
+          builder: (context, state) {
+            final params = state.uri.queryParameters;
+            return PaymentSuccessful(queryParams: params);
+          }),
       GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => OnboardingScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => RegisterScreen(),
-      ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => FinalView(),
-      ),
-      GoRoute(
-        path: '/detailProfile',
-        builder: (context, state) => DetailprofileScreen(),
-      ),
+          path: '/detailProfile',
+          builder: (context, state) => DetailprofileScreen()),
     ],
   );
 
-  MyApp({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _appLinks = AppLinks();
+    _handleDeepLinks();
+  }
+
+  void _handleDeepLinks() async {
+    _appLinks.uriLinkStream.listen((Uri? uri) {
+      if (uri != null && uri.path == '/payment-success') {
+        _router.go('/payment-success'); // Điều hướng về trang Home
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

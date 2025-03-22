@@ -1,4 +1,5 @@
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/screens/splash_screen.dart';
 import '../presentation/screens/onboarding_screen.dart';
@@ -16,6 +17,12 @@ class AppRoutes {
       GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
       GoRoute(path: '/register', builder: (context, state) => RegisterScreen()),
       GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
+      GoRoute(
+          path: '/payment-success',
+          builder: (context, state) {
+            final params = state.uri.queryParameters;
+            return PaymentSuccessful(queryParams: params);
+          }),
       GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
