@@ -6,8 +6,7 @@ import 'package:app_datvexemphim/api/api_service.dart';
 class PickCinemaAndTimeScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
 
-  const PickCinemaAndTimeScreen({Key? key, required this.movie})
-      : super(key: key);
+  const PickCinemaAndTimeScreen({super.key, required this.movie});
 
   @override
   _PickCinemaAndTimeScreenState createState() =>
@@ -112,11 +111,11 @@ class DatePickerHorizontal extends StatelessWidget {
   final Function(DateTime) onDateSelected;
 
   const DatePickerHorizontal({
-    Key? key,
+    super.key,
     required this.dates,
     required this.selectedDate,
     required this.onDateSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -171,12 +170,12 @@ class ShowtimeList extends StatelessWidget {
   final Function(String) toggleCinema;
 
   const ShowtimeList({
-    Key? key,
+    super.key,
     required this.showtimes,
     required this.selectedDate,
     required this.expandedCinemas,
     required this.toggleCinema,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
