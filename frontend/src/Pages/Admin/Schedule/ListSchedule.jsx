@@ -8,8 +8,10 @@ import {
   RefreshCw,
   Filter,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LichChieuPhim = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalType, setModalType] = useState("");
@@ -475,6 +477,16 @@ const LichChieuPhim = () => {
                             >
                               <Trash size={18} />
                             </button>
+                            <button
+                              onClick={() =>
+                                // navigate(`ListSeatSchedules/${item.id}`)
+                                navigate(`/admin/ListSeatSchedules/${item._id}`)
+                              }
+                              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                              title="Xem danh sách ghế"
+                            >
+                              <Trash size={18} />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -534,9 +546,16 @@ const LichChieuPhim = () => {
                   <div className="flex">
                     <div className="w-1/3">
                       <img
-                        src="/api/placeholder/150/225"
+                        className="h-96 w-80   rounded-md object-cover"
+                        src={
+                          selectedItem.id_phim.url_poster
+                            ? `https://rapchieuphim.com${selectedItem.id_phim.url_poster}`
+                            : "https://via.placeholder.com/150x200"
+                        }
                         alt="Poster"
-                        className="rounded-md"
+                        onError={(e) =>
+                          (e.target.src = "https://via.placeholder.com/150x200")
+                        }
                       />
                     </div>
                     <div className="w-2/3 pl-6 space-y-3">

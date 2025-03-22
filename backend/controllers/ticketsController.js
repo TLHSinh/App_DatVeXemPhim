@@ -74,3 +74,29 @@ export const getTicketByID = async (req, res) => {
         res.status(500).json({ message: "Lỗi máy chủ" });
     }
 };
+
+
+export const layDonVeTheoGheVaXuatChieu = async (req, res) => {
+  try {
+    const { id_ghe, id_xuat_chieu } = req.params;
+
+    const donDatVe = await DonDatVe.findOne({
+      id_lich_chieu: id_xuat_chieu,
+      danh_sach_ghe: id_ghe,
+    })
+      .populate("id_nguoi_dung", "ten email")
+      .populate("id_lich_chieu")
+      .populate("danh_sach_ghe")
+      .populate("danh_sach_do_an")
+      .populate("id_voucher")
+      .populate("nhanVienXuatVeGiay", "ten email");
+
+    if (!donDatVe) {
+      return res.status(404).json({ message: "Không tìm thấy đơn đặt vé!" });
+    }
+
+    res.status(200).json(donDatVe);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};

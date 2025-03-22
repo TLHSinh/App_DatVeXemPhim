@@ -207,7 +207,10 @@ const TheaterList = () => {
                   <td className="py-3 px-4">{theater.ma_rap}</td>
                   <td className="py-3 px-4">
                     <img
-                      src={theater.anh || "/api/placeholder/80/80"}
+                      src={
+                        `https://rapchieuphim.com${theater.anh}` ||
+                        "/api/placeholder/80/80"
+                      }
                       alt={theater.ten_rap}
                       className="w-16 h-16 object-cover rounded"
                     />
