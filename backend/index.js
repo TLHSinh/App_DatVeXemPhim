@@ -12,6 +12,7 @@ import userRoutes from './routes/userRoutes.js';
 import seatRoutes from "./routes/seatRoutes.js";
 import bookTicketsRoutes from "./routes/bookTicketsRoutes.js";
 import advertiseRoutes from "./routes/advertiseRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 // Admin routes
 import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
@@ -23,6 +24,7 @@ import VoucherManagementRoutes from './admin/routes/VoucherManagementRoutes.js';
 import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
+import FeedbackManagementRoutes from './admin/routes/FeedbackManagementRoutes.js';
 
 //Kiểm tra huỷ vé nếu chưa thanh toán
 //import "./controllers/paymentTime.js"; // Import cron job
@@ -67,17 +69,19 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/seat', seatRoutes);
 app.use('/api/v1/book', bookTicketsRoutes);
 app.use('/api/v1/advertise', advertiseRoutes);
+app.use('/api/v1/reviews', feedbackRoutes);
 
 // Admin routes
-app.use('/api/admin', UserManagementRoutes);
-app.use('/api/admin', MovieManagementRoutes);
-app.use('/api/admin', CinemaManagementRoutes);
-app.use('/api/admin', SeatManagementRoutes);
-app.use('/api/admin', BookTicketManagementRoutes);
-app.use('/api/admin', VoucherManagementRoutes);
+app.use('/api/v1/admin', UserManagementRoutes);
+app.use('/api/v1/admin', MovieManagementRoutes);
+app.use('/api/v1/admin', CinemaManagementRoutes);
+app.use('/api/v1/admin', SeatManagementRoutes);
+app.use('/api/v1/admin', BookTicketManagementRoutes);
+app.use('/api/v1/admin', VoucherManagementRoutes);
 app.use('/api/v1', FoodManagementRoutes);
-app.use('/api/admin', AdsManagementRoutes);
-app.use('/api/admin', RevenueManagementRoutes);
+app.use('/api/v1/admin', AdsManagementRoutes);
+app.use('/api/v1/admin', RevenueManagementRoutes);
+app.use('/api/v1', FeedbackManagementRoutes);
 
 // Start server
 app.listen(port, () => {

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  const LocationScreen({super.key});
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -68,8 +68,10 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        title: const Text("Danh Sách Rạp"),
+        title: const Text('Danh Sách Rạp',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xfff9f9f9),
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(
@@ -108,7 +110,10 @@ class _LocationScreenState extends State<LocationScreen> {
                       ? const Center(
                           child: Text(
                             "Không có rạp nào trong tỉnh/thành này",
-                            style: TextStyle(color: Colors.black, fontSize: 16),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
                           ),
                         )
                       : ListView.builder(
@@ -129,7 +134,7 @@ class _LocationScreenState extends State<LocationScreen> {
 class CinemaCard extends StatelessWidget {
   final Map<String, dynamic> cinema;
 
-  const CinemaCard({Key? key, required this.cinema}) : super(key: key);
+  const CinemaCard({super.key, required this.cinema});
 
   @override
   Widget build(BuildContext context) {
@@ -233,3 +238,7 @@ class CinemaCard extends StatelessWidget {
     );
   }
 }
+
+
+
+

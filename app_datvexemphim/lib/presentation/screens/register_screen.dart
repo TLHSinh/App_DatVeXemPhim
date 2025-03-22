@@ -69,12 +69,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         fillColor: Colors.white,
         labelText: hint,
         labelStyle: const TextStyle(color: Color(0xFF545454)),
-        prefixIcon: Icon(icon, color: Color(0xFFC20077)),
+        prefixIcon: Icon(icon, color: Color(0xFFee0033)),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Color(0xFFC20077),
+                  color: Color(0xFFee0033),
                 ),
                 onPressed: () {
                   setState(() {
@@ -85,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFC20077)),
+          borderSide: const BorderSide(color: Color(0xFFee0033)),
         ),
       ),
     );
@@ -94,6 +94,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => GoRouter.of(context).go('/home'),
+        ),
+        //title: Text("Đăng nhập", style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -117,15 +128,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   _buildTextField(_emailController, "Email", Icons.email),
                   const SizedBox(height: 15),
-                  _buildTextField(_fullNameController, "Họ và tên", Icons.person),
+                  _buildTextField(
+                      _fullNameController, "Họ và tên", Icons.person),
                   const SizedBox(height: 15),
                   _buildTextField(_genderController, "Giới tính", Icons.wc),
                   const SizedBox(height: 15),
-                  _buildTextField(_imageController, "Link ảnh đại diện", Icons.image),
+                  _buildTextField(
+                      _imageController, "Link ảnh đại diện", Icons.image),
                   const SizedBox(height: 15),
-                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock, isPassword: true),
+                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock,
+                      isPassword: true),
                   const SizedBox(height: 15),
-                  _buildTextField(_confirmPasswordController, "Xác nhận mật khẩu", Icons.lock, isPassword: true),
+                  _buildTextField(_confirmPasswordController,
+                      "Xác nhận mật khẩu", Icons.lock,
+                      isPassword: true),
                   const SizedBox(height: 10),
                   _errorMessage != null
                       ? Text(_errorMessage!,
@@ -151,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: ElevatedButton(
                 onPressed: _register,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.redAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -161,7 +177,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         'Hoàn Tất',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
             ),
@@ -170,8 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onTap: () => GoRouter.of(context).go('/login'),
               child: const Text(
                 "Bạn đã có tài khoản? Đăng nhập ngay",
-                style: TextStyle(
-                    color: Colors.black, fontSize: 16),
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
           ],

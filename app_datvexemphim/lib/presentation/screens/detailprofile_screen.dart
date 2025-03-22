@@ -1,8 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:app_datvexemphim/data/services/storage_service.dart';
@@ -48,52 +47,53 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   }
 
   Future<void> _fetchUserData() async {
+    setState(() => isLoading = true);
     try {
-      final response = await Dio().get(
-        "http://localhost:5000/api/v1/user/$userId",
-        options: Options(headers: {"Authorization": "Bearer $token"}),
-      );
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        setState(() {
-          userData = response.data['data'];
-          _nameController.text = userData!["hoTen"] ?? "";
-          _emailController.text = userData!["email"] ?? "";
-          _phoneController.text = userData!["sodienthoai"] ?? "";
-          _dobController.text = userData!["ngaySinh"] ?? "";
-          _cccdController.text = userData!["cccd"] ?? "";
-          _genderController.text = userData!["gioiTinh"] ?? "";
-          _addressController.text = userData!["diaChi"] ?? "";
-        });
+      final response = await ApiService.get("/user/$userId");
+
+      if (response?.statusCode == 200 &&
+          response?.data is Map<String, dynamic>) {
+        var data = response?.data as Map<String, dynamic>;
+        if (data['success'] == true) {
+          setState(() {
+            userData = data['data'];
+            _nameController.text = userData?["hoTen"] ?? "";
+            _emailController.text = userData?["email"] ?? "";
+            _phoneController.text = userData?["sodienthoai"] ?? "";
+            _dobController.text = userData?["ngaySinh"] ?? "";
+            _cccdController.text = userData?["cccd"] ?? "";
+            _genderController.text = userData?["gioiTinh"] ?? "";
+            _addressController.text = userData?["diaChi"] ?? "";
+          });
+        }
       }
     } catch (e) {
-      print("Lỗi lấy dữ liệu: $e");
-    } finally {
-      setState(() => isLoading = false);
+      print("❌ Lỗi lấy dữ liệu người dùng: $e");
     }
+    setState(() => isLoading = false);
   }
 
   Future<void> _updateUserData(String? imageUrl) async {
     try {
-      final response = await Dio().put(
-        "http://localhost:5000/api/v1/user/$userId",
-        data: {
+      final response = await ApiService.put(
+        "/user/$userId",
+        {
           "hoTen": _nameController.text,
           "sodienthoai": _phoneController.text,
           "ngaySinh": _dobController.text,
           "cccd": _cccdController.text,
           "gioiTinh": _genderController.text,
           "diaChi": _addressController.text,
-          if (imageUrl != null) "hinhAnh": imageUrl, // Cập nhật URL ảnh
+          if (imageUrl != null) "hinhAnh": imageUrl,
         },
-        options: Options(headers: {"Authorization": "Bearer $token"}),
       );
-      if (response.statusCode == 200 && response.data['success'] == true) {
+      if (response?.statusCode == 200 && response?.data['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cập nhật thành công!")),
+          const SnackBar(content: Text("✅ Cập nhật thành công!")),
         );
       }
     } catch (e) {
-      print("Lỗi cập nhật dữ liệu: $e");
+      print("❌ Lỗi cập nhật dữ liệu: $e");
     }
   }
 //dùng cho máy  máy thật chọn file từ đt
@@ -194,7 +194,13 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Chỉnh sửa thông tin")),
+      backgroundColor: const Color(0xfff9f9f9),
+      appBar: AppBar(
+        title: const Text("Chỉnh sửa thông tin",
+            style: TextStyle(
+                color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xfff9f9f9),
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : _buildUserView(),
@@ -291,3 +297,208 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
     );
   }
 }
+//
+//
+//
+//
+//
+//
+
+// class DetailProfileScreen extends StatefulWidget {
+//   @override
+//   _DetailProfileScreenState createState() => _DetailProfileScreenState();
+// }
+
+// class _DetailProfileScreenState extends State<DetailProfileScreen> {
+//   String? token, userId;
+//   Map<String, dynamic>? userData;
+//   bool isLoading = true;
+//   File? _imageFile;
+//   Uint8List? _imageBytes;
+
+//   final TextEditingController _nameController = TextEditingController();
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _phoneController = TextEditingController();
+//   final TextEditingController _dobController = TextEditingController();
+//   final TextEditingController _cccdController = TextEditingController();
+//   final TextEditingController _genderController = TextEditingController();
+//   final TextEditingController _addressController = TextEditingController();
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _checkLoginStatus();
+//   }
+
+//   Future<void> _checkLoginStatus() async {
+//     token = await StorageService.getToken();
+//     userId = await StorageService.getUserId();
+//     if (token == null || userId == null) {
+//       setState(() => isLoading = false);
+//       return;
+//     }
+//     _fetchUserData();
+//   }
+
+//   Future<void> _fetchUserData() async {
+//     setState(() => isLoading = true);
+//     try {
+//       final response = await ApiService.get("/user/$userId");
+//       if (response?.statusCode == 200 &&
+//           response?.data is Map<String, dynamic>) {
+//         var data = response?.data as Map<String, dynamic>;
+//         if (data['success'] == true) {
+//           setState(() {
+//             userData = data['data'];
+//             _nameController.text = userData?["hoTen"] ?? "";
+//             _emailController.text = userData?["email"] ?? "";
+//             _phoneController.text = userData?["sodienthoai"] ?? "";
+//             _dobController.text = userData?["ngaySinh"] ?? "";
+//             _cccdController.text = userData?["cccd"] ?? "";
+//             _genderController.text = userData?["gioiTinh"] ?? "";
+//             _addressController.text = userData?["diaChi"] ?? "";
+//           });
+//         }
+//       }
+//     } catch (e) {
+//       print("❌ Lỗi lấy dữ liệu người dùng: $e");
+//     }
+//     setState(() => isLoading = false);
+//   }
+
+//   Future<void> _pickImage() async {
+//     if (kIsWeb) {
+//       FilePickerResult? result =
+//           await FilePicker.platform.pickFiles(type: FileType.image);
+//       if (result != null) {
+//         setState(() => _imageBytes = result.files.first.bytes);
+//       }
+//     } else {
+//       final pickedFile =
+//           await ImagePicker().pickImage(source: ImageSource.gallery);
+//       if (pickedFile != null) {
+//         setState(() => _imageFile = File(pickedFile.path));
+//       }
+//     }
+//   }
+
+//   Future<String?> _uploadImageToFirebase() async {
+//     try {
+//       String fileName = "user_$userId.jpg";
+//       Reference storageRef =
+//           FirebaseStorage.instance.ref().child('users/$fileName');
+//       UploadTask uploadTask;
+//       if (kIsWeb && _imageBytes != null) {
+//         uploadTask = storageRef.putData(_imageBytes!);
+//       } else if (!kIsWeb && _imageFile != null) {
+//         uploadTask = storageRef.putFile(_imageFile!);
+//       } else {
+//         return null;
+//       }
+//       TaskSnapshot snapshot = await uploadTask;
+//       return await snapshot.ref.getDownloadURL();
+//     } catch (e) {
+//       print("Lỗi upload ảnh lên Firebase: $e");
+//       return null;
+//     }
+//   }
+
+//   Future<void> _updateUserData(String? imageUrl) async {
+//     try {
+//       final response = await ApiService.put(
+//         "/user/$userId",
+//         {
+//           "hoTen": _nameController.text,
+//           "sodienthoai": _phoneController.text,
+//           "ngaySinh": _dobController.text,
+//           "cccd": _cccdController.text,
+//           "gioiTinh": _genderController.text,
+//           "diaChi": _addressController.text,
+//           if (imageUrl != null) "hinhAnh": imageUrl,
+//         },
+//       );
+//       if (response?.statusCode == 200 && response?.data['success'] == true) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("✅ Cập nhật thành công!")),
+//         );
+//       }
+//     } catch (e) {
+//       print("❌ Lỗi cập nhật dữ liệu: $e");
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("Chỉnh sửa thông tin")),
+//       body: isLoading
+//           ? const Center(child: CircularProgressIndicator())
+//           : _buildUserView(),
+//     );
+//   }
+
+//   Widget _buildUserView() {
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.all(16.0),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Center(
+//             child: Stack(
+//               children: [
+//                 CircleAvatar(
+//                   radius: 50,
+//                   backgroundImage: _imageFile != null
+//                       ? FileImage(_imageFile!)
+//                       : userData?["hinhAnh"] != null
+//                           ? NetworkImage(userData!["hinhAnh"])
+//                           : const AssetImage("assets/default_avatar.png")
+//                               as ImageProvider,
+//                 ),
+//                 Positioned(
+//                   bottom: 0,
+//                   right: 0,
+//                   child: IconButton(
+//                     icon: const Icon(Icons.camera_alt, color: Colors.blue),
+//                     onPressed: _pickImage,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           const SizedBox(height: 20),
+//           _buildTextField("Họ và Tên", _nameController),
+//           _buildTextField("Email", _emailController, enabled: false),
+//           _buildTextField("Số điện thoại", _phoneController),
+//           _buildTextField("Ngày sinh", _dobController),
+//           _buildTextField("CCCD", _cccdController),
+//           _buildTextField("Giới tính", _genderController),
+//           _buildTextField("Địa chỉ", _addressController),
+//           const SizedBox(height: 30),
+//           Center(
+//             child: ElevatedButton(
+//               onPressed: () async {
+//                 String? imageUrl = await _uploadImageToFirebase();
+//                 await _updateUserData(imageUrl ?? userData?["hinhAnh"]);
+//               },
+//               child: const Text("Lưu thông tin"),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildTextField(String label, TextEditingController controller,
+//       {bool enabled = true}) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 8.0),
+//       child: TextField(
+//         controller: controller,
+//         decoration:
+//             InputDecoration(labelText: label, border: OutlineInputBorder()),
+//         enabled: enabled,
+//       ),
+//     );
+//   }
+// }

@@ -18,6 +18,7 @@ Future<void> main() async {
   await initializeDateFormatting('vi_VN', null);
 
   // Chờ Firebase khởi tạo trước khi chạy ứng dụng
+  
   {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

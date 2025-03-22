@@ -1,3 +1,5 @@
+import 'package:app_datvexemphim/presentation/screens/payment_screen.dart'
+    show PaymentScreen;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,7 +11,7 @@ class DetailsTicket extends StatelessWidget {
   final Map<String, dynamic> selectedMovie;
 
   const DetailsTicket({
-    Key? key,
+    super.key,
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedFoods,
@@ -17,7 +19,7 @@ class DetailsTicket extends StatelessWidget {
     required this.selectedMovie,
     required String movieId,
     required selectedShowtime,
-  }) : super(key: key);
+  });
 
   String formatCurrency(int amount) {
     return NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(amount);
@@ -45,8 +47,14 @@ class DetailsTicket extends StatelessWidget {
     String fullImageUrl = imageBaseUrl + (selectedMovie["url_poster"] ?? "");
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Thông tin thanh toán")),
-      backgroundColor: const Color(0xfff9f9f9),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Thông tin thanh toán",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -140,17 +148,18 @@ class DetailsTicket extends StatelessWidget {
                       Text(formatCurrency((food["gia"] ?? 0) * entry.value)),
                   trailing: Text("x${entry.value}"),
                 );
-              }).toList(),
+              }),
               const Divider(),
             ],
           ],
         ),
       ),
+      
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 5)]),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)]),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -168,18 +177,48 @@ class DetailsTicket extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {},
+            //     style: ElevatedButton.styleFrom(
+            //         backgroundColor: const Color(0xffb81d24),
+            //         minimumSize: const Size(double.infinity, 50)),
+            //     child: const Text("Tiếp theo",
+            //         style: TextStyle(
+            //             fontSize: 18,
+            //             fontWeight: FontWeight.bold,
+            //             color: Colors.white)),
+            //   ),
+            // ),
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentScreen(
+                        selectedSeats: selectedSeats,
+                        totalPrice: totalPrice,
+                        selectedFoods: selectedFoods,
+                        foods: foods,
+                        selectedMovie: selectedMovie,
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
                     minimumSize: const Size(double.infinity, 50)),
-                child: const Text("Tiếp theo",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
+                child: const Text(
+                  "Tiếp theo",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             ),
           ],
