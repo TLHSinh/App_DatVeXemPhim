@@ -13,10 +13,9 @@ class PickseatScreen extends StatefulWidget {
 }
 
 class _PickseatScreenState extends State<PickseatScreen> {
-  final int rows = 10;
-  final int cols = 12;
   List<String> bookedSeats = [];
   List<String> selectedSeats = [];
+  List<Map<String, dynamic>> availableSeats = []; // Danh sách ghế từ API
   bool isLoading = true;
 
   @override
@@ -35,13 +34,17 @@ class _PickseatScreenState extends State<PickseatScreen> {
             .where((seat) => seat["trang_thai"] == "đã đặt trước")
             .map<String>((seat) => seat["so_ghe"])
             .toList();
+List<Map<String, dynamic>> available = seatList.cast<Map<String, dynamic>>();
 
         setState(() {
           bookedSeats = booked;
+          availableSeats = available; // Cập nhật danh sách ghế có sẵn
           isLoading = false;
         });
       }
+
       print(response?.data); // Kiểm tra dữ liệu nhận được
+      print('id lich chieu: ${widget.schedule['_id']}');
     } catch (e) {
       print("Lỗi khi tải trạng thái ghế: $e");
       setState(() => isLoading = false);
@@ -162,16 +165,20 @@ class _PickseatScreenState extends State<PickseatScreen> {
     double seatMargin = AppSizes.blockSizeHorizontal * 1;
 
     return Column(
-      children: List.generate(rows, (row) {
+      children: List.generate(availableSeats.length ~/ 12 + 1, (row) {
         return Row(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(cols, (col) {
-            String seatLabel = "${String.fromCharCode(65 + row)}${col + 1}";
+          children: List.generate(12, (col) {
+            int index = row * 12 + col;
+            if (index >= availableSeats.length) return SizedBox(); // Tránh lỗi khi không đủ ghế
+
+            var seat = availableSeats[index];
+            String seatLabel = seat["so_ghe"];
             bool isBooked = bookedSeats.contains(seatLabel);
-            bool isSelected = selectedSeats.contains(seatLabel);
+            bool isSelected = selectedSeats.contains(seat["_id_Ghe"]); // Kiểm tra ID ghế đã chọn
 
             return GestureDetector(
-              onTap: isBooked ? null : () => _toggleSeatSelection(seatLabel),
+              onTap: isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
               child: Container(
                 width: seatWidth,
                 height: seatHeight,
@@ -182,7 +189,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                       ? Colors.red
                       : isSelected
                           ? Colors.green
-                          : const Color(0xffb7b7b7),
+                          : Color(0xffb7b7b7),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -200,12 +207,12 @@ class _PickseatScreenState extends State<PickseatScreen> {
     );
   }
 
-  void _toggleSeatSelection(String seatLabel) {
+  void _toggleSeatSelection(String seatId) {
     setState(() {
-      if (selectedSeats.contains(seatLabel)) {
-        selectedSeats.remove(seatLabel);
+      if (selectedSeats.contains(seatId)) {
+        selectedSeats.remove(seatId);
       } else {
-        selectedSeats.add(seatLabel);
+        selectedSeats.add(seatId);
       }
     });
   }
@@ -261,7 +268,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
                       ),
                     ),
                     TextSpan(
-                      // text: "${totalPrice.toStringAsFixed(0)}đ",
                       text: "${formatCurrency(totalPrice)}đ", // Cập nhật
                       style: TextStyle(
                         color: Colors.red,
@@ -303,33 +309,54 @@ class _PickseatScreenState extends State<PickseatScreen> {
     );
   }
 
-  void _bookTickets() {
+  void _bookTickets() async {
     if (selectedSeats.isEmpty) return;
-    int totalPrice =
-        (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
-    print("Danh sách ghế đã chọn trước khi chuyển màn hình: $selectedSeats");
-    List<String> selectedSeatsList = selectedSeats.toList();
-    Map<String, dynamic> selectedMovie = {
-      "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
-      "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-      "thoi_gian_chieu": widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
-      "url_poster": widget.schedule["id_phim"]?["url_poster"],
-      "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
-    };
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ComboSelectionScreen(
-          selectedSeats: List<String>.from(selectedSeatsList),
-          totalPrice: totalPrice,
-          selectedMovie: selectedMovie,
-        ),
-      ),
-    );
-    setState(() {
-      bookedSeats.addAll(selectedSeats);
-      selectedSeats.clear();
-    });
+
+    int totalPrice = (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
+    print("Danh sách ghế đã chọn: $selectedSeats");
+        print("id lich chieu da chọn: ${widget.schedule["_id"]}");
+
+    try {
+      final response = await ApiService.post("/book/chonGhe", {
+        "idLichChieu": widget.schedule["_id"],
+        "danhSachGhe": selectedSeats,  // Gửi ID của ghế
+        // "tong_tien": totalPrice,
+      });
+
+      if (response?.statusCode == 200) {
+        print("Đặt ghế thành công: ${response?.data}");
+        setState(() {
+          bookedSeats.addAll(selectedSeats);
+          // selectedSeats.clear();
+        });
+
+        // Chuyển đến màn hình chọn combo
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
+              return              ComboSelectionScreen(
+              selectedSeats: selectedSeats,  // Truyền danh sách ID ghế
+              totalPrice: totalPrice,
+              selectedMovie: {
+                "id_lich_chieu": widget.schedule["_id"],
+                "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
+                "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
+                "thoi_gian_chieu": widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+                "url_poster": widget.schedule["id_phim"]?["url_poster"],
+                "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
+              },
+            );
+            }
+          ),
+        );
+      } else {
+        print("Lỗi đặt ghế: ${response?.data}");
+      }
+    } catch (e) {
+      print("Lỗi khi gọi API đặt ghế: $e");
+    }
   }
 }
 
@@ -354,8 +381,6 @@ class ScreenPainter extends CustomPainter {
     Path fillPath = Path();
     fillPath.moveTo(0, size.height);
     fillPath.quadraticBezierTo(size.width / 2, 0, size.width, size.height);
-    // fillPath.lineTo(size.width, size.height * 1);
-    // fillPath.lineTo(0, size.height * 1);
     fillPath.close();
 
     canvas.drawPath(fillPath, fillPaint);
