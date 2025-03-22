@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -17,6 +18,22 @@ class _WebViewScreenState extends State<WebViewScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (NavigationRequest request) async {
+          // Nếu URL là deeplink (moMo, VNPAY, ZaloPay)
+          if (request.url.startsWith("momo://") ||
+              request.url.startsWith("vnpay://") ||
+              request.url.startsWith("zalopay://")) {
+            // Mở app MoMo/ZaloPay/VNPAY
+            if (await canLaunchUrl(Uri.parse(request.url))) {
+              await launchUrl(Uri.parse(request.url),
+                  mode: LaunchMode.externalApplication);
+            }
+            return NavigationDecision.prevent; // Chặn WebView điều hướng
+          }
+          return NavigationDecision.navigate;
+        },
+      ))
       ..loadRequest(Uri.parse(widget.url));
   }
 

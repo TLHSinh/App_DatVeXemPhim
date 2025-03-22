@@ -76,7 +76,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
 
     final Map<String, dynamic> body = {
-      "amount": _finalPrice,
+      "amount": _finalPrice, // Thay bằng giá trị thực tế
       "orderInfo": "Thanh toán MoMo test"
     };
 
@@ -91,15 +91,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final Map<String, dynamic> result = jsonDecode(response.body);
         final String payUrl = result['payUrl'];
 
+        // Hiển thị thông báo
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Mở trang thanh toán...")),
+          SnackBar(
+            content: Text(
+                "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}"),
+          ),
         );
 
-        // Điều hướng vào WebView
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => WebViewScreen(url: payUrl)),
-        );
+        // Mở URL trong trình duyệt ngoài
+        final Uri url = Uri.parse(payUrl);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          throw 'Không thể mở URL: $payUrl';
+        }
       } else {
         throw 'Lỗi khi thanh toán: ${response.body}';
       }
