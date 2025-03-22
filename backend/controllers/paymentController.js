@@ -7,7 +7,7 @@ var partnerCode = 'MOMO';
 export const createPayment = async (req, res) => {
     const { amount, orderInfo } = req.body;
 
-    var redirectUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
+    var redirectUrl = 'appdatvexemphim://payment-success';
     var ipnUrl = 'https://ba95-2405-4802-9112-b2d0-18f4-97b1-fd5e-b8a9.ngrok-free.app/api/v1/callback';
     var requestType = "payWithMethod";
     var orderId = partnerCode + new Date().getTime();
