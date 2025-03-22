@@ -28,6 +28,10 @@ const Sidebar = ({ isActive }) => {
           <FaCapsules className="icon" size={"1.25em"} />
           {!isActive && <span className="menu-text">Phim</span>}
         </Link>
+        <Link to="/admin/ListSchedules" className="item-ad">
+          <FaCapsules className="icon" size={"1.25em"} />
+          {!isActive && <span className="menu-text">Phim</span>}
+        </Link>
       </div>
     </div>
   );
