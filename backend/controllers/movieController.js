@@ -180,7 +180,7 @@ export const deletePhim = async (req, res) => {
 export const getSinglePhim = async (req, res) => {
     const { id } = req.params;
     try {
-        const phim = await Phim.findById(id).populate("id_the_loai");
+        const phim = await Phim.findById(id);
         if (!phim) {
             return res.status(404).json({ success: false, message: "Phim không tồn tại" });
         }

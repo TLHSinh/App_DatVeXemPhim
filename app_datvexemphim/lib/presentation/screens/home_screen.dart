@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchAllData() async {
     try {
       final responses = await Future.wait([
-        ApiService.get("/phims/dangchieu"),
-        ApiService.get("/phims/sapchieu"),
+        ApiService.get("/movie/phims/dangchieu"),
+        ApiService.get("/movie/phims/sapchieu"),
         ApiService.get("/admin/ads"),
       ]);
 

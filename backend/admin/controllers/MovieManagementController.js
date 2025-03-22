@@ -59,6 +59,7 @@ export const addNewMovie = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
+
 // Cập nhật phim
 export const updateMovie = async (req, res) => {
     try {

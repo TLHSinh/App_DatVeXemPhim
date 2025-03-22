@@ -136,5 +136,65 @@ export const resetAllSeatsState = async (req, res) => {
     }
 };
 
+export const updateSeatStatus = async (req, res, next) => {
+    try {
+      const { id_phong, id_ghe } = req.params;
+      const { trang_thai } = req.body;
+  
+      // Kiểm tra id_phong có tồn tại không
+      const room = await PhongChieu.findById(id_phong);
+      if (!room) {
+        return res.status(404).json({ status: "error", message: "Không tìm thấy phòng với ID này" });
+      }
+  
+      // Kiểm tra trạng thái hợp lệ
+      const validStatuses = ["có sẵn", "đã đặt trước", "hư hỏng", "bảo trì"];
+      if (!validStatuses.includes(trang_thai)) {
+        return res.status(400).json({ status: "error", message: "Trạng thái không hợp lệ" });
+      }
+  
+      // Xử lý cập nhật nhiều ghế
+      const seatIds = id_ghe.split(",").map((id) => id.trim());
+  
+      // Kiểm tra tất cả ID ghế có hợp lệ không
+      for (const id of seatIds) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ status: "error", message: `ID ghế không hợp lệ: ${id}` });
+        }
+      }
+  
+      // Cập nhật trạng thái cho tất cả ghế có ID trong danh sách và thuộc phòng cụ thể
+      const result = await Ghe.updateMany(
+        {
+          _id: { $in: seatIds },
+          id_phong: id_phong,
+        },
+        {
+          $set: {
+            trang_thai,
+            updatedAt: Date.now(),
+          },
+        }
+      );
+  
+      if (result.matchedCount === 0) {
+        return res.status(404).json({ status: "error", message: "Không tìm thấy ghế nào phù hợp để cập nhật" });
+      }
+  
+      res.status(200).json({
+        status: "success",
+        data: {
+          updatedCount: result.modifiedCount,
+          message: `Đã cập nhật ${result.modifiedCount} ghế thành "${trang_thai}"`,
+        },
+      });
+    } catch (error) {
+        
+      console.error("Lỗi cập nhật trạng thái ghế:", error);
+      res.status(500).json({ status: "error", message: "Lỗi server, vui lòng thử lại sau." });
+    }
+  };
+  
+
 
 

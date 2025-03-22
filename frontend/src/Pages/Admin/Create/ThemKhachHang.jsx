@@ -1,31 +1,30 @@
-import './Them.css';
+import "./Them.css";
 import { FaChevronLeft } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import uploadImageToCloudinary from '../../../utils/uploadCloudinary';
-import { BASE_URL } from '../../../config';
-import { toast } from 'react-toastify';
-import HashLoader from 'react-spinners/HashLoader';
-import Breadcrumb from '../../../Components/Breadcrumb';
+import uploadImageToCloudinary from "../../../utils/uploadCloudinary";
+import { BASE_URL } from "../../../config";
+import { toast } from "react-toastify";
+import HashLoader from "react-spinners/HashLoader";
+import Breadcrumb from "../../../Components/Breadcrumb";
 const ThemKhachHang = () => {
-
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewURL, setPreviewURL] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    ten: "",             // Tên bệnh nhân
-    email: "",           // Email
-    matKhau: "",         // Mật khẩu
+    hoTen: "", // Tên bệnh nhân
+    email: "", // Email
+    matKhau: "", // Mật khẩu
     hinhAnh: "", // Hình ảnh (URL)
-    gioiTinh: "",        // Giới tính
-    role: "BenhNhan",    // Vai trò: mặc định là bệnh nhân
-    soDienThoai: "",
+    gioiTinh: "", // Giới tính
+    role: "user", // Vai trò: mặc định là bệnh nhân
+    sodienthoai: "",
     ngaySinh: "",
     cccd: "",
     diaChi: "",
-    nhomMau: ""
+    nhomMau: "",
   });
 
   const handleInputChange = (e) => {
@@ -40,18 +39,17 @@ const ThemKhachHang = () => {
     setFormData({ ...formData, hinhAnh: data.url });
   };
 
-
   const submitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/users/addUser`, {
-        method: 'post',
+      const res = await fetch(`${BASE_URL}/api/v1/user/addUser`, {
+        method: "post",
         headers: {
-          'Content-type': 'application/json'
+          "Content-type": "application/json",
         },
-        body: JSON.stringify(formData)  // Gửi formData lên backend
+        body: JSON.stringify(formData), // Gửi formData lên backend
       });
 
       const { message } = await res.json();
@@ -63,7 +61,6 @@ const ThemKhachHang = () => {
       setLoading(false);
       toast.success(message);
       navigate("/admin/danhsachkhachhang");
-
     } catch (err) {
       toast.error(err.message);
       setLoading(false);
@@ -74,22 +71,28 @@ const ThemKhachHang = () => {
   };
   return (
     <div>
-      <div className='row'>
-        <div className='col-sm-12'>
+      <div className="row">
+        <div className="col-sm-12">
           <Breadcrumb />
         </div>
       </div>
       <div className="row">
-        <div className='col-sm-12'>
-          <div className='card-list-ad'>
-            <div className=' header-list-card' >
+        <div className="col-sm-12">
+          <div className="card-list-ad">
+            <div className=" header-list-card">
               <div style={{ float: "left" }}>
                 <h1 className="title-ad">THÊM KHÁCH HÀNG</h1>
               </div>
             </div>
 
             <form className="form" onSubmit={submitHandler}>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <div className="mb-4 flex items-center gap-2">
                   {/* Hiển thị ảnh hiện tại hoặc ảnh mới được chọn */}
                   <figure className="w-[100px] h-[100px] mt-3 rounded-full border-primaryColor flex items-center justify-center overflow-hidden">
@@ -120,64 +123,103 @@ const ThemKhachHang = () => {
               <div class="column">
                 <div class="input-box">
                   <label>Họ và tên</label>
-                  <input type="text" name="ten" value={formData.ten} onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    name="hoTen"
+                    value={formData.hoTen}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div class="input-box">
                   <label>Ngày sinh</label>
-                  <input type="date" name="ngaySinh" value={formData.ngaySinh} onChange={handleInputChange} />
+                  <input
+                    type="date"
+                    name="ngaySinh"
+                    value={formData.ngaySinh}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div class="column">
                 <div class="input-box">
                   <label>Số điện thoại</label>
-                  <input type="text" name="soDienThoai" value={formData.soDienThoai} onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    name="sodienthoai"
+                    value={formData.sodienthoai}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div class="input-box">
                   <label>Email</label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div class="input-box address">
                 <div class="column">
                   <div class="select-box">
                     <select
-                      name="gioiTinh"  // Phải là 'gioiTinh' theo schema
+                      name="gioiTinh" // Phải là 'gioiTinh' theo schema
                       value={formData.gioiTinh}
                       onChange={handleInputChange}
                     >
                       <option value="">Chọn</option>
-                      <option value="Nam">Nam</option>
-                      <option value="Nữ">Nữ</option>
-                      <option value="Khác">Khác</option>
+                      <option value="nam">Nam</option>
+                      <option value="nu">Nữ</option>
+                      <option value="khac">Khác</option>
                     </select>
                   </div>
-                  <input type="text" name="nhomMau" value={formData.nhomMau} onChange={handleInputChange} placeholder="Nhóm máu" />
                 </div>
               </div>
               <div class="column">
                 <div class="input-box">
                   <label>CCCD</label>
-                  <input type="text" name="cccd" value={formData.cccd} onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    name="cccd"
+                    value={formData.cccd}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div class="input-box">
                   <label>Mật khẩu</label>
-                  <input type="password" name="matKhau" value={formData.matKhau} onChange={handleInputChange} />
+                  <input
+                    type="password"
+                    name="matKhau"
+                    value={formData.matKhau}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
 
-
               <div class="input-box">
                 <label>Địa chỉ</label>
-                <input type="text" name="diaChi" value={formData.diaChi} onChange={handleInputChange} />
+                <input
+                  type="text"
+                  name="diaChi"
+                  value={formData.diaChi}
+                  onChange={handleInputChange}
+                />
               </div>
 
-
-              <div className='col-12'>
+              <div className="col-12">
                 <div style={{ textAlign: "right" }}>
-                  <button className='submitform-ad' type="submit" disabled={loading}>
-                    {loading ? <HashLoader size={35} color="#ffffff" /> : 'Tạo'}
+                  <button
+                    className="submitform-ad"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? <HashLoader size={35} color="#ffffff" /> : "Tạo"}
                   </button>
-                  <button className='cancelform-ad' onClick={() => handlerCancel()} >
+                  <button
+                    className="cancelform-ad"
+                    onClick={() => handlerCancel()}
+                  >
                     Huỷ
                   </button>
                 </div>
@@ -187,8 +229,7 @@ const ThemKhachHang = () => {
         </div>
       </div>
     </div>
+  );
+};
 
-  )
-}
-
-export default ThemKhachHang
+export default ThemKhachHang;

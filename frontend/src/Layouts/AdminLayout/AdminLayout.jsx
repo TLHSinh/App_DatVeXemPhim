@@ -80,7 +80,8 @@ const AdminLayout = () => {
           {/* Dropdown */}
           {isDropdownOpen && (
             <div className="dropdown-ad-profile">
-              <div className="dropdown-ad-profile-item" onClick={() => handleNavigate('/admin/chinhsuaadmin')}>Chỉnh sửa</div>
+              <div className="dropdown-ad-profile-item" onClick={() => handleNavigate('/profile/details')}>Chi tiết</div>
+              <div className="dropdown-ad-profile-item" onClick={() => handleNavigate('/profile/edit')}>Chỉnh sửa</div>
               <div className="dropdown-ad-profile-item" onClick={handleLogout}>Đăng xuất</div>
             </div>
           )}

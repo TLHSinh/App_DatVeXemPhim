@@ -3,7 +3,7 @@ import { addNewMovie, updateMovie, deleteMovie, getScheduleByRoom, getScheduleOf
 
 const router = express.Router();
 
-router.post('/movies', addNewMovie);
+router.post('/addmovies', addNewMovie);
 router.put('/movies/:id', updateMovie);
 router.delete('/movies/:id', deleteMovie);
 router.get('/movies/:id_phim/schedule', getScheduleByRoom);
