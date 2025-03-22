@@ -22,6 +22,7 @@ import ListEmployees from "../Pages/Admin/Employee/ListEmployees";
 import ListCinema from "../Pages/Admin/Cinema/ListCinema";
 import ListRoom from "../Pages/Admin/Room/ListRoom";
 import ListSeat from "../Pages/Admin/Seat/ListSeat";
+import ListSchedule from "../Pages/Admin/Schedule/ListSchedule";
 
 import DetailUser from "../Pages/Admin/Users/DetailUser";
 import DetailEmployees from "../Pages/Admin/Employee/DetailEmployee";
@@ -33,6 +34,7 @@ import UpdateMovie from "../Pages/Admin/Movie/UpdateMovie";
 
 import CreateUser from "../Pages/Admin/Users/CreateUser";
 import CreateMovie from "../Pages/Admin/Movie/CreateMovie";
+import CreateScheduleMovie from "../Pages/Admin/Schedule/createScheduleForMovie";
 
 const AdminRouter = () => (
   <Routes>
@@ -59,6 +61,7 @@ const AdminRouter = () => (
       <Route path="ListCinemas" element={<ListCinema />} />
       <Route path="ListRooms/:theaterId/rooms" element={<ListRoom />} />
       <Route path="ListSeats/:roomId/seats" element={<ListSeat />} />
+      <Route path="ListSchedules" element={<ListSchedule />} />
 
       {/* details */}
       <Route path="DetailUser/:id" element={<DetailUser />} />
@@ -73,6 +76,10 @@ const AdminRouter = () => (
       {/* create */}
       <Route path="CreateUser" element={<CreateUser />} />
       <Route path="CreateMovie" element={<CreateMovie />} />
+      <Route
+        path="CreateScheduleMovie/:id_phim"
+        element={<CreateScheduleMovie />}
+      />
     </Route>
   </Routes>
 );

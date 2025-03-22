@@ -107,6 +107,40 @@ export const deleteMovie = async (req, res) => {
 
 
 /* [Schedule] */
+
+// Lấy All lịch chiếu của phim 
+export const getAllSchedule = async (req, res) => {
+    try {
+      const lichChieuList = await LichChieu.find()
+        .populate("id_phim", "ten_phim url_poster thoi_luong gioi_han_tuoi")
+        .populate("id_phong", "ten_phong")
+        .populate("id_rap", "ten_rap")
+        .sort({ thoi_gian_chieu: 1 });
+  
+      res.status(200).json(lichChieuList);
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi khi lấy danh sách lịch chiếu", error });
+    }
+};
+
+// Lấy lịch chiếu theo id
+export const getScheduleById = async (req, res) => {
+    try {
+        const schedule = await LichChieu.findById(req.params.id)
+            .populate("id_phim", "ten_phim url_poster url_trailer thoi_luong")
+            .populate("id_phong", "ten_phong so_ghe")
+            .populate("id_rap", "ten_rap dia_chi");
+
+        if (!schedule) {
+            return res.status(404).json({ message: "Lịch chiếu không tồn tại" });
+        }
+
+        res.json(schedule);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server", error });
+    }
+};
+
 // Lấy lịch chiếu của phim [group-by phòng]
 export const getScheduleByRoom = async (req, res) => {
     const { id_phim } = req.params;
@@ -179,7 +213,77 @@ export const getScheduleOfRoom = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
-// Tạo lịch chiếu
+
+// Tạo lịch chiếu 
+export const createSchedule = async (req, res) => {
+    const { id_phim,id_phong, thoi_gian_chieu, gia_ve, id_rap } = req.body;
+
+    try {
+        // Kiểm tra phim tồn tại
+        const phim = await Phim.findById(id_phim);
+        if (!phim) {
+            return res.status(404).json({ success: false, message: "Phim không tồn tại" });
+        }
+
+        // Kiểm tra phòng chiếu tồn tại
+        const phongChieu = await PhongChieu.findById(id_phong);
+        if (!phongChieu) {
+            return res.status(404).json({ success: false, message: "Phòng chiếu không tồn tại" });
+        }
+
+        const rapPhim = await RapPhim.findById(id_rap);
+        if (!rapPhim) {
+            return res.status(404).json({ success: false, message: "Rạp phim không tồn tại" });
+        }
+
+        // Kiểm tra trùng lịch chiếu (cùng phòng, cùng thời gian)
+        const existingSchedule = await LichChieu.findOne({ id_phong, thoi_gian_chieu });
+        if (existingSchedule) {
+            return res.status(400).json({ success: false, message: "Suất chiếu này đã tồn tại trong phòng" });
+        }
+
+        // Tạo lịch chiếu mới
+        const newSchedule = new LichChieu({
+            id_phim,
+            id_phong,
+            id_rap,
+            thoi_gian_chieu,
+            gia_ve
+        });
+
+        await newSchedule.save();
+        res.status(201).json({ success: true, message: "Tạo lịch chiếu thành công", data: newSchedule });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    }
+};
+
+//xoá lịch chiếu
+export const deleteSchedule = async (req, res) => {
+    try {
+        const showtime = await LichChieu.findById(req.params.id);
+        if (!showtime) {
+            return res.status(404).json({ message: 'Lịch chiếu không tồn tại' });
+        }
+
+        const today = new Date();
+        const showtimeDate = new Date(showtime.date);
+        const diffDays = Math.ceil((showtimeDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 6) {
+            return res.status(400).json({ message: 'Chỉ có thể xoá lịch chiếu trước 6 ngày chiếu' });
+        }
+
+        await LichChieu.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Xoá lịch chiếu thành công' });
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi server', error });
+    }
+};
+
+
+
+// Tạo lịch chiếu theo phim
 export const createMovieSchedule = async (req, res) => {
     const { id_phim } = req.params;
     const { id_phong, thoi_gian_chieu, gia_ve, id_rap } = req.body;
