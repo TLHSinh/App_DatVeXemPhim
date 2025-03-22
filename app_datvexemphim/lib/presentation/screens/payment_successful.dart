@@ -2,7 +2,8 @@ import 'package:app_datvexemphim/presentation/widgets/final_view.dart';
 import 'package:flutter/material.dart';
 
 class PaymentSuccessful extends StatefulWidget {
-  const PaymentSuccessful({super.key});
+  final Map<String, String> queryParams;
+  const PaymentSuccessful({super.key, required this.queryParams});
 
   @override
   State<PaymentSuccessful> createState() => _PaymentSuccessfulState();
