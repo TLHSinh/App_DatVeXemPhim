@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

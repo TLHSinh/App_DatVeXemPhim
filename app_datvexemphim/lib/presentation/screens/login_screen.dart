@@ -28,7 +28,7 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiService.post("/auth/login", {
+      final response = await ApiService.post("/auth/loginUser", {
         "email": _emailController.text.trim(),
         "matKhau": _passwordController.text.trim(),
       });

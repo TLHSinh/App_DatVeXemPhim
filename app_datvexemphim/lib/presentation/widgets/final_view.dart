@@ -35,7 +35,7 @@ class _FinalViewState extends State<FinalView> {
   Widget build(BuildContext context) {
     AppSizes().init(context);
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       body: SafeArea(
         bottom: false,
         child: Stack(

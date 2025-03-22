@@ -76,7 +76,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                 _buildScreenIndicator(),
                 SizedBox(height: AppSizes.blockSizeVertical * 1),
                 Expanded(
-                  child: Container(
+                  child: SizedBox(
                     width: 100000,
                     child: InteractiveViewer(
                       boundaryMargin: EdgeInsets.all(20),
@@ -190,7 +190,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: AppSizes.blockSizeHorizontal * 3),
+                      fontSize: AppSizes.blockSizeHorizontal * 2.0),
                 ),
               ),
             );

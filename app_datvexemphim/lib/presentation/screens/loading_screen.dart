@@ -68,7 +68,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 flex: 2, // Đoạn chữ phía dưới
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: const [
                     Text(
                       "ĐANG TẢI DỮ LIỆU...",
                       style: TextStyle(

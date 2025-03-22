@@ -34,7 +34,7 @@
   font-weight: 500;
 }
 
-.form :where(.input-box input, .input-box textarea, .select-box) {
+.form :where(.input-box input, .select-box) {
   position: relative;
   height: 50px;
   width: 100%;
@@ -104,13 +104,25 @@
 }
 
 .form button {
+  /* height: 50px;
+  border-radius: 5px;
+  width: 9%;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #66B5A3;
+  text-align: right; */
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
   min-width: 131px;
   padding: 10px 15px;
   margin: 15px 5px 5px;
 }
-
 .submitform-ad{
   color: white;
   background: #66B5A3;
@@ -156,10 +168,4 @@
   .form :where(.gender-option, .gender) {
     row-gap: 15px;
   }
-}
-
-.required::after{
-content: '*';
-color: red;
-padding-left: 5px;
 }

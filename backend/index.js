@@ -12,6 +12,7 @@ import userRoutes from './routes/userRoutes.js';
 import seatRoutes from "./routes/seatRoutes.js";
 import bookTicketsRoutes from "./routes/bookTicketsRoutes.js";
 import advertiseRoutes from "./routes/advertiseRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 // Admin routes
 import UserManagementRoutes from './admin/routes/UserManagementRoutes.js';
@@ -23,6 +24,11 @@ import VoucherManagementRoutes from './admin/routes/VoucherManagementRoutes.js';
 import FoodManagementRoutes from './admin/routes/FoodManagementRoutes.js';
 import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
+import FeedbackManagementRoutes from './admin/routes/FeedbackManagementRoutes.js';
+
+//EmloyeeRoutes
+import emloyeeRoutes from "./routes/employeeRoutes.js";;
+
 
 //Kiểm tra huỷ vé nếu chưa thanh toán
 //import "./controllers/paymentTime.js"; // Import cron job
@@ -61,12 +67,13 @@ app.use(cors(corsOptions));
 
 // User routes
 app.use('/api/v1/auth', authRoute);
-app.use('/api/v1', movieRoutes);
+app.use('/api/v1/movie', movieRoutes);
 app.use('/api/v1', cinemaRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/seat', seatRoutes);
 app.use('/api/v1/book', bookTicketsRoutes);
 app.use('/api/v1/advertise', advertiseRoutes);
+app.use('/api/v1/reviews', feedbackRoutes);
 
 // Admin routes
 app.use('/api/v1/admin', UserManagementRoutes);
@@ -78,6 +85,12 @@ app.use('/api/v1/admin', VoucherManagementRoutes);
 app.use('/api/v1', FoodManagementRoutes);
 app.use('/api/v1/admin', AdsManagementRoutes);
 app.use('/api/v1/admin', RevenueManagementRoutes);
+app.use('/api/v1', FeedbackManagementRoutes);
+
+
+//EmloyeeRoutes
+app.use('/api/v1/employee', emloyeeRoutes);
+
 
 // Start server
 app.listen(port, () => {
