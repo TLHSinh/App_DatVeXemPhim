@@ -1,2 +1,0 @@
-C:/Users/ASUS/OneDrive/Desktop/LTDD_NC/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/RelWithDebInfo/4k6t221d/x86/CMakeFiles/edit_cache.dir
-C:/Users/ASUS/OneDrive/Desktop/LTDD_NC/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/RelWithDebInfo/4k6t221d/x86/CMakeFiles/rebuild_cache.dir

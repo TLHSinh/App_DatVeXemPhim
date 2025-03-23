@@ -4,7 +4,7 @@ import 'package:app_datvexemphim/data/services/storage_service.dart';
 class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://192.168.1.4:5000/api/v1",
+      baseUrl: "http://192.168.12.105:5000/api/v1",
       //"http://192.168.12.110:5000/api/v1",
       // "http://192.168.1.11:5000/api/v1",
 

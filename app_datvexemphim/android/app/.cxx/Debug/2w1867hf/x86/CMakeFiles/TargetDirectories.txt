@@ -1,2 +1,0 @@
-D:/XemPhim/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/Debug/2w1867hf/x86/CMakeFiles/edit_cache.dir
-D:/XemPhim/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/Debug/2w1867hf/x86/CMakeFiles/rebuild_cache.dir

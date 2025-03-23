@@ -28,14 +28,13 @@ class DetailsTicket extends StatefulWidget {
 }
 
 class _DetailsTicketState extends State<DetailsTicket> {
-    String? userId;
+  String? userId;
   @override
   void initState() {
     super.initState();
     print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
     print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
     print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
-
   }
 
   String formatCurrency(int amount) {
@@ -54,9 +53,8 @@ class _DetailsTicketState extends State<DetailsTicket> {
   }
 
   Future<void> _confirmBooking(BuildContext context) async {
-
-     userId = await StorageService.getUserId();
-     print('id nguoi dung $userId');
+    userId = await StorageService.getUserId();
+    print('id nguoi dung $userId');
     if (userId == null) {
       print("Không tìm thấy ID người dùng.");
       return;
@@ -64,10 +62,10 @@ class _DetailsTicketState extends State<DetailsTicket> {
 
     try {
       final response = await ApiService.post("/book/xacNhanDatVe", {
-              "idNguoiDung": userId, // Sử dụng ID người dùng
-      "idLichChieu": widget.selectedMovie["id_lich_chieu"],
-      "danhSachGhe": widget.selectedSeats,
-      "danhSachDoAn": widget.selectedFoods.keys.join(", "),
+        "idNguoiDung": userId, // Sử dụng ID người dùng
+        "idLichChieu": widget.selectedMovie["id_lich_chieu"],
+        "danhSachGhe": widget.selectedSeats,
+        "danhSachDoAn": widget.selectedFoods.keys.join(", "),
       });
       if (response?.statusCode == 200) {
         // Đặt vé thành công
