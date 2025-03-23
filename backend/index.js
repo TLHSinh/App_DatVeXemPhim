@@ -88,7 +88,7 @@ app.use('/api/v1/admin', VoucherManagementRoutes);
 app.use('/api/v1', FoodManagementRoutes);
 app.use('/api/v1/admin', AdsManagementRoutes);
 app.use('/api/v1/admin', RevenueManagementRoutes);
-app.use('/api/v1/admin', FeedbackManagementRoutes);
+app.use('/api/v1', FeedbackManagementRoutes);
 
 
 //EmloyeeRoutes

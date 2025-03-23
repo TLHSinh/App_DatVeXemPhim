@@ -1,9 +1,11 @@
+import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:app_datvexemphim/data/services/storage_service.dart';
 import 'package:app_datvexemphim/presentation/screens/payment_screen.dart'
     show PaymentScreen;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class DetailsTicket extends StatelessWidget {
+class DetailsTicket extends StatefulWidget {
   final List<String> selectedSeats;
   final int totalPrice;
   final Map<String, int> selectedFoods;
@@ -21,6 +23,21 @@ class DetailsTicket extends StatelessWidget {
     required selectedShowtime,
   });
 
+  @override
+  _DetailsTicketState createState() => _DetailsTicketState();
+}
+
+class _DetailsTicketState extends State<DetailsTicket> {
+    String? userId;
+  @override
+  void initState() {
+    super.initState();
+    print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
+    print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
+    print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
+
+  }
+
   String formatCurrency(int amount) {
     return NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(amount);
   }
@@ -36,15 +53,65 @@ class DetailsTicket extends StatelessWidget {
     }
   }
 
+  Future<void> _confirmBooking(BuildContext context) async {
+
+     userId = await StorageService.getUserId();
+     print('id nguoi dung $userId');
+    if (userId == null) {
+      print("Không tìm thấy ID người dùng.");
+      return;
+    }
+
+    try {
+      final response = await ApiService.post("/book/xacNhanDatVe", {
+              "idNguoiDung": userId, // Sử dụng ID người dùng
+      "idLichChieu": widget.selectedMovie["id_lich_chieu"],
+      "danhSachGhe": widget.selectedSeats,
+      "danhSachDoAn": widget.selectedFoods.keys.join(", "),
+      });
+      if (response?.statusCode == 200) {
+        // Đặt vé thành công
+        print("Đặt vé thành công: ${response?.data}");
+
+        // In thông tin vào terminal
+        print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
+        print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
+        print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
+
+        // Chuyển đến màn hình thanh toán
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentScreen(
+              selectedSeats: widget.selectedSeats,
+              totalPrice: widget.totalPrice,
+              selectedFoods: widget.selectedFoods,
+              foods: widget.foods,
+              selectedMovie: widget.selectedMovie,
+            ),
+          ),
+        );
+      } else {
+        // Xử lý lỗi nếu có
+        print("Lỗi khi xác nhận đặt vé: ${response?.data['message']}");
+      }
+    } catch (e) {
+      print("Lỗi khi gọi API xác nhận đặt vé: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    String cinema = selectedMovie["ten_rap"] ?? "Không rõ rạp";
-    String movieTitle = selectedMovie["ten_phim"] ?? "Không có tên";
-    String format = selectedMovie['dinh_dang'] ?? "2D Phụ Đề";
-    String showtimeDate = formatShowtime(selectedMovie['thoi_gian_chieu']);
+    String cinema = widget.selectedMovie["ten_rap"] ?? "Không rõ rạp";
+    String movieTitle = widget.selectedMovie["ten_phim"] ?? "Không có tên";
+    String format = widget.selectedMovie['dinh_dang'] ?? "2D Phụ Đề";
+    String showtimeDate =
+        formatShowtime(widget.selectedMovie['thoi_gian_chieu']);
+    // String listSeat = selectedSeats["_id"] ?? "Không có tên";
 
     String imageBaseUrl = "https://rapchieuphim.com";
-    String fullImageUrl = imageBaseUrl + (selectedMovie["url_poster"] ?? "");
+    String fullImageUrl =
+        imageBaseUrl + (widget.selectedMovie["url_poster"] ?? "");
 
     return Scaffold(
       appBar: AppBar(
@@ -120,7 +187,7 @@ class DetailsTicket extends StatelessWidget {
                                 fontWeight: FontWeight.bold)),
                         Text("Thời gian: $showtimeDate",
                             style: TextStyle(color: Colors.grey[700])),
-                        Text("Ghế: ${selectedSeats.join(", ")}",
+                        Text("Ghế: ${widget.selectedSeats.join(", ")}",
                             style: TextStyle(color: Colors.grey[700])),
                       ],
                     ),
@@ -129,12 +196,12 @@ class DetailsTicket extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            if (selectedFoods.isNotEmpty) ...[
+            if (widget.selectedFoods.isNotEmpty) ...[
               const Text("Combo bắp nước",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ...selectedFoods.entries.map((entry) {
-                var food = foods.firstWhere((f) => f["_id"] == entry.key,
-                    orElse: () => {});
+              ...widget.selectedFoods.entries.map((entry) {
+                var food = widget.foods
+                    .firstWhere((f) => f["_id"] == entry.key, orElse: () => {});
                 if (food.isEmpty) return const SizedBox();
                 return ListTile(
                   leading: Image.network(
@@ -154,7 +221,6 @@ class DetailsTicket extends StatelessWidget {
           ],
         ),
       ),
-      
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
@@ -169,7 +235,7 @@ class DetailsTicket extends StatelessWidget {
                 const Text("Tạm tính",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(formatCurrency(totalPrice),
+                Text(formatCurrency(widget.totalPrice),
                     style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -177,37 +243,23 @@ class DetailsTicket extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     onPressed: () {},
-            //     style: ElevatedButton.styleFrom(
-            //         backgroundColor: const Color(0xffb81d24),
-            //         minimumSize: const Size(double.infinity, 50)),
-            //     child: const Text("Tiếp theo",
-            //         style: TextStyle(
-            //             fontSize: 18,
-            //             fontWeight: FontWeight.bold,
-            //             color: Colors.white)),
-            //   ),
-            // ),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                        selectedSeats: selectedSeats,
-                        totalPrice: totalPrice,
-                        selectedFoods: selectedFoods,
-                        foods: foods,
-                        selectedMovie: selectedMovie,
-                      ),
-                    ),
-                  );
+                  _confirmBooking(context);
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => PaymentScreen(
+                  //       selectedSeats: selectedSeats,
+                  //       totalPrice: totalPrice,
+                  //       selectedFoods: selectedFoods,
+                  //       foods: foods,
+                  //       selectedMovie: selectedMovie,
+                  //     ),
+                  //   ),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
