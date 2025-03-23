@@ -4,6 +4,7 @@ import TrangThaiGhe from "../models/TrangThaiGheSchema.js";
 import DonDatVe from "../models/DonDatVeSchema.js";
 import Voucher from "../models/VoucherSchema.js";
 import RapPhim from "../models/VoucherSchema.js";
+import DoAn from "../models/DoAnSchema.js";
 
 
 import mongoose from "mongoose";
@@ -306,7 +307,7 @@ export const datGhe = async (req, res) => {
         id_nguoi_dung: idNguoiDung,
         id_lich_chieu: idLichChieu,
         danh_sach_ghe: danhSachGhe,
-        danh_sach_do_ăn: danhSachDoAn || [],
+        danh_sach_do_an: danhSachDoAn || [],
         id_voucher: idVoucher || null,
         gia_tri_giam_ap_dung: idVoucher ? tienGiam : 0,
         tong_tien: tongTien,
@@ -390,4 +391,8 @@ export const thanhToan = async (req, res) => {
       res.status(500).json({ message: "Lỗi server!", error: error.message });
     }
   };
+
+
+
+  
   

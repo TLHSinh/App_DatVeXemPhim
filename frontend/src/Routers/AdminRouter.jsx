@@ -23,6 +23,7 @@ import ListCinema from "../Pages/Admin/Cinema/ListCinema";
 import ListRoom from "../Pages/Admin/Room/ListRoom";
 import ListSeat from "../Pages/Admin/Seat/ListSeat";
 import ListSchedule from "../Pages/Admin/Schedule/ListSchedule";
+import ListSeatSchedule from "../Pages/Admin/Schedule/ListSeatSchedule";
 
 import DetailUser from "../Pages/Admin/Users/DetailUser";
 import DetailEmployees from "../Pages/Admin/Employee/DetailEmployee";
@@ -62,6 +63,10 @@ const AdminRouter = () => (
       <Route path="ListRooms/:theaterId/rooms" element={<ListRoom />} />
       <Route path="ListSeats/:roomId/seats" element={<ListSeat />} />
       <Route path="ListSchedules" element={<ListSchedule />} />
+      <Route
+        path="ListSeatSchedules/:idLichChieu"
+        element={<ListSeatSchedule />}
+      />
 
       {/* details */}
       <Route path="DetailUser/:id" element={<DetailUser />} />

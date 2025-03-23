@@ -17,7 +17,6 @@ router.get("/lich-chieu/:idPhim/rap", getLichChieuTheoRap);    //API lấy lịc
 router.get("/all-lich-chieu/:idRap", getAllLichChieuTheoRap);    //API lấy all lịch chiếu theo rạp
 
 
-
 export default router;
 
 

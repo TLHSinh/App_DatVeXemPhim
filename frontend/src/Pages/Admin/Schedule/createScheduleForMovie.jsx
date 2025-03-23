@@ -54,7 +54,13 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
         throw new Error("Không thể tải thông tin phim");
       }
       const result = await response.json();
-      setMovieInfo(result);
+
+      // Log the response to debug
+      console.log("Movie data received:", result);
+
+      // Handle different possible response structures
+      const movieData = result.data || result || {};
+      setMovieInfo(movieData);
     } catch (err) {
       console.error("Lỗi khi tải thông tin phim:", err);
       setError("Không thể tải thông tin phim");
@@ -265,7 +271,7 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
             Thêm lịch chiếu phim
           </h3>
           <button
-            onClick={onClose}
+            onClick={() => navigate(`/admin/ListMovies`)}
             className="text-white/80 hover:text-white focus:outline-none transition-all duration-200 bg-white/10 rounded-full p-1"
             disabled={submitting || success}
           >
@@ -311,9 +317,9 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
               <div className="flex items-start gap-4">
                 <div className="w-1/4">
                   <div className="rounded-md overflow-hidden aspect-[2/3] flex items-center justify-center shadow-md">
-                    {movieInfo.hinh_anh ? (
+                    {movieInfo.url_poster ? (
                       <img
-                        src={movieInfo.hinh_anh}
+                        src={`https://rapchieuphim.com${movieInfo.url_poster}`}
                         alt={movieInfo.ten_phim}
                         className="w-full h-full object-cover"
                       />
@@ -338,7 +344,7 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
                       <Calendar size={16} className="mr-2 text-blue-500" />
                       <span className="font-medium">Khởi chiếu:</span>{" "}
                       <span className="ml-1">
-                        {new Date(movieInfo.ngay_khoi_chieu).toLocaleDateString(
+                        {new Date(movieInfo.ngay_cong_chieu).toLocaleDateString(
                           "vi-VN"
                         )}
                       </span>
@@ -491,7 +497,7 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
                 <>
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={() => navigate(`/admin/ListMovies`)}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 mr-3 hover:bg-gray-50 transition-colors duration-200"
                     disabled={submitting}
                   >
@@ -519,7 +525,7 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
               {success && (
                 <button
                   type="button"
-                  onClick={() => navigate(`/admin/schedule/${scheduleId}`)}
+                  onClick={() => navigate(`/admin/ListSchedules`)}
                   className="px-5 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 focus:ring-2 focus:ring-green-300 transition-all duration-200 shadow-md flex items-center"
                 >
                   Xem chi tiết

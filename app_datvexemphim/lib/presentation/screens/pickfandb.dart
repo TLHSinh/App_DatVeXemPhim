@@ -144,10 +144,9 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
             "Tổng tiền: ${formatCurrency(totalPrice)}đ",
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              // Chuyển hướng sang màn hình DetailsTicket
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -236,17 +235,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     );
   }
 
-  /// 🎟 Tính tổng tiền bao gồm giá vé và bắp nước
-  // int _calculateTotalPrice() {
-  //   int total = widget.totalPrice.toInt();
-  //   selectedFoods.forEach((foodId, quantity) {
-  //     var food = foods.firstWhere((food) => food["_id"] == foodId, orElse: () => {});
-  //     if (food.isNotEmpty) {
-  //       total += food["gia"] * quantity;
-  //     }
-  //   });
-  //   return total;
-  // }
   int _calculateTotalPrice() {
     int total = widget.totalPrice;
     selectedFoods.forEach((foodId, quantity) {
