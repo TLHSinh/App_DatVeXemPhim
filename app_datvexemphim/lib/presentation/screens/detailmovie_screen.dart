@@ -9,7 +9,7 @@ import 'package:dio/dio.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
-  const DetailMovieScreen({Key? key, required this.movie}) : super(key: key);
+  const DetailMovieScreen({super.key, required this.movie});
 
   @override
   _DetailMovieScreenState createState() => _DetailMovieScreenState();

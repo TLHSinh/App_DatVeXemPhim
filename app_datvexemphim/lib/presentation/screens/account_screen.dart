@@ -223,10 +223,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Stars + Mã thành viên
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.star, color: Colors.orange, size: 20),
-              const SizedBox(width: 5),
-              const Text('0 Stars',
+            children: const [
+              Icon(Icons.star, color: Colors.orange, size: 20),
+              SizedBox(width: 5),
+              Text('0 Stars',
                   style: TextStyle(color: Colors.grey, fontSize: 16)),
             ],
           ),

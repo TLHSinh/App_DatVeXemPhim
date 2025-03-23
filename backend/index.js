@@ -3,6 +3,8 @@ import cookieParser from "cookie-parser";
 import cors from 'cors';
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
+import { default as axios } from "axios";
+import crypto from "crypto";
 
 // Import routes
 import authRoute from "./routes/auth.js";
@@ -14,6 +16,7 @@ import bookTicketsRoutes from "./routes/bookTicketsRoutes.js";
 import advertiseRoutes from "./routes/advertiseRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 
 // Admin routes
@@ -77,6 +80,7 @@ app.use('/api/v1/book', bookTicketsRoutes);
 app.use('/api/v1/advertise', advertiseRoutes);
 app.use('/api/v1/reviews', feedbackRoutes);
 app.use('/api/v1/ticket', ticketRoutes);
+app.use('/api/v1', paymentRoutes);
 
 // Admin routes
 app.use('/api/v1/admin', UserManagementRoutes);
