@@ -54,10 +54,7 @@ class _MyAppState extends State<MyApp> {
       GoRoute(path: '/home', builder: (context, state) => FinalView()),
       GoRoute(
           path: '/payment-success',
-          builder: (context, state) {
-            final params = state.uri.queryParameters;
-            return PaymentSuccessful(queryParams: params);
-          }),
+          builder: (context, state) => PaymentSuccessful()),
       GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
@@ -72,11 +69,30 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleDeepLinks() async {
+    // Khi app đang chạy và nhận deep link mới
     _appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null && uri.path == '/payment-success') {
-        _router.go('/payment-success'); // Điều hướng về trang Home
+      if (uri != null) {
+        _navigateToDeepLink(uri);
       }
     });
+
+    // Khi app mở từ deep link lần đầu tiên
+    final initialUri = await _appLinks.getInitialLink();
+    if (initialUri != null) {
+      _navigateToDeepLink(initialUri);
+    }
+  }
+
+  void _navigateToDeepLink(Uri uri) {
+    if (uri.path == '/payment-success') {
+      final params = uri.queryParameters; // Lấy query parameters từ MoMo
+      print("Thanh toán thành công: $params");
+
+      // Chỉ điều hướng nếu app đang mở
+      if (mounted) {
+        _router.go('/payment-success', extra: params);
+      }
+    }
   }
 
   @override

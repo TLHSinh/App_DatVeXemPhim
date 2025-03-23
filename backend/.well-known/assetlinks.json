@@ -1,0 +1,12 @@
+[
+    {
+        "relation": [ "delegate_permission/common.handle_all_urls" ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.example.app_datvexemphim",
+            "sha256_cert_fingerprints": [
+                "7A:9F:DB:3C:99:6B:26:19:05:38:12:1A:49:31:84:E3:2C:80:54:64:CE:2C:FF:F4:F8:2D:3E:1A:E8:FF:A5:21"
+            ]
+        }
+    }
+]

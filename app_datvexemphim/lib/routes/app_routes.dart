@@ -19,10 +19,7 @@ class AppRoutes {
       GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
       GoRoute(
           path: '/payment-success',
-          builder: (context, state) {
-            final params = state.uri.queryParameters;
-            return PaymentSuccessful(queryParams: params);
-          }),
+          builder: (context, state) => PaymentSuccessful()),
       GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),

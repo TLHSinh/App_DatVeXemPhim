@@ -31,12 +31,13 @@
                 android:name="flutter_deeplinking_enabled"
                 android:value="true"/>
               <!-- Deep Link để nhận kết quả thanh toán từ MoMo -->
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http" android:host="example.com"/>
-                <data android:scheme="https"/>
+                <data android:scheme="appdatvexemphim" android:host="payment-success"/>
+                <data android:scheme="https" android:host="1391-2405-4802-9112-b2d0-c9b7-f7db-9c03-8d2.ngrok-free.app" 
+                        android:pathPrefix="/payment-success"/>
             </intent-filter>
 
             <intent-filter>

@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
+import 'package:app_datvexemphim/presentation/screens/web_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -31,6 +34,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String? _promoMessage;
   int _discount = 0;
   int _finalPrice = 0;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -72,7 +76,57 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   // Xử lý khi nhấn thanh toán
   void _confirmPayment() async {
+    // const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
+
+    // final Map<String, dynamic> body = {
+    //   "amount": _finalPrice, // Thay bằng giá trị thực tế
+    //   "orderInfo": "Thanh toán MoMo test"
+    // };
+
+    // try {
+    //   final response = await http.post(
+    //     Uri.parse(apiUrl),
+    //     headers: {"Content-Type": "application/json"},
+    //     body: jsonEncode(body),
+    //   );
+
+    //   if (response.statusCode == 200) {
+    //     final Map<String, dynamic> result = jsonDecode(response.body);
+    //     final String payUrl = result['payUrl'];
+    //     final String orderId = result['orderId'];
+
+    //     // Hiển thị thông báo
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content: Text(
+    //             "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}"),
+    //       ),
+    //     );
+
+    //     // Mở URL trong trình duyệt ngoài
+    //     final Uri url = Uri.parse(payUrl);
+    //     if (await canLaunchUrl(url)) {
+    //       await launchUrl(url, mode: LaunchMode.externalApplication);
+    //     } else {
+    //       throw 'Không thể mở URL: $payUrl';
+    //     }
+    //   } else {
+    //     throw 'Lỗi khi thanh toán: ${response.body}';
+    //   }
+    // } catch (e) {
+    //   print("Lỗi: $e");
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text("Lỗi thanh toán!")),
+    //   );
+    // }
+
     const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
+    const String checkStatusUrl =
+        "http://192.168.1.4:5000/api/v1/transaction-status";
+
+    setState(() {
+      isLoading = true; // Hiển thị vòng xoay
+    });
 
     final Map<String, dynamic> body = {
       "amount": _finalPrice, // Thay bằng giá trị thực tế
@@ -89,27 +143,56 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> result = jsonDecode(response.body);
         final String payUrl = result['payUrl'];
+        final String orderId = result['orderId'];
 
-        // Hiển thị thông báo
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}"),
-          ),
-        );
-
-        // Mở URL trong trình duyệt ngoài
+        // Mở URL thanh toán trên trình duyệt
         final Uri url = Uri.parse(payUrl);
         if (await canLaunchUrl(url)) {
           await launchUrl(url, mode: LaunchMode.externalApplication);
         } else {
           throw 'Không thể mở URL: $payUrl';
         }
+
+        // Kiểm tra trạng thái giao dịch sau khi thanh toán
+        bool isPaid = false;
+        while (!isPaid) {
+          await Future.delayed(
+              Duration(seconds: 2)); // Chờ 2 giây trước khi kiểm tra lại
+
+          final statusResponse = await http.post(
+            Uri.parse(checkStatusUrl),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({"orderId": orderId}),
+          );
+
+          if (statusResponse.statusCode == 200) {
+            final Map<String, dynamic> statusResult =
+                jsonDecode(statusResponse.body);
+            final int resultCode = statusResult['resultCode'];
+
+            if (resultCode == 0) {
+              isPaid = true;
+              setState(() => isLoading = false);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => PaymentSuccessful()),
+              );
+            } else if (resultCode == 1) {
+              isPaid = true;
+              setState(() => isLoading = false);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            }
+          }
+        }
       } else {
         throw 'Lỗi khi thanh toán: ${response.body}';
       }
     } catch (e) {
       print("Lỗi: $e");
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi thanh toán!")),
       );

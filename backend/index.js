@@ -3,6 +3,8 @@ import cookieParser from "cookie-parser";
 import cors from 'cors';
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
+import path from "path";
+import { fileURLToPath } from "url";
 import { default as axios } from "axios";
 import crypto from "crypto";
 
@@ -69,6 +71,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
+
+// Xác định __dirname trong ES Module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/.well-known", express.static(path.join(__dirname, ".well-known")));
 
 // User routes
 app.use('/api/v1/auth', authRoute);
