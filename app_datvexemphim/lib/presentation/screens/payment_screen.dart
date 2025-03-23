@@ -13,6 +13,7 @@ class PaymentScreen extends StatefulWidget {
   final Map<String, int> selectedFoods;
   final List<dynamic> foods;
   final Map<String, dynamic> selectedMovie;
+  final String idDonDatVe;
 
   const PaymentScreen({
     super.key,
@@ -21,6 +22,7 @@ class PaymentScreen extends StatefulWidget {
     required this.selectedFoods,
     required this.foods,
     required this.selectedMovie,
+    required this.idDonDatVe,
   });
 
   @override
@@ -38,6 +40,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+    print(widget.idDonDatVe);
+    print(widget.idDonDatVe);
+    print(widget.idDonDatVe);
     _finalPrice = widget.totalPrice; // Giá ban đầu = tổng tiền gốc
   }
 
@@ -75,53 +80,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   // Xử lý khi nhấn thanh toán
   void _confirmPayment() async {
-    // const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
-
-    // final Map<String, dynamic> body = {
-    //   "amount": _finalPrice, // Thay bằng giá trị thực tế
-    //   "orderInfo": "Thanh toán MoMo test"
-    // };
-
-    // try {
-    //   final response = await http.post(
-    //     Uri.parse(apiUrl),
-    //     headers: {"Content-Type": "application/json"},
-    //     body: jsonEncode(body),
-    //   );
-
-    //   if (response.statusCode == 200) {
-    //     final Map<String, dynamic> result = jsonDecode(response.body);
-    //     final String payUrl = result['payUrl'];
-    //     final String orderId = result['orderId'];
-
-    //     // Hiển thị thông báo
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content: Text(
-    //             "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}"),
-    //       ),
-    //     );
-
-    //     // Mở URL trong trình duyệt ngoài
-    //     final Uri url = Uri.parse(payUrl);
-    //     if (await canLaunchUrl(url)) {
-    //       await launchUrl(url, mode: LaunchMode.externalApplication);
-    //     } else {
-    //       throw 'Không thể mở URL: $payUrl';
-    //     }
-    //   } else {
-    //     throw 'Lỗi khi thanh toán: ${response.body}';
-    //   }
-    // } catch (e) {
-    //   print("Lỗi: $e");
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("Lỗi thanh toán!")),
-    //   );
-    // }
-
     const String apiUrl = "http://192.168.1.4:5000/api/v1/payment";
     const String checkStatusUrl =
         "http://192.168.1.4:5000/api/v1/transaction-status";
+    const String updateSeatUrl =
+        "http://192.168.1.4:5000/api/v1/book/thanhtoan"; // API cập nhật trạng thái ghế
 
     setState(() {
       isLoading = true; // Hiển thị vòng xoay
@@ -171,11 +134,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
             if (resultCode == 0) {
               isPaid = true;
-              setState(() => isLoading = false);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => PaymentSuccessful()),
+
+              // 🛠 Gọi API cập nhật trạng thái ghế
+              final updateResponse = await http.put(
+                Uri.parse(updateSeatUrl),
+                headers: {"Content-Type": "application/json"},
+                body: jsonEncode({"idDonDatVe": widget.idDonDatVe}),
               );
+
+              if (updateResponse.statusCode == 200) {
+                // Cập nhật trạng thái thành công, chuyển trang
+                setState(() => isLoading = false);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaymentSuccessful()),
+                );
+              } else {
+                throw 'Lỗi cập nhật trạng thái ghế: ${updateResponse.body}';
+              }
             } else if (resultCode == 1) {
               isPaid = true;
               setState(() => isLoading = false);
@@ -190,7 +166,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         throw 'Lỗi khi thanh toán: ${response.body}';
       }
     } catch (e) {
-      print("Lỗi: $e");
+      print("❌ Lỗi: $e");
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi thanh toán!")),

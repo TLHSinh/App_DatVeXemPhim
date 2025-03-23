@@ -54,7 +54,7 @@ class _DetailsTicketState extends State<DetailsTicket> {
 
   Future<void> _confirmBooking(BuildContext context) async {
     userId = await StorageService.getUserId();
-    print('id nguoi dung $userId');
+    print('ID người dùng: $userId');
     if (userId == null) {
       print("Không tìm thấy ID người dùng.");
       return;
@@ -67,11 +67,15 @@ class _DetailsTicketState extends State<DetailsTicket> {
         "danhSachGhe": widget.selectedSeats,
         "danhSachDoAn": widget.selectedFoods.keys.join(", "),
       });
+
       if (response?.statusCode == 200) {
-        // Đặt vé thành công
         print("Đặt vé thành công: ${response?.data}");
 
+        // Lấy `idDonDatVe` từ phản hồi API
+        String idDonDatVe = response?.data["idDonDatVe"] ?? '';
+
         // In thông tin vào terminal
+        print("ID đơn đặt vé: $idDonDatVe");
         print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
         print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
         print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
@@ -86,11 +90,12 @@ class _DetailsTicketState extends State<DetailsTicket> {
               selectedFoods: widget.selectedFoods,
               foods: widget.foods,
               selectedMovie: widget.selectedMovie,
+              idDonDatVe:
+                  idDonDatVe, // Truyền `idDonDatVe` vào màn hình thanh toán
             ),
           ),
         );
       } else {
-        // Xử lý lỗi nếu có
         print("Lỗi khi xác nhận đặt vé: ${response?.data['message']}");
       }
     } catch (e) {

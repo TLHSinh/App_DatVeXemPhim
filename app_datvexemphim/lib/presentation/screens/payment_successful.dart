@@ -1,3 +1,4 @@
+import 'package:app_datvexemphim/presentation/screens/ticket_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,23 +17,24 @@ class _PaymentSuccessfulState extends State<PaymentSuccessful> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Payment successfully'),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         color: Colors.white,
         child: Center(
           child: ElevatedButton(
               onPressed: () {
-                // Navigator.pushReplacement(
-                //     context,
-                //     PageRouteBuilder(
-                //       pageBuilder: (context, animation, secondaryAnimation) =>
-                //           FinalView(),
-                //     ));
-                if (mounted) {
-                  GoRouter.of(context).push('/home');
-                }
+                Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          TicketScreen(),
+                    ));
+                // if (mounted) {
+                //   GoRouter.of(context).push('/home');
+                // }
               },
-              child: Text('Move to Home')),
+              child: Text('Move to your Ticket')),
         ),
       ),
     );

@@ -36,13 +36,14 @@ dependencies:
   app_links: ^6.4.0
   geolocator: ^13.0.3
 
-  webview_flutter_wkwebview: ^3.10.0
-  webview_flutter_android: ^4.3.4
+  # webview_flutter_wkwebview: ^3.10.0
+  # webview_flutter_android: ^4.3.4
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true

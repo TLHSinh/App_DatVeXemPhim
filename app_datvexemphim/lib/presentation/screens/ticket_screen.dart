@@ -13,17 +13,14 @@
 //   }
 // }
 
-
-
-
-
 import 'package:app_datvexemphim/data/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 
-
 class TicketScreen extends StatefulWidget {
+  const TicketScreen({super.key});
+
   @override
   _TicketScreenState createState() => _TicketScreenState();
 }
@@ -40,7 +37,7 @@ class _TicketScreenState extends State<TicketScreen> {
   }
 
   Future<void> _fetchTickets() async {
-     userId = await StorageService.getUserId();
+    userId = await StorageService.getUserId();
     if (userId != null) {
       try {
         final response = await ApiService.get("/ticket/listticket/$userId");
@@ -69,6 +66,7 @@ class _TicketScreenState extends State<TicketScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Danh Sách Vé"),
+        automaticallyImplyLeading: false,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -79,14 +77,16 @@ class _TicketScreenState extends State<TicketScreen> {
                   itemBuilder: (context, index) {
                     var ticket = tickets[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("ID Vé: ${ticket["_id"]}"),
-                            Text("Số ghế: ${ticket["danh_sach_ghe"].join(", ")}"),
+                            Text(
+                                "Số ghế: ${ticket["danh_sach_ghe"].join(", ")}"),
                             Text("Tổng tiền: ${ticket["tong_tien"]}"),
                             Text("Trạng thái: ${ticket["trang_thai"]}"),
                           ],
