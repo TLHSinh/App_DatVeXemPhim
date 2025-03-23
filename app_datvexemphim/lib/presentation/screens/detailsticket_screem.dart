@@ -154,7 +154,6 @@ class DetailsTicket extends StatelessWidget {
           ],
         ),
       ),
-      
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
@@ -196,7 +195,7 @@ class DetailsTicket extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentScreen(

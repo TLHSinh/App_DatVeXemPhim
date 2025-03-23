@@ -1,5 +1,5 @@
-import 'package:app_datvexemphim/presentation/widgets/final_view.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PaymentSuccessful extends StatefulWidget {
   const PaymentSuccessful({
@@ -22,12 +22,15 @@ class _PaymentSuccessfulState extends State<PaymentSuccessful> {
         child: Center(
           child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          FinalView(),
-                    ));
+                // Navigator.pushReplacement(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) =>
+                //           FinalView(),
+                //     ));
+                if (mounted) {
+                  GoRouter.of(context).push('/home');
+                }
               },
               child: Text('Move to Home')),
         ),
