@@ -67,18 +67,16 @@ class _DetailsTicketState extends State<DetailsTicket> {
               "idNguoiDung": userId, // Sử dụng ID người dùng
       "idLichChieu": widget.selectedMovie["id_lich_chieu"],
       "danhSachGhe": widget.selectedSeats,
-      "danhSachDoAn": widget.selectedFoods.keys.join(", "),
+      "danhSachDoAn": widget.selectedFoods.keys.toList(),
       });
       if (response?.statusCode == 200) {
-        // Đặt vé thành công
-        print("Đặt vé thành công: ${response?.data}");
 
-        // In thông tin vào terminal
+        print("Đặt vé thành công: ${response?.data}");
         print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
         print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
         print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
 
-        // Chuyển đến màn hình thanh toán
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -248,18 +246,6 @@ class _DetailsTicketState extends State<DetailsTicket> {
               child: ElevatedButton(
                 onPressed: () {
                   _confirmBooking(context);
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PaymentScreen(
-                  //       selectedSeats: selectedSeats,
-                  //       totalPrice: totalPrice,
-                  //       selectedFoods: selectedFoods,
-                  //       foods: foods,
-                  //       selectedMovie: selectedMovie,
-                  //     ),
-                  //   ),
-                  // );
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
