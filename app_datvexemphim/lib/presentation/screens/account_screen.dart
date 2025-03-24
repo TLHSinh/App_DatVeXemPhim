@@ -1,5 +1,6 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
@@ -378,18 +379,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
 
               const SizedBox(height: 10), // Khoảng cách giữa hai nút
-
-              // Nút Xóa Tài Khoản
+              // Nút Xóa tài khoản
               SizedBox(
-                width: double.infinity, // Kéo dài ngang màn hình
-                child: ElevatedButton(
+                width: double.infinity,
+                child: OutlinedButton(
                   onPressed: () async {
                     bool? shouldDelete = await showDialog<bool>(
                       context: context,
                       builder: (BuildContext context) => AlertDialog(
                         title: const Text("Xác nhận xóa tài khoản"),
                         content: const Text(
-                            "Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác!"),
+                          "Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác.",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
@@ -397,22 +398,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text(
-                              "Xóa tài khoản",
-                              style: TextStyle(color: Colors.red),
-                            ),
+                            child: const Text("Xóa",
+                                style: TextStyle(color: Colors.red)),
                           ),
                         ],
                       ),
                     );
 
                     if (shouldDelete == true) {
-                      // Gọi API hoặc xử lý logic xóa tài khoản
-                      //await StorageService.deleteUserAccount();
+                      try {
+                        final response =
+                            await ApiService.delete("/user/$userId");
 
-                      if (mounted) {
-                        context.go(
-                            '/onboarding'); // Chuyển về trang khởi động sau khi xóa tài khoản
+                        if (response?.statusCode == 200 &&
+                            response?.data['success'] == true) {
+                          await StorageService
+                              .clearUserData(); // Xóa dữ liệu người dùng
+                          if (context.mounted) {
+                            context.go(
+                                '/onboarding'); // Chuyển về màn hình đăng nhập
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Không thể xóa tài khoản. Vui lòng thử lại."),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Lỗi khi xóa tài khoản: $e"),
+                              backgroundColor: Colors.red),
+                        );
                       }
                     }
                   },
@@ -435,7 +455,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-
           const SizedBox(height: 20),
         ],
       ),

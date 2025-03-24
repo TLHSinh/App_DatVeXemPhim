@@ -41,6 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         "hinhAnh": _imageController.text.trim(),
         "role": "user",
       });
+      
 
       if (response != null && response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
