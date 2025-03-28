@@ -32,7 +32,7 @@ class _GiftScreenState extends State<GiftScreen>
           controller: _tabController,
           labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           indicatorColor: Colors.redAccent,
-          tabs: [
+          tabs: const [
             Tab(text: "Ưu đãi"),
             Tab(text: "Voucher"),
           ],
@@ -40,7 +40,7 @@ class _GiftScreenState extends State<GiftScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           AdsTab(),
           VouchersTab(),
         ],
@@ -50,6 +50,8 @@ class _GiftScreenState extends State<GiftScreen>
 }
 
 class AdsTab extends StatefulWidget {
+  const AdsTab({super.key});
+
   @override
   _AdsTabState createState() => _AdsTabState();
 }
@@ -133,6 +135,8 @@ class _AdsTabState extends State<AdsTab> with AutomaticKeepAliveClientMixin {
 }
 
 class VouchersTab extends StatefulWidget {
+  const VouchersTab({super.key});
+
   @override
   _VouchersTabState createState() => _VouchersTabState();
 }
@@ -223,17 +227,19 @@ class DetailScreen extends StatelessWidget {
   final String description;
 
   const DetailScreen(
-      {Key? key,
+      {super.key,
       required this.imageUrl,
       required this.title,
-      required this.description})
-      : super(key: key);
+      required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text(title),backgroundColor: Colors.white,),
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.white,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

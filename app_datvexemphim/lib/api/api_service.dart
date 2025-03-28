@@ -4,11 +4,10 @@ import 'package:app_datvexemphim/data/services/storage_service.dart';
 class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl:
-          // "http://localhost:5000/api/v1",
-          "http://192.168.12.105:5000/api/v1",
+      baseUrl: //"http://localhost:5000/api/v1",
+          "http://10.21.12.229:5000/api/v1",
 
-      // "http://192.168.1.11:5000/api/v1",
+      // "http://10.21.9.151:5000/api/v1",
 
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),

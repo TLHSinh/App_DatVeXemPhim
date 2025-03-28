@@ -7,6 +7,7 @@ import {
   Search,
   RefreshCw,
   Filter,
+  LucideArmchair,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -485,7 +486,7 @@ const LichChieuPhim = () => {
                               className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                               title="Xem danh sách ghế"
                             >
-                              <Trash size={18} />
+                              <LucideArmchair size={18} />
                             </button>
                           </div>
                         </td>

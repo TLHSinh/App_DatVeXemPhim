@@ -9,7 +9,7 @@ import 'package:dio/dio.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
-  const DetailMovieScreen({Key? key, required this.movie}) : super(key: key);
+  const DetailMovieScreen({super.key, required this.movie});
 
   @override
   _DetailMovieScreenState createState() => _DetailMovieScreenState();
@@ -42,7 +42,8 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
 
   Future<void> _fetchReviews() async {
     try {
-      final response = await ApiService.get('/reviews/movie/${widget.movie["_id"]}');
+      final response =
+          await ApiService.get('/reviews/movie/${widget.movie["_id"]}');
       if (response != null && response.statusCode == 200) {
         setState(() {
           _reviews = response.data; // Lưu bình luận vào danh sách
@@ -117,7 +118,9 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
           children: [
             // Hình ảnh người bình luận
             CircleAvatar(
-              backgroundImage: NetworkImage(review["id_nguoi_dung"]?["hinhAnh"] ?? "https://via.placeholder.com/150"),
+              backgroundImage: NetworkImage(review["id_nguoi_dung"]
+                      ?["hinhAnh"] ??
+                  "https://via.placeholder.com/150"),
               radius: 25,
             ),
             const SizedBox(width: 10),
@@ -231,13 +234,18 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Nội dung phim", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text("Nội dung phim",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     HtmlWidget(
                       _isExpanded
                           ? movie["mo_ta"] ?? "<p>Không có mô tả</p>"
-                          : (movie["mo_ta"]?.substring(0, 200) ?? "<p>Không có mô tả</p>") + "...",
-                      textStyle: const TextStyle(color: Color(0xFF545454), fontSize: 16),
+                          : (movie["mo_ta"]?.substring(0, 200) ??
+                                  "<p>Không có mô tả</p>") +
+                              "...",
+                      textStyle: const TextStyle(
+                          color: Color(0xFF545454), fontSize: 16),
                     ),
                     TextButton(
                       onPressed: () {
@@ -256,13 +264,14 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
             // Hiển thị bình luận
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text("Bình luận", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text("Bình luận",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
-            ..._reviews.map((review) => _buildReviewCard(review)).toList(), // Hiển thị danh sách bình luận
+            ..._reviews.map((review) =>
+                _buildReviewCard(review)), // Hiển thị danh sách bình luận
           ],
         ),
       ),
-      
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton.icon(
@@ -289,6 +298,4 @@ class _DetailMovieScreenState extends State<DetailMovieScreen> {
       ),
     );
   }
-
-
 }

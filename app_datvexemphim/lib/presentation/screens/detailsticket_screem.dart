@@ -28,14 +28,13 @@ class DetailsTicket extends StatefulWidget {
 }
 
 class _DetailsTicketState extends State<DetailsTicket> {
-    String? userId;
+  String? userId;
   @override
   void initState() {
     super.initState();
     print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
     print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
     print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
-
   }
 
   String formatCurrency(int amount) {
@@ -54,9 +53,8 @@ class _DetailsTicketState extends State<DetailsTicket> {
   }
 
   Future<void> _confirmBooking(BuildContext context) async {
-
-     userId = await StorageService.getUserId();
-     print('id nguoi dung $userId');
+    userId = await StorageService.getUserId();
+    print('id nguoi dung $userId');
     if (userId == null) {
       print("Không tìm thấy ID người dùng.");
       return;
@@ -64,21 +62,29 @@ class _DetailsTicketState extends State<DetailsTicket> {
 
     try {
       final response = await ApiService.post("/book/xacNhanDatVe", {
-              "idNguoiDung": userId, // Sử dụng ID người dùng
-      "idLichChieu": widget.selectedMovie["id_lich_chieu"],
-      "danhSachGhe": widget.selectedSeats,
-      "danhSachDoAn": widget.selectedFoods.keys.join(", "),
+        "idNguoiDung": userId, // Sử dụng ID người dùng
+        "idLichChieu": widget.selectedMovie["id_lich_chieu"],
+        "danhSachGhe": widget.selectedSeats,
+        "danhSachDoAn": widget.selectedFoods.keys.join(", "),
       });
+
       if (response?.statusCode == 200) {
-        // Đặt vé thành công
         print("Đặt vé thành công: ${response?.data}");
 
+        // Lấy `idDonDatVe` từ phản hồi API
+        String? idDonDatVe = response?.data["idDonDatVe"];
+
+        if (idDonDatVe == null || idDonDatVe.isEmpty) {
+          print("Lỗi: idDonDatVe không hợp lệ.");
+          return;
+        }
+
         // In thông tin vào terminal
+        print("ID đơn đặt vé: $idDonDatVe");
         print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
         print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
         print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
 
-        // Chuyển đến màn hình thanh toán
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -88,11 +94,11 @@ class _DetailsTicketState extends State<DetailsTicket> {
               selectedFoods: widget.selectedFoods,
               foods: widget.foods,
               selectedMovie: widget.selectedMovie,
+              idDonDatVe: idDonDatVe, // Chắc chắn idDonDatVe không rỗng
             ),
           ),
         );
       } else {
-        // Xử lý lỗi nếu có
         print("Lỗi khi xác nhận đặt vé: ${response?.data['message']}");
       }
     } catch (e) {
@@ -248,18 +254,6 @@ class _DetailsTicketState extends State<DetailsTicket> {
               child: ElevatedButton(
                 onPressed: () {
                   _confirmBooking(context);
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PaymentScreen(
-                  //       selectedSeats: selectedSeats,
-                  //       totalPrice: totalPrice,
-                  //       selectedFoods: selectedFoods,
-                  //       foods: foods,
-                  //       selectedMovie: selectedMovie,
-                  //     ),
-                  //   ),
-                  // );
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
