@@ -79,16 +79,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  final String api = "http://10.21.9.151:5000/api/v1";
+  // final String api = "http://10.21.9.151:5000/api/v1";
 
   // Xử lý khi nhấn thanh toán
   void _confirmPayment() async {
-    const String apiUrl = "http://10.21.5.186:5000/api/v1/payment";
-    const String checkStatusUrl =
-        "http://10.21.5.186:5000/api/v1/transaction-status";
-    const String updateSeatUrl =
-        "http://10.21.5.186:5000/api/v1/book/thanhtoan"; // API cập nhật trạng thái ghế
-
     setState(() {
       isLoading = true; // Hiển thị vòng xoay
     });
@@ -99,18 +93,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     };
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(body),
-      );
+      final response = await ApiService.post('/payment', body);
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> result = jsonDecode(response.body);
+      if (response != null && response.statusCode == 200) {
+        final Map<String, dynamic> result = response.data;
         final String payUrl = result['payUrl'];
         final String orderId = result['orderId'];
 
-        // Mở URL thanh toán trên trình duyệt
         final Uri url = Uri.parse(payUrl);
         if (await canLaunchUrl(url)) {
           await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -118,42 +107,34 @@ class _PaymentScreenState extends State<PaymentScreen> {
           throw 'Không thể mở URL: $payUrl';
         }
 
-        // Kiểm tra trạng thái giao dịch sau khi thanh toán
         bool isPaid = false;
         while (!isPaid) {
-          await Future.delayed(
-              Duration(seconds: 2)); // Chờ 2 giây trước khi kiểm tra lại
+          await Future.delayed(Duration(seconds: 2));
 
-          final statusResponse = await http.post(
-            Uri.parse(checkStatusUrl),
-            headers: {"Content-Type": "application/json"},
-            body: jsonEncode({"orderId": orderId}),
+          final statusResponse = await ApiService.post(
+            '/transaction-status',
+            {"orderId": orderId},
           );
 
-          if (statusResponse.statusCode == 200) {
-            final Map<String, dynamic> statusResult =
-                jsonDecode(statusResponse.body);
+          if (statusResponse != null && statusResponse.statusCode == 200) {
+            final Map<String, dynamic> statusResult = statusResponse.data;
             final int resultCode = statusResult['resultCode'];
 
             if (resultCode == 0) {
               isPaid = true;
-
-              // 🛠 Gọi API cập nhật trạng thái ghế
-              final updateResponse = await http.put(
-                Uri.parse(updateSeatUrl),
-                headers: {"Content-Type": "application/json"},
-                body: jsonEncode({"idDonDatVe": widget.idDonDatVe}),
+              final updateResponse = await ApiService.put(
+                '/book/thanhtoan',
+                {'idDonDatVe': widget.idDonDatVe},
               );
 
-              if (updateResponse.statusCode == 200) {
-                // Cập nhật trạng thái thành công, chuyển trang
+              if (updateResponse != null && updateResponse.statusCode == 200) {
                 setState(() => isLoading = false);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => PaymentSuccessful()),
                 );
               } else {
-                throw 'Lỗi cập nhật trạng thái ghế: ${updateResponse.body}';
+                throw 'Lỗi cập nhật trạng thái ghế: ${updateResponse!.data}';
               }
             } else if (resultCode == 1) {
               isPaid = true;
@@ -166,7 +147,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           }
         }
       } else {
-        throw 'Lỗi khi thanh toán: ${response.body}';
+        throw 'Lỗi khi thanh toán: ${response!.data}';
       }
     } catch (e) {
       print("❌ Lỗi: $e");
@@ -188,26 +169,53 @@ class _PaymentScreenState extends State<PaymentScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("🎬 Thông tin vé",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _buildTicketDetails(),
-            const SizedBox(height: 16),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("🎬 Thông tin vé",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                _buildTicketDetails(),
+                const SizedBox(height: 16),
 
-            // Mã giảm giá
-            _buildPromoCodeField(),
-            const SizedBox(height: 16),
+                // Mã giảm giá
+                _buildPromoCodeField(),
+                const SizedBox(height: 16),
 
-            // Chọn phương thức thanh toán
-            _buildPaymentMethodSelection(),
-            const SizedBox(height: 16),
-          ],
-        ),
+                // Chọn phương thức thanh toán
+                _buildPaymentMethodSelection(),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+          if (isLoading)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                // width: MediaQuery.of(context).size.width,
+                // height: MediaQuery.of(context).size.height,
+                color: Colors.black.withValues(alpha: .6),
+                child: Center(
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.all(16.0),
@@ -234,11 +242,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _confirmPayment,
+                onPressed: isLoading ? null : _confirmPayment,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
                     minimumSize: const Size(double.infinity, 50)),
-                child: const Text("Thanh Toán",
+                child: Text("Thanh Toán",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

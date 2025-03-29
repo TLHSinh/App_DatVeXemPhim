@@ -27,10 +27,6 @@ Future<void> main() async {
     );
   }
 
-  final uri = Uri.base; // Nhận deep link từ hệ thống
-  if (uri.scheme == "appdatvexemphim" && uri.host == "payment-success") {
-    print("Nhận deep link: ${uri.queryParameters}");
-  }
   runApp(MyApp()); // Chạy app sau khi Firebase đã được khởi tạo
 }
 
@@ -42,7 +38,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final AppLinks _appLinks;
   final GoRouter _router = GoRouter(
     initialLocation: '/splash',
     routes: [
@@ -54,47 +49,10 @@ class _MyAppState extends State<MyApp> {
       GoRoute(path: '/register', builder: (context, state) => RegisterScreen()),
       GoRoute(path: '/home', builder: (context, state) => FinalView()),
       GoRoute(
-          path: '/payment-success',
-          builder: (context, state) => PaymentSuccessful()),
-      GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
     ],
   );
-
-  @override
-  void initState() {
-    super.initState();
-    _appLinks = AppLinks();
-    _handleDeepLinks();
-  }
-
-  void _handleDeepLinks() async {
-    // Khi app đang chạy và nhận deep link mới
-    _appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        _navigateToDeepLink(uri);
-      }
-    });
-
-    // Khi app mở từ deep link lần đầu tiên
-    final initialUri = await _appLinks.getInitialLink();
-    if (initialUri != null) {
-      _navigateToDeepLink(initialUri);
-    }
-  }
-
-  void _navigateToDeepLink(Uri uri) {
-    if (uri.path == '/payment-success') {
-      final params = uri.queryParameters; // Lấy query parameters từ MoMo
-      print("Thanh toán thành công: $params");
-
-      // Chỉ điều hướng nếu app đang mở
-      if (mounted) {
-        _router.go('/payment-success', extra: params);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,5 +60,10 @@ class _MyAppState extends State<MyApp> {
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
     );
+
+    // return MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   home: PaymentSuccessful(),
+    // );
   }
 }

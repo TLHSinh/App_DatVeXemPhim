@@ -4,8 +4,8 @@ import 'package:app_datvexemphim/data/services/storage_service.dart';
 class ApiService {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: //"http://localhost:5000/api/v1",
-          "http://10.21.12.229:5000/api/v1",
+      baseUrl: "http://localhost:5000/api/v1",
+      //"http://10.21.12.229:5000/api/v1",
 
       // "http://10.21.9.151:5000/api/v1",
 
@@ -47,11 +47,9 @@ class ApiService {
     try {
       String? token =
           await StorageService.getToken(); // Lấy token từ StorageService
-      Response response = await _dio.put(
-        endpoint,
-        data: data,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
-      );
+      Response response = await _dio.put(endpoint,
+          data: data,
+          options: Options(headers: {"Authorization": "Bearer $token"}));
       return response;
     } catch (e) {
       print("❌ API PUT Error ($endpoint): $e");
