@@ -360,21 +360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: const Text("Hủy"),
                           ),
                           TextButton(
-                            onPressed: () async {
-                              // Navigator.of(context).pop(true);
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.remove('email');
-                              // Navigator.pushReplacement(
-                              //     context,
-                              //     PageRouteBuilder(
-                              //       pageBuilder: (context, animation,
-                              //               secondaryAnimation) =>
-                              //           OnboardingScreen(),
-                              //     )).then((value) async => {});
-
-                              GoRouter.of(context).go('/onboarding');
-                            },
+                            onPressed: () => Navigator.of(context).pop(true),
                             child: const Text("Đăng xuất"),
                           ),
                         ],
