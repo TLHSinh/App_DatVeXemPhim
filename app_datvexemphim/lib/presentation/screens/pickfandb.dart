@@ -9,11 +9,11 @@ class ComboSelectionScreen extends StatefulWidget {
   final Map<String, dynamic> selectedMovie;
 
   const ComboSelectionScreen({
-    Key? key,
+    super.key,
     required this.selectedSeats,
     required this.totalPrice,
-    required this.selectedMovie,
-  }) : super(key: key);
+    required this.selectedMovie, required Map<String, dynamic> schedule,
+  });
 
   @override
   _ComboSelectionScreenState createState() => _ComboSelectionScreenState();

@@ -34,7 +34,8 @@ class _PickseatScreenState extends State<PickseatScreen> {
             .where((seat) => seat["trang_thai"] == "đã đặt trước")
             .map<String>((seat) => seat["so_ghe"])
             .toList();
-List<Map<String, dynamic>> available = seatList.cast<Map<String, dynamic>>();
+        List<Map<String, dynamic>> available =
+            seatList.cast<Map<String, dynamic>>();
 
         setState(() {
           bookedSeats = booked;
@@ -170,15 +171,18 @@ List<Map<String, dynamic>> available = seatList.cast<Map<String, dynamic>>();
           mainAxisSize: MainAxisSize.min,
           children: List.generate(12, (col) {
             int index = row * 12 + col;
-            if (index >= availableSeats.length) return SizedBox(); // Tránh lỗi khi không đủ ghế
+            if (index >= availableSeats.length)
+              return SizedBox(); // Tránh lỗi khi không đủ ghế
 
             var seat = availableSeats[index];
             String seatLabel = seat["so_ghe"];
             bool isBooked = bookedSeats.contains(seatLabel);
-            bool isSelected = selectedSeats.contains(seat["_id_Ghe"]); // Kiểm tra ID ghế đã chọn
+            bool isSelected = selectedSeats
+                .contains(seat["_id_Ghe"]); // Kiểm tra ID ghế đã chọn
 
             return GestureDetector(
-              onTap: isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
+              onTap:
+                  isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
               child: Container(
                 width: seatWidth,
                 height: seatHeight,
@@ -312,14 +316,15 @@ List<Map<String, dynamic>> available = seatList.cast<Map<String, dynamic>>();
   void _bookTickets() async {
     if (selectedSeats.isEmpty) return;
 
-    int totalPrice = (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
+    int totalPrice =
+        (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
     print("Danh sách ghế đã chọn: $selectedSeats");
-        print("id lich chieu da chọn: ${widget.schedule["_id"]}");
+    print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
     try {
       final response = await ApiService.post("/book/chonGhe", {
         "idLichChieu": widget.schedule["_id"],
-        "danhSachGhe": selectedSeats,  // Gửi ID của ghế
+        "danhSachGhe": selectedSeats, // Gửi ID của ghế
         // "tong_tien": totalPrice,
       });
 
@@ -333,23 +338,23 @@ List<Map<String, dynamic>> available = seatList.cast<Map<String, dynamic>>();
         // Chuyển đến màn hình chọn combo
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) {
-              print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
-              return              ComboSelectionScreen(
-              selectedSeats: selectedSeats,  // Truyền danh sách ID ghế
+          MaterialPageRoute(builder: (context) {
+            print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
+            return ComboSelectionScreen(
+              selectedSeats: selectedSeats, // Truyền danh sách ID ghế
               totalPrice: totalPrice,
               selectedMovie: {
                 "id_lich_chieu": widget.schedule["_id"],
-                "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
+                "ten_phim":
+                    widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
                 "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-                "thoi_gian_chieu": widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+                "thoi_gian_chieu":
+                    widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
                 "url_poster": widget.schedule["id_phim"]?["url_poster"],
                 "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
-              },
+              }, schedule: {},
             );
-            }
-          ),
+          }),
         );
       } else {
         print("Lỗi đặt ghế: ${response?.data}");

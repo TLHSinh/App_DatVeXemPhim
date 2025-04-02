@@ -1,3 +1,5 @@
+import 'package:app_datvexemphim/data/services/storage_service.dart';
+import 'package:app_datvexemphim/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:intl/intl.dart';
@@ -235,15 +237,44 @@ class MovieScheduleCard extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PickseatScreen(schedule: schedule),
-                            ),
-                          );
-                        },
+                        // onPressed: () {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) =>
+                        //           PickseatScreen(schedule: schedule),
+                        //     ),
+                        //   );
+                        // },
+                        onPressed: () async {
+                              String? token = await StorageService.getToken();
+                              if (token == null) {
+                                // Nếu chưa đăng nhập -> Chuyển sang LoginScreen
+                                bool? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                                );
+
+                                // Nếu đăng nhập thành công -> Chuyển sang PickseatScreen
+                                if (result == true) {
+                                  token = await StorageService.getToken(); // Kiểm tra lại token
+                                  if (token != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PickseatScreen(schedule: schedule)),
+                                    );
+                                  }
+                                }
+                              } else {
+                                // Nếu đã đăng nhập -> Chuyển sang PickseatScreen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PickseatScreen(schedule: schedule)),
+                                );
+                              }
+                            },
                         child: Text(
                           schedule['thoi_gian_chieu'].substring(11, 16),
                           style: TextStyle(

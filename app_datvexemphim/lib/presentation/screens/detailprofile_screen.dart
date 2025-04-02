@@ -198,7 +198,8 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
       appBar: AppBar(
         title: const Text("Chỉnh sửa thông tin",
             style: TextStyle(
-                color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold)),
+                color: Color.fromARGB(255, 0, 0, 0),
+                fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xfff9f9f9),
       ),
       body: isLoading

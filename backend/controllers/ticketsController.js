@@ -18,10 +18,41 @@ export const getListTicketByID = async (req, res) => {
 
     // Lấy danh sách đơn đặt vé theo ID người dùng
     const donDatVeList = await DonDatVe.find({ id_nguoi_dung })
-      .populate("id_lich_chieu")
-      .populate("id_voucher")
-      .populate("nhanVienXuatVeGiay")
-      .lean();
+    .populate("id_nguoi_dung", "ten email")
+    .populate({
+      path: "id_lich_chieu",
+      populate: {
+          path: "id_phim",
+          select: "ten_phim url_poster",
+      },
+  })
+  .populate({
+    path: "id_lich_chieu",
+    populate: {
+      path: "id_phong",
+      select: "ten_phong",
+  },
+})
+.populate({
+  path: "id_lich_chieu",
+populate: {
+  path: "id_rap",
+  select: "ten_rap",
+},
+})
+
+  .populate({
+      path: "danh_sach_ghe",
+      select: "so_ghe",
+  })
+  .populate({
+      path: "danh_sach_do_an",
+      select: "ten_do_an",
+  })
+  .populate("id_voucher", "ma_voucher gia_tri")
+  .populate("nhanVienXuatVeGiay", "ten")
+
+    .lean();
 
     if (!donDatVeList.length) {
       return res.status(404).json({ message: "Không tìm thấy đơn đặt vé" });
@@ -57,12 +88,41 @@ export const getTicketByID = async (req, res) => {
         }
 
         const donDatVe = await DonDatVe.findById(id_ve)
-            .populate("id_nguoi_dung", "ten email")
-            .populate("id_lich_chieu")
-            .populate("danh_sach_ghe")
-            .populate("id_voucher", "ma_voucher gia_tri")
-            .populate("nhanVienXuatVeGiay", "ten")
-            .lean();
+        .populate("id_nguoi_dung", "ten email")
+        .populate({
+          path: "id_lich_chieu",
+          populate: {
+              path: "id_phim",
+              select: "ten_phim url_poster",
+          },
+      })
+      .populate({
+        path: "id_lich_chieu",
+        populate: {
+          path: "id_phong",
+          select: "ten_phong",
+      },
+    })
+    .populate({
+      path: "id_lich_chieu",
+    populate: {
+      path: "id_rap",
+      select: "ten_rap",
+    },
+    })
+    
+      .populate({
+          path: "danh_sach_ghe",
+          select: "so_ghe",
+      })
+      .populate({
+          path: "danh_sach_do_an",
+          select: "ten_do_an",
+      })
+      .populate("id_voucher", "ma_voucher gia_tri")
+      .populate("nhanVienXuatVeGiay", "ten")
+    
+        .lean();
 
         if (!donDatVe) {
             return res.status(404).json({ message: "Không tìm thấy vé" });

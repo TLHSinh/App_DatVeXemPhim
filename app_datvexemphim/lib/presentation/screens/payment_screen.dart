@@ -1,5 +1,12 @@
+import 'dart:convert';
+
+import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:app_datvexemphim/api/api_service.dart';
 
 class PaymentScreen extends StatefulWidget {
   final List<String> selectedSeats;
@@ -7,15 +14,17 @@ class PaymentScreen extends StatefulWidget {
   final Map<String, int> selectedFoods;
   final List<dynamic> foods;
   final Map<String, dynamic> selectedMovie;
+  final String idDonDatVe;
 
   const PaymentScreen({
-    Key? key,
+    super.key,
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedFoods,
     required this.foods,
     required this.selectedMovie,
-  }) : super(key: key);
+    required this.idDonDatVe,
+  });
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -27,10 +36,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String? _promoMessage;
   int _discount = 0;
   int _finalPrice = 0;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    print(widget.idDonDatVe);
+    print(widget.idDonDatVe);
+    print(widget.idDonDatVe);
     _finalPrice = widget.totalPrice; // Giá ban đầu = tổng tiền gốc
   }
 
@@ -66,15 +79,102 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
+  final String api = "http://10.21.9.151:5000/api/v1";
+
   // Xử lý khi nhấn thanh toán
-  void _confirmPayment() {
-    // TODO: Gọi API thanh toán ở đây
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(
-              "Thanh toán thành công với số tiền ${formatCurrency(_finalPrice)}")),
-    );
-    Navigator.pushReplacementNamed(context, '/paymentResult');
+  void _confirmPayment() async {
+    const String apiUrl = "http://localhost:5000/api/v1/payment";
+    const String checkStatusUrl =
+        "http://localhost:5000/api/v1/transaction-status";
+    const String updateSeatUrl =
+        "http://localhost:5000/api/v1/book/thanhtoan"; // API cập nhật trạng thái ghế
+
+    setState(() {
+      isLoading = true; // Hiển thị vòng xoay
+    });
+
+    final Map<String, dynamic> body = {
+      "amount": _finalPrice, // Thay bằng giá trị thực tế
+      "orderInfo": "Thanh toán MoMo test"
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> result = jsonDecode(response.body);
+        final String payUrl = result['payUrl'];
+        final String orderId = result['orderId'];
+
+        // Mở URL thanh toán trên trình duyệt
+        final Uri url = Uri.parse(payUrl);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          throw 'Không thể mở URL: $payUrl';
+        }
+
+        // Kiểm tra trạng thái giao dịch sau khi thanh toán
+        bool isPaid = false;
+        while (!isPaid) {
+          await Future.delayed(
+              Duration(seconds: 2)); // Chờ 2 giây trước khi kiểm tra lại
+
+          final statusResponse = await http.post(
+            Uri.parse(checkStatusUrl),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({"orderId": orderId}),
+          );
+
+          if (statusResponse.statusCode == 200) {
+            final Map<String, dynamic> statusResult =
+                jsonDecode(statusResponse.body);
+            final int resultCode = statusResult['resultCode'];
+
+            if (resultCode == 0) {
+              isPaid = true;
+
+              // 🛠 Gọi API cập nhật trạng thái ghế
+              final updateResponse = await http.put(
+                Uri.parse(updateSeatUrl),
+                headers: {"Content-Type": "application/json"},
+                body: jsonEncode({"idDonDatVe": widget.idDonDatVe}),
+              );
+
+              if (updateResponse.statusCode == 200) {
+                // Cập nhật trạng thái thành công, chuyển trang
+                setState(() => isLoading = false);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaymentSuccessful()),
+                );
+              } else {
+                throw 'Lỗi cập nhật trạng thái ghế: ${updateResponse.body}';
+              }
+            } else if (resultCode == 1) {
+              isPaid = true;
+              setState(() => isLoading = false);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            }
+          }
+        }
+      } else {
+        throw 'Lỗi khi thanh toán: ${response.body}';
+      }
+    } catch (e) {
+      print("❌ Lỗi: $e");
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi thanh toán!")),
+      );
+    }
   }
 
   @override
@@ -113,7 +213,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 5)]),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)]),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -134,7 +234,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _confirmPayment,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb81d24),
                     minimumSize: const Size(double.infinity, 50)),
@@ -240,7 +340,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               subtitle: Text(formatCurrency((food["gia"] ?? 0) * entry.value)),
               trailing: Text("x${entry.value}"),
             );
-          }).toList(),
+          }),
           const Divider(),
         ],
       ],

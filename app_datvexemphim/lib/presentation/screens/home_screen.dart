@@ -213,23 +213,12 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/detailmovie_screen.dart';
-import 'package:app_datvexemphim/presentation/screens/location_screen.dart'; // Thêm import cho LocationScreen
+// Thêm import cho LocationScreen
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -272,13 +261,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: const Color(0xfff9f9f9),
         title: Row(
@@ -316,8 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 
   Widget _buildAdsSlider() {
     return CarouselSlider(

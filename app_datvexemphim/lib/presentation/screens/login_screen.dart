@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
-import '../../data/services/storage_service.dart'; // File quản lý lưu trữ
+import '../../data/services/storage_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,11 +44,10 @@ class LoginScreenState extends State<LoginScreen> {
         String token = response.data['token'];
         String userId = response.data['data']['_id'];
 
-        // Lưu vào SharedPreferences
         await StorageService.saveUserData(token, userId);
 
-        // Chuyển hướng đến màn hình chính
-        GoRouter.of(context).go('/home');
+        // Quay lại trang trước đó và truyền kết quả thành công
+        Navigator.pop(context, true);
       } else {
         setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
       }
@@ -101,9 +100,8 @@ class LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => GoRouter.of(context).go('/home'),
+          onPressed: () => Navigator.pop(context, false),
         ),
-        //title: Text("Đăng nhập", style: TextStyle(color: Colors.black)),
         centerTitle: true,
       ),
       backgroundColor: Colors.white,

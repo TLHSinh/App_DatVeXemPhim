@@ -22,4 +22,6 @@ class StorageService {
     await prefs.remove('token');
     await prefs.remove('userId');
   }
+
+  static getUserToken() {}
 }
