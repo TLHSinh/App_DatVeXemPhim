@@ -5,7 +5,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:dio/dio.dart';
 
 class DetailMovieScreen extends StatefulWidget {
   final Map<String, dynamic> movie;

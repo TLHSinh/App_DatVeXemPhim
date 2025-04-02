@@ -33,6 +33,9 @@ import AdsManagementRoutes from './admin/routes/AdsManagementRoutes.js';
 import RevenueManagementRoutes from './admin/routes/RevenueManagementRoutes.js';
 import FeedbackManagementRoutes from './admin/routes/FeedbackManagementRoutes.js';
 
+// Sign in Google
+import signingoogleRoute from './routes/signingoogleRoute.js';
+
 //EmloyeeRoutes
 import emloyeeRoutes from "./routes/employeeRoutes.js";;
 
@@ -105,6 +108,8 @@ app.use('/api/v1/admin', AdsManagementRoutes);
 app.use('/api/v1/admin', RevenueManagementRoutes);
 app.use('/api/v1', FeedbackManagementRoutes);
 
+// Sign in Google
+app.use('/api/v1/google', signingoogleRoute);
 
 //EmloyeeRoutes
 app.use('/api/v1/employee', emloyeeRoutes);

@@ -6,8 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 class DetailsTicketScreen extends StatefulWidget {
   final dynamic ticketData;
 
-  const DetailsTicketScreen({Key? key, required this.ticketData})
-      : super(key: key);
+  const DetailsTicketScreen({super.key, required this.ticketData});
 
   @override
   State<DetailsTicketScreen> createState() => _DetailsTicketScreenState();

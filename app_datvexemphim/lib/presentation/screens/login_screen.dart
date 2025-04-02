@@ -1,7 +1,23 @@
+import 'package:app_datvexemphim/const.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/storage_service.dart'; // File quản lý lưu trữ
+
+const List<String> scopes = <String>[
+  'email',
+  'https://www.googleapis.com/auth/contacts.readonly',
+];
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  serverClientId: CLIENT_KEY,
+  scopes: scopes,
+);
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,43 +33,82 @@ class LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   String? _errorMessage;
 
+  late String? _currentAccount;
+  GoogleSignInAccount? _currentUser;
+  bool _isAuthorized = false; // has granted permissions?
+  final String _contactText = '';
+
   Future<void> _login() async {
     setState(() => _errorMessage = null);
 
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      setState(() => _errorMessage = "Vui lòng nhập đầy đủ thông tin!");
-      return;
+    if (_currentUser != null) {
+    } else {
+      if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+        setState(() => _errorMessage = "Vui lòng nhập đầy đủ thông tin!");
+        return;
+      }
     }
 
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiService.post("/auth/loginUser", {
-        "email": _emailController.text.trim(),
-        "matKhau": _passwordController.text.trim(),
-      });
+      if (_currentUser != null) {
+        final emailUser = _currentUser?.email;
+        //----------------------------------------------
 
-      if (response == null) {
-        setState(() => _errorMessage = "⚠️ Lỗi kết nối đến server!");
-        return;
-      }
+        final response =
+            await ApiService.post("/auth/loginGoogle", {"email": '$emailUser'});
 
-      if (response.statusCode == 200) {
-        print("✅ Đăng nhập thành công!");
+        if (response == null) {
+          setState(() => _errorMessage = "⚠️ Lỗi kết nối đến server!");
+          return;
+        }
 
-        String token = response.data['token'];
-        String userId = response.data['data']['_id'];
+        if (response.statusCode == 200) {
+          print("✅ Đăng nhập thành công!");
 
-        // Lưu vào SharedPreferences
-        await StorageService.saveUserData(token, userId);
+          String token = response.data['token'];
+          String userId = response.data['data']['_id'];
 
-        // Chuyển hướng đến màn hình chính
-        GoRouter.of(context).go('/home');
-        if (context.mounted) {
-          context.pop(true); // Trả về true sau khi đăng nhập thành công
+          // Lưu vào SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('email', emailUser ?? '');
+
+          await StorageService.saveUserData(token, userId);
+
+          // Chuyển hướng đến màn hình chính
+          GoRouter.of(context).go('/home');
+        } else {
+          setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
         }
       } else {
-        setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
+        final response = await ApiService.post("/auth/loginUser", {
+          "email": _emailController.text.trim(),
+          "matKhau": _passwordController.text.trim(),
+        });
+
+        if (response == null) {
+          setState(() => _errorMessage = "⚠️ Lỗi kết nối đến server!");
+          return;
+        }
+
+        if (response.statusCode == 200) {
+          print("✅ Đăng nhập thành công!");
+
+          String token = response.data['token'];
+          String userId = response.data['data']['_id'];
+
+          // Lưu vào SharedPreferences
+          await StorageService.saveUserData(token, userId);
+
+          // Chuyển hướng đến màn hình chính
+          GoRouter.of(context).go('/home');
+          if (context.mounted) {
+            context.pop(true); // Trả về true sau khi đăng nhập thành công
+          }
+        } else {
+          setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
+        }
       }
     } catch (e) {
       setState(() => _errorMessage = "⚠️ Lỗi đăng nhập, thử lại!");
@@ -94,6 +149,106 @@ class LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleGetSignInGoogle() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? email = prefs.getString('email');
+      if (email == null) {
+        final emailUser = _currentUser?.email;
+        final response =
+            await ApiService.post('/google/signin', {"email": '$emailUser'});
+
+        print("Response Status Code: ${response?.statusCode}");
+        print("Response Body: ${response?.data}");
+
+        if (response != null && response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Đăng nhập thành công!")),
+          );
+        } else if (response!.statusCode == 400) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('email', emailUser ?? '');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Đăng nhập thành công!")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text("Đăng nhập thất bại! (${response.statusCode})")),
+          );
+        }
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Lỗi server, thử lại sau!")),
+      );
+    }
+  }
+
+  //-------------------------------
+  Future<void> _handleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+
+      // _handleSignOut();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<void> _handleSignOut() async {
+    await _googleSignIn.signOut();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // await prefs.remove('email');
+    // setState(() => _currentUser = null);
+    print("🚪 Đã đăng xuất và xóa email khỏi SharedPreferences!");
+  }
+
+  Future<void> _loadEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+
+    if (email != null) {
+      print("📌 Email đã lưu: $email");
+      // setState(() => _currentAccount = email);
+    } else {
+      print("⚠️ Không tìm thấy email, thử đăng nhập lại...");
+      await _handleSignOut(); // Chỉ đăng xuất khi không có email
+      return;
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // _handleSignOut();
+    _loadEmail();
+
+    _googleSignIn.onCurrentUserChanged.listen((
+      GoogleSignInAccount? account,
+    ) async {
+      bool isAuthorized = account != null;
+
+      if (kIsWeb && account != null) {
+        isAuthorized = await _googleSignIn.canAccessScopes(scopes);
+      }
+
+      setState(() {
+        _currentUser = account;
+        _isAuthorized = isAuthorized;
+      });
+      if (_currentUser != null) {
+        _handleGetSignInGoogle();
+      }
+      if (isAuthorized) {
+        // unawaited(_handleGetContact(account!));
+      }
+    });
+    _googleSignIn.signInSilently();
   }
 
   @override
@@ -142,6 +297,36 @@ class LoginScreenState extends State<LoginScreen> {
                               const TextStyle(color: Colors.red, fontSize: 14))
                       : const SizedBox.shrink(),
                   const SizedBox(height: 25),
+                  if (_currentUser != null)
+                    Column(
+                      children: const [
+                        Center(
+                            child: Text(
+                          'Đăng nhập Google thành công',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 15,
+                            //
+                          ),
+                        )),
+                        // ElevatedButton(
+                        //   onPressed: _handleSignOut,
+                        //   child: const Text('SIGN OUT'),
+                        // ),
+                      ],
+                    )
+                  else
+                    Center(
+                      child: SignInButton(
+                        Buttons.Google,
+                        onPressed: _handleSignIn,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                    ),
                 ],
               ),
             ),

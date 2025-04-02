@@ -12,8 +12,8 @@ import crypto from 'crypto';
 // Tạo token JWT
 const generateToken = user => {
     return jwt.sign(
-        { id: user._id, role: user.role, email: user.email }, 
-        process.env.JWT_SECRET_KEY, 
+        { id: user._id, role: user.role, email: user.email },
+        process.env.JWT_SECRET_KEY,
         { expiresIn: '15d' }
     );
 };
@@ -22,7 +22,20 @@ export const register = async (req, res) => {
     const { email, matKhau, hoTen, gioiTinh, hinhAnh, role, sodienthoai, ngaySinh, cccd, diaChi, chucVu } = req.body;
 
     try {
-        let user = await NguoiDung.findOne({ email });
+        let user = null;
+
+        // Kiểm tra user đã tồn tại
+        if (role === "user") {
+            user = await NguoiDung.findOne({ email });
+        } else if (role === "nhanvien" || role === "admin") {
+            user = await NhanVien.findOne({ email });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "Vai trò không hợp lệ. Vui lòng chọn 'user', 'nhanvien' hoặc 'admin'"
+            });
+        }
+
         if (user) {
             return res.status(400).json({ success: false, message: "Email đã được sử dụng" });
         }
@@ -149,6 +162,47 @@ export const loginUser = async (req, res) => {
     }
 };
 
+export const loginGoogle = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Kiểm tra email tồn tại
+        const user = await NguoiDung.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Email không tồn tại' });
+        }
+
+        // Kiểm tra trạng thái tài khoản
+        if (user.trangThai === false) {
+            return res.status(403).json({ success: false, message: 'Tài khoản đã bị vô hiệu hóa' });
+        }
+
+        // Tạo JWT token
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '15d' }
+        );
+
+        // Lưu token vào cookie
+        res.cookie('accessToken', token, {
+            httpOnly: true,
+            expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000) // 15 ngày
+        });
+
+        const { ...userDetails } = user._doc;
+
+        res.status(200).json({
+            success: true,
+            message: 'Đăng nhập thành công',
+            token,
+            data: userDetails
+        });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Đăng nhập thất bại', error: err.message });
+    }
+};
 
 // Đăng xuất
 export const logout = async (req, res) => {
@@ -167,15 +221,15 @@ export const changePassword = async (req, res) => {
     const userRole = req.role;
 
     if (!matKhauCu || !matKhauMoi) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Vui lòng cung cấp mật khẩu cũ và mật khẩu mới' 
+        return res.status(400).json({
+            success: false,
+            message: 'Vui lòng cung cấp mật khẩu cũ và mật khẩu mới'
         });
     }
 
     try {
         let user = null;
-        
+
         // Tìm user dựa vào role
         if (userRole === 'user') {
             user = await NguoiDung.findById(userID);
@@ -214,7 +268,7 @@ export const getCurrentUser = async (req, res) => {
 
     try {
         let user = null;
-        
+
         if (userRole === 'user') {
             user = await NguoiDung.findById(userID).select("-matKhau");
         } else if (userRole === 'nhanvien' || userRole === 'admin') {
@@ -225,10 +279,10 @@ export const getCurrentUser = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin người dùng' });
         }
 
-        res.status(200).json({ 
-            success: true, 
-            message: 'Lấy thông tin người dùng thành công', 
-            data: user 
+        res.status(200).json({
+            success: true,
+            message: 'Lấy thông tin người dùng thành công',
+            data: user
         });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Lỗi server', error: err.message });

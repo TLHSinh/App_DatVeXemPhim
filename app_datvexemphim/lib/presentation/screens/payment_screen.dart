@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_datvexemphim/api/api_service.dart';

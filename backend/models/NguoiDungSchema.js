@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const NguoiDungSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  matKhau: { type: String, required: true },
+  matKhau: { type: String },
   sodienthoai: { type: String },
   hoTen: { type: String },              // Họ và tên đầy đủ
   ngaySinh: { type: Date },              // Ngày sinh
