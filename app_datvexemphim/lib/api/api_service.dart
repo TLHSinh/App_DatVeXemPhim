@@ -47,11 +47,9 @@ class ApiService {
     try {
       String? token =
           await StorageService.getToken(); // Lấy token từ StorageService
-      Response response = await _dio.put(
-        endpoint,
-        data: data,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
-      );
+      Response response = await _dio.put(endpoint,
+          data: data,
+          options: Options(headers: {"Authorization": "Bearer $token"}));
       return response;
     } catch (e) {
       print("❌ API PUT Error ($endpoint): $e");
