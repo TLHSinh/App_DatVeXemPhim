@@ -38,6 +38,8 @@ dependencies:
   webview_flutter_wkwebview: ^3.10.0
   app_links: ^6.4.0
   qr_flutter: ^4.1.0
+  dropdown_button2: ^2.3.9
+  google_fonts: ^6.2.1
 
 
 
@@ -52,5 +54,6 @@ flutter:
 
   assets:
     - assets/images/
+
 
    

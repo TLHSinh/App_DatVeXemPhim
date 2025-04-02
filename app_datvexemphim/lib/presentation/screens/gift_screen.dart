@@ -226,11 +226,22 @@ class DetailScreen extends StatelessWidget {
   final String title;
   final String description;
 
-  const DetailScreen(
-      {super.key,
-      required this.imageUrl,
-      required this.title,
-      required this.description});
+  const DetailScreen({
+    super.key,
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+  });
+
+  void _showSuccessMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Lưu thành công!"),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -249,6 +260,28 @@ class DetailScreen extends StatelessWidget {
             child: Text(description, style: TextStyle(fontSize: 16)),
           ),
         ],
+      ),
+      bottomNavigationBar: Container(
+        color: const Color.fromARGB(255, 255, 243, 243),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: () => _showSuccessMessage(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Lưu',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
       ),
     );
   }

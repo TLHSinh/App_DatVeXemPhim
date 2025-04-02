@@ -1,4 +1,5 @@
 import 'package:app_datvexemphim/presentation/screens/pickmovieandtime_screen.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
@@ -6,6 +7,7 @@ import 'package:geolocator/geolocator.dart'; // Thêm import này
 import 'package:icons_plus/icons_plus.dart';
 import 'package:url_launcher/url_launcher.dart'; // Thêm import này
 import 'dart:math';
+import 'package:google_fonts/google_fonts.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -167,56 +169,141 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       appBar: AppBar(
-        title: const Text('Danh Sách Rạp',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Danh Sách Rạp',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: const Color(0xfff9f9f9),
         centerTitle: true,
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator()) // Hiển thị vòng xoay khi tải
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Dropdown chọn tỉnh/thành
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: "Chọn tỉnh/thành",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    value: selectedProvince,
-                    items: provinces.map((String province) {
-                      return DropdownMenuItem<String>(
-                        value: province,
-                        child: Text(province),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        filterCinemas(value);
-                      }
-                    },
-                  ),
-                ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Ô chọn tỉnh/thành (70%)
+                      Expanded(
+                        flex: 7,
+                        child: SizedBox(
+                          height: 50,
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            hint: const Text(
+                              "Chọn tỉnh/thành",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            value: (selectedProvince?.isNotEmpty ?? false)
+                                ? selectedProvince
+                                : null,
+                            items: provinces.map((String province) {
+                              return DropdownMenuItem<String>(
+                                value: province,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 12),
+                                  child: Text(
+                                    province,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                filterCinemas(value);
+                              }
+                            },
+                            buttonStyleData: ButtonStyleData(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade400),
+                              ),
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              offset: const Offset(
+                                  0, -10), // Đẩy dropdown xuống dưới một chút
+                              maxHeight: 400,
+                              padding: const EdgeInsets.only(top: 8),
+                              width: MediaQuery.of(context).size.width - 32,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4)),
+                                ],
+                              ),
+                            ),
+                            iconStyleData: IconStyleData(
+                              icon: const Icon(Icons.keyboard_arrow_down,
+                                  size: 24, color: Colors.black54),
+                            ),
+                          ),
+                        ),
+                      ),
 
-                // Nút tìm kiếm 5 rạp gần nhất
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ElevatedButton(
-                    onPressed: isLocationLoading ? null : _getCurrentLocation,
-                    child: isLocationLoading
-                        ? const CircularProgressIndicator() // Hiển thị vòng xoay khi đang lấy vị trí
-                        : const Text("Tìm 5 rạp gần nhất"),
+                      const SizedBox(width: 10),
+
+                      // Nút tìm kiếm (30%)
+                      Expanded(
+                        flex: 3,
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed:
+                                isLocationLoading ? null : _getCurrentLocation,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: isLocationLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  )
+                                : Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.location_on,
+                                            size: 18, color: Colors.white),
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          "Gần đây",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
                 // Danh sách rạp
                 Expanded(
-                  child: filteredCinemas.isEmpty
+                  child: (filteredCinemas.isEmpty)
                       ? const Center(
                           child: Text(
                             "Không có rạp nào trong tỉnh/thành này",
@@ -228,15 +315,16 @@ class _LocationScreenState extends State<LocationScreen> {
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.all(16),
-                          itemCount: filteredCinemas.length +
-                              1, // Tăng itemCount lên 1
+                          itemCount: filteredCinemas.length,
                           itemBuilder: (context, index) {
-                            if (index == filteredCinemas.length) {
-                              return const SizedBox(
-                                  height:
-                                      50); // Thêm khoảng trống cuối danh sách
-                            }
                             var cinema = filteredCinemas[index];
+
+                            // Kiểm tra dữ liệu null
+                            String cinemaName =
+                                cinema["name"] ?? "Rạp không tên";
+                            double? lat = cinema["geo_lat"];
+                            double? long = cinema["geo_long"];
+
                             return CinemaCard(
                               cinema: cinema,
                               onNavigate: () {
@@ -246,7 +334,7 @@ class _LocationScreenState extends State<LocationScreen> {
                             );
                           },
                         ),
-                )
+                ),
               ],
             ),
     );
@@ -255,7 +343,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
 class CinemaCard extends StatelessWidget {
   final Map<String, dynamic> cinema;
-  final VoidCallback onNavigate; // Thêm tham số cho hàm chỉ đường
+  final VoidCallback onNavigate; // Hàm chỉ đường
 
   const CinemaCard({super.key, required this.cinema, required this.onNavigate});
 
@@ -274,9 +362,9 @@ class CinemaCard extends StatelessWidget {
         );
       },
       child: Card(
-        color: Colors.grey[200], // Màu trắng xám
+        color: Colors.grey[200], // Màu nền trắng xám
         margin: const EdgeInsets.only(bottom: 16),
-        elevation: 4, // Thêm bóng đổ
+        elevation: 4, // Hiệu ứng bóng đổ
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,22 +395,25 @@ class CinemaCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Tiêu đề và nút chỉ đường
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        cinema["ten_rap"] ?? "Không có tên",
-                        style: const TextStyle(
-                          color: Colors.black, // Màu chữ đen
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          cinema["ten_rap"] ?? "Không có tên",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       IconButton(
-                        icon: const Icon(LineAwesome.directions_solid),
-                        color: Colors.blueAccent,
+                        icon: const Icon(Icons.directions,
+                            color: Colors.blueAccent),
                         onPressed: onNavigate,
                       ),
                     ],
@@ -330,37 +421,13 @@ class CinemaCard extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   // Địa chỉ
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on,
-                          color: Colors.redAccent, size: 20),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          cinema["dia_chi"] ?? "Không có địa chỉ",
-                          style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14), // Màu chữ đen
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
+                  _buildInfoRow(Icons.location_on, Colors.redAccent,
+                      cinema["dia_chi"], "Không có địa chỉ"),
 
                   // Số điện thoại
-                  Row(
-                    children: [
-                      const Icon(Icons.phone, color: Colors.green, size: 20),
-                      const SizedBox(width: 6),
-                      Text(
-                        cinema["so_dien_thoai"] ?? "Không có SĐT",
-                        style: const TextStyle(
-                            color: Colors.black87, fontSize: 14), // Màu chữ đen
-                      ),
-                    ],
-                  ),
+                  _buildInfoRow(Icons.phone, Colors.green,
+                      cinema["so_dien_thoai"], "Không có SĐT"),
+
                   const SizedBox(height: 6),
                 ],
               ),
@@ -368,6 +435,25 @@ class CinemaCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Hàm tạo thông tin hàng
+  Widget _buildInfoRow(
+      IconData icon, Color iconColor, String? value, String defaultValue) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 20),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value ?? defaultValue,
+            style: const TextStyle(color: Colors.black87, fontSize: 14),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
