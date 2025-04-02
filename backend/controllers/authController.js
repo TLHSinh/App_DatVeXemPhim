@@ -2,6 +2,12 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import NguoiDung from '../models/NguoiDungSchema.js';
 import NhanVien from '../models/NhanVienSchema.js';
+import OTPModel from '../models/OTPSchema.js';
+import TempUser from '../models/TempUserSchema.js';
+
+
+import { sendMail } from '../helpers/sendMail.js';
+import crypto from 'crypto';
 
 // Tạo token JWT
 const generateToken = user => {
@@ -12,66 +18,32 @@ const generateToken = user => {
     );
 };
 
-// Đăng ký tài khoản 
 export const register = async (req, res) => {
     const { email, matKhau, hoTen, gioiTinh, hinhAnh, role, sodienthoai, ngaySinh, cccd, diaChi, chucVu } = req.body;
 
     try {
-        let user = null;
-
-        // Kiểm tra user đã tồn tại
-        if (role === "user") {
-            user = await NguoiDung.findOne({ email });
-        } else if (role === "nhanvien" || role === "admin") {
-            user = await NhanVien.findOne({ email });
-        } else {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Vai trò không hợp lệ. Vui lòng chọn 'user', 'nhanvien' hoặc 'admin'" 
-            });
-        }
-
+        let user = await NguoiDung.findOne({ email });
         if (user) {
             return res.status(400).json({ success: false, message: "Email đã được sử dụng" });
         }
 
-        // Hash mật khẩu
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(matKhau, salt);
+        // Tạo OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const hashPassword = await bcrypt.hash(matKhau, 10);
 
-        // Tạo đối tượng mới dựa vào role
-        if (role === "user") {
-            user = new NguoiDung({
-                hoTen,
-                email,
-                matKhau: hashPassword,
-                sodienthoai,
-                hinhAnh,
-                ngaySinh,
-                cccd,
-                gioiTinh,
-                diaChi,
-                role
-            });
-        } else if (role === "nhanvien" || role === "admin") {
-            user = new NhanVien({
-                hoTen,
-                email,
-                matKhau: hashPassword,
-                sodienthoai,
-                hinhAnh,
-                ngaySinh,
-                cccd,
-                gioiTinh,
-                diaChi,
-                chucVu,
-                role,
-                trangThai: true
-            });
+        // Lưu OTP vào database (hoặc Redis)
+        await OTPModel.create({ email, otp, expiresAt: Date.now() + 5 * 60 * 1000 });
+
+        // Gửi email sử dụng sendMail
+        const mailResponse = await sendMail(email, "Xác thực OTP", `Mã OTP của bạn là: ${otp}`);
+        if (!mailResponse.success) {
+            return res.status(500).json({ success: false, message: "Không thể gửi email OTP" });
         }
 
-        await user.save();
-        res.status(201).json({ success: true, message: "Đăng ký thành công" });
+        // Lưu thông tin đăng ký tạm thời
+        await TempUser.create({ email, matKhau: hashPassword, hoTen, gioiTinh, hinhAnh, role, sodienthoai, ngaySinh, cccd, diaChi, chucVu });
+
+        res.status(200).json({ success: true, message: "Mã OTP đã được gửi" });
 
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });

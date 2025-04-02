@@ -38,7 +38,11 @@ import emloyeeRoutes from "./routes/employeeRoutes.js";;
 
 
 //Kiểm tra huỷ vé nếu chưa thanh toán
-//import "./controllers/paymentTime.js"; // Import cron job
+//import "./helpers/paymentTime.js"; // Import cron job
+
+//auto gửi mail nhắc nhở
+//import "./helpers/autoSendMailRemind.js"; // Import cron job
+
 
 // Load environment variables
 dotenv.config();

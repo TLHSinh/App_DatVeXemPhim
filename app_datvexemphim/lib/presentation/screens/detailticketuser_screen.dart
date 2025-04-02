@@ -354,8 +354,6 @@ class _DetailsTicketScreenState extends State<DetailsTicketScreen> {
                       size: 180,
                       backgroundColor: Colors.white,
                       errorCorrectionLevel: QrErrorCorrectLevel.H,
-                      embeddedImage:
-                          const AssetImage('assets/images/logo_small.png'),
                       embeddedImageStyle: QrEmbeddedImageStyle(
                         size: const Size(40, 40),
                       ),

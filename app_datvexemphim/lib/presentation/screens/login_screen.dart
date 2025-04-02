@@ -49,6 +49,9 @@ class LoginScreenState extends State<LoginScreen> {
 
         // Chuyển hướng đến màn hình chính
         GoRouter.of(context).go('/home');
+        if (context.mounted) {
+          context.pop(true); // Trả về true sau khi đăng nhập thành công
+        }
       } else {
         setState(() => _errorMessage = "❌ Sai tài khoản hoặc mật khẩu!");
       }

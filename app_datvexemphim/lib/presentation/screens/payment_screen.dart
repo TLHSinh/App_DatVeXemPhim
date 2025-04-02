@@ -158,6 +158,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
+  // Hàm gửi email đơn vé
+  Future<void> _sendEmailReceipt() async {
+    try {
+      final emailResponse = await ApiService.post('/send-email', {
+        "idDonDatVe": widget.idDonDatVe,
+      });
+
+      if (emailResponse != null && emailResponse.statusCode == 200) {
+        print("✅ Email đơn vé đã được gửi thành công!");
+      } else {
+        print("❌ Lỗi khi gửi email: ${emailResponse?.data}");
+      }
+    } catch (e) {
+      print("❌ Lỗi gửi email: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

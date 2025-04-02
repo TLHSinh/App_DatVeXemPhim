@@ -17,10 +17,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
 
+  Future<void>? _futureUserData;
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _futureUserData = _checkLoginStatus(); // Chỉ gọi API một lần khi khởi tạo
+  }
+
+  void _onLoginSuccess() {
+    setState(() {
+      _futureUserData =
+          _checkLoginStatus(); // Gọi lại để cập nhật thông tin user
+    });
   }
 
   Future<void> _checkLoginStatus() async {
@@ -70,18 +78,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ]
             : null,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : token == null
+      body: FutureBuilder(
+        future: _futureUserData, // Sử dụng Future đã lưu
+        builder: (context, snapshot) {
+          if (isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return token == null
               ? _buildGuestView(context)
-              : _buildUserView(context),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.local_movies), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tài khoản'),
-        ],
-        currentIndex: 2,
+              : _buildUserView(context);
+        },
       ),
     );
   }
@@ -147,7 +153,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => context.push('/login'),
+                  onPressed: () async {
+                    final result = await context.push('/login');
+
+                    if (result == true) {
+                      // Nếu đăng nhập thành công
+                      _onLoginSuccess(); // Load lại dữ liệu user
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: Colors.white,

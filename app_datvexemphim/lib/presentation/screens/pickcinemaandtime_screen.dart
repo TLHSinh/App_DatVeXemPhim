@@ -1,7 +1,11 @@
+import 'package:app_datvexemphim/presentation/screens/login_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/pickseat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
+import '../../data/services/storage_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
 
 class PickCinemaAndTimeScreen extends StatefulWidget {
   final Map<String, dynamic> movie;
@@ -163,6 +167,102 @@ class DatePickerHorizontal extends StatelessWidget {
   }
 }
 
+// class ShowtimeList extends StatelessWidget {
+//   final List<dynamic> showtimes;
+//   final DateTime? selectedDate;
+//   final Map<String, bool> expandedCinemas;
+//   final Function(String) toggleCinema;
+
+//   const ShowtimeList({
+//     super.key,
+//     required this.showtimes,
+//     required this.selectedDate,
+//     required this.expandedCinemas,
+//     required this.toggleCinema,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     Map<String, List<dynamic>> groupedShowtimes = {};
+//     for (var s in showtimes) {
+//       DateTime showDate = DateTime.parse(s['thoi_gian_chieu']);
+//       if (selectedDate != null &&
+//           showDate.year == selectedDate!.year &&
+//           showDate.month == selectedDate!.month &&
+//           showDate.day == selectedDate!.day) {
+//         String cinemaName = s['id_rap']['ten_rap'] ?? "Không rõ rạp";
+//         if (!groupedShowtimes.containsKey(cinemaName)) {
+//           groupedShowtimes[cinemaName] = [];
+//         }
+//         groupedShowtimes[cinemaName]!.add(s);
+//       }
+//     }
+
+//     return ListView(
+//       children: groupedShowtimes.entries.map((entry) {
+//         bool isExpanded = expandedCinemas[entry.key] ?? false;
+//         return Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             GestureDetector(
+//               onTap: () => toggleCinema(entry.key),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text(entry.key,
+//                       style:
+//                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//                   Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+//                 ],
+//               ),
+//             ),
+//             AnimatedSize(
+//               duration: Duration(milliseconds: 300),
+//               child: isExpanded
+//                   ? Padding(
+//                       padding: EdgeInsets.symmetric(vertical: 10),
+//                       child: GridView.builder(
+//                         shrinkWrap:
+//                             true, // Đảm bảo GridView không chiếm toàn bộ không gian
+//                         physics:
+//                             NeverScrollableScrollPhysics(), // Tránh cuộn bên trong ListView
+//                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                           crossAxisCount: 4, // Mỗi hàng chứa 4 suất chiếu
+//                           crossAxisSpacing: 8,
+//                           mainAxisSpacing: 10,
+//                           childAspectRatio: 2, // Điều chỉnh tỉ lệ phù hợp
+//                         ),
+//                         itemCount: entry.value.length,
+//                         itemBuilder: (context, index) {
+//                           var s = entry.value[index];
+//                           return ElevatedButton(
+//                             style: ElevatedButton.styleFrom(
+//                                 backgroundColor: Colors.red),
+//                             onPressed: () => Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                   builder: (context) =>
+//                                       PickseatScreen(schedule: s)),
+//                             ),
+//                             child: Text(
+//                               DateFormat('HH:mm')
+//                                   .format(DateTime.parse(s['thoi_gian_chieu'])),
+//                               style: TextStyle(color: Colors.white),
+//                             ),
+//                           );
+//                         },
+//                       ),
+//                     )
+//                   : SizedBox(),
+//             ),
+//             SizedBox(height: 15),
+//           ],
+//         );
+//       }).toList(),
+//     );
+//   }
+// }
+
 class ShowtimeList extends StatelessWidget {
   final List<dynamic> showtimes;
   final DateTime? selectedDate;
@@ -218,15 +318,13 @@ class ShowtimeList extends StatelessWidget {
                   ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
                       child: GridView.builder(
-                        shrinkWrap:
-                            true, // Đảm bảo GridView không chiếm toàn bộ không gian
-                        physics:
-                            NeverScrollableScrollPhysics(), // Tránh cuộn bên trong ListView
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4, // Mỗi hàng chứa 4 suất chiếu
+                          crossAxisCount: 4,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 10,
-                          childAspectRatio: 2, // Điều chỉnh tỉ lệ phù hợp
+                          childAspectRatio: 2,
                         ),
                         itemCount: entry.value.length,
                         itemBuilder: (context, index) {
@@ -234,12 +332,39 @@ class ShowtimeList extends StatelessWidget {
                           return ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red),
-                            onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      PickseatScreen(schedule: s)),
-                            ),
+                            onPressed: () async {
+                              String? token = await StorageService.getToken();
+                              if (token == null) {
+                                // Nếu chưa đăng nhập -> Chuyển sang LoginScreen
+                                bool? result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginScreen()),
+                                );
+
+                                // Nếu đăng nhập thành công -> Chuyển sang PickseatScreen
+                                if (result == true) {
+                                  token = await StorageService
+                                      .getToken(); // Kiểm tra lại token
+                                  if (token != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PickseatScreen(schedule: s)),
+                                    );
+                                  }
+                                }
+                              } else {
+                                // Nếu đã đăng nhập -> Chuyển sang PickseatScreen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PickseatScreen(schedule: s)),
+                                );
+                              }
+                            },
                             child: Text(
                               DateFormat('HH:mm')
                                   .format(DateTime.parse(s['thoi_gian_chieu'])),

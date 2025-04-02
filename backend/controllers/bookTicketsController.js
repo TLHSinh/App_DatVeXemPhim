@@ -313,6 +313,7 @@ export const xacNhanDatVe = async (req, res) => {
       tong_tien: tongTien,
       tien_giam: tienGiam,
       tien_thanh_toan: tienThanhToan,
+      nhac_nho:true,
       trang_thai: "đang chờ",
       nhanVienXuatVeGiay: idNhanVien || null,
     });

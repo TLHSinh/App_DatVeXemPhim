@@ -22,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _errorMessage;
   bool _obscurePassword = true;
 
+  // Màn hình Đăng Ký
   Future<void> _register() async {
     setState(() => _errorMessage = null);
 
@@ -44,9 +45,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (response != null && response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Đăng ký thành công!")),
+          const SnackBar(
+              content: Text("✅ Đăng ký thành công! Vui lòng nhập OTP.")),
         );
-        GoRouter.of(context).go('/login');
+        GoRouter.of(context)
+            .push('/verify-otp', extra: _emailController.text.trim());
       } else {
         setState(() => _errorMessage = "Đăng ký thất bại, thử lại!");
       }
@@ -101,7 +104,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => GoRouter.of(context).go('/home'),
         ),
-        //title: Text("Đăng nhập", style: TextStyle(color: Colors.black)),
         centerTitle: true,
       ),
       backgroundColor: Colors.white,

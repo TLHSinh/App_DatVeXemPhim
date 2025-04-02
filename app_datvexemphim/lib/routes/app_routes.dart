@@ -6,6 +6,7 @@ import '../presentation/screens/login_screen.dart';
 import '../presentation/screens/register_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/account_screen.dart';
+import '../presentation/screens/veryfyOTP_screen.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -20,6 +21,13 @@ class AppRoutes {
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
       GoRoute(path: '/profile', builder: (context, state) => ProfileScreen()),
+      GoRoute(
+        path: '/verify-otp',
+        builder: (context, state) {
+          final email = state.extra as String; // Lấy email từ màn hình trước
+          return OtpVerificationScreen(email: email);
+        },
+      ),
     ],
   );
 }

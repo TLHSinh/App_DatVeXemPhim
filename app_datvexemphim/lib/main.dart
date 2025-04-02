@@ -9,6 +9,8 @@ import 'package:app_datvexemphim/presentation/screens/loading_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/login_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/register_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
+import '../presentation/screens/veryfyOTP_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/account_screen.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,6 +53,15 @@ class _MyAppState extends State<MyApp> {
       GoRoute(
           path: '/detailProfile',
           builder: (context, state) => DetailprofileScreen()),
+      GoRoute(
+          path: '/ProfileScreen', builder: (context, state) => ProfileScreen()),
+      GoRoute(
+        path: '/verify-otp',
+        builder: (context, state) {
+          final email = state.extra as String; // Lấy email từ màn hình trước
+          return OtpVerificationScreen(email: email);
+        },
+      ),
     ],
   );
 
