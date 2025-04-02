@@ -1,0 +1,119 @@
+.menu-ad{
+    position: fixed;
+    width: 257px;
+    transition: 0.3s ease;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 10px;
+    padding-left:14px ;
+    margin-right: 5px;
+    top: 90px;
+    background: white;
+    border-radius: 20px;
+    height: 100vh;
+ }
+ .menu-ad.active {
+    width: 80px;
+  }
+  .menu-ad.active .logo-text {
+    opacity: 1;
+    width: auto;
+  }
+  
+  .menu-ad:not(.active) .logo-text {
+    opacity: 0;
+    width: 0;
+  }
+  
+.logo-ad img{
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    transition: var(--tran-05);
+}
+.menu-list-ad{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 210px;
+   
+}
+.menu-list-ad .item-ad{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 10px;
+    transition: 0.3s ease-in-out;
+    text-decoration: none;
+    color: rgb(107 114 128);
+    
+}
+.menu-list-ad .item-ad:hover{
+    background: #f2faf8;
+    color: #66B5A3;
+}
+.menu-ad.active .item-ad{
+    width: 45px;
+}
+.icon{
+    color: #66B5A3;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* sinh them */
+ .confirm-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.confirm-dialog {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.confirm-dialog button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-dialog button:first-child {
+    background-color: #66B5A3; /* Màu xanh cho nút Đồng ý */
+     color: white;
+} 
+
+ .confirm-dialog button:last-child {
+    background-color: #dc3545; /* Màu đỏ cho nút Hủy */
+    /* color: white; */
+}  
+
+
+
+

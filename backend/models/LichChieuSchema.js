@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const LichChieuSchema = new mongoose.Schema({
   id_phim: { type: mongoose.Types.ObjectId, ref: "Phim", required: true },
   id_phong: { type: mongoose.Types.ObjectId, ref: "PhongChieu", required: true },
+  id_rap: { type: mongoose.Types.ObjectId, ref: "RapPhim", required: true },
   thoi_gian_chieu: { type: Date, required: true },
   gia_ve: { type: Number, required: true, min: 0 },
 }, { timestamps: true });

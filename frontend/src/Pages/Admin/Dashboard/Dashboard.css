@@ -1,0 +1,55 @@
+.dashboard-ad {
+    padding: 20px;
+  }
+  
+  .dashboard-title-ad {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .dashboard-cards-ad {
+    /* display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center; */
+
+
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 30px;
+  }
+  
+  .card-ad {
+    position: relative;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .card-ad:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .cardName-ad{
+    color: rgb(107 114 128);
+    font-size: 1.1rem;
+    margin-top: 5px;
+  }
+  
+  .numbers {
+    position: relative;
+    font-weight: 500;
+    font-size: 2.5rem;
+    color: #66B5A3;
+  }
+  

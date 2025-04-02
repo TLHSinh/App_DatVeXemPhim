@@ -7,6 +7,7 @@ const VoucherSchema = new mongoose.Schema({
   don_hang_toi_thieu: { type: Number, default: 0 },
   gioi_han_su_dung: { type: Number, default: 0 },
   ngay_het_han: { type: Date },
+  url_hinh: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model("Voucher", VoucherSchema);
