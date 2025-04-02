@@ -83,11 +83,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   // Xử lý khi nhấn thanh toán
   void _confirmPayment() async {
-    const String apiUrl = "http://10.21.5.186:5000/api/v1/payment";
+    const String apiUrl = "http://localhost:5000/api/v1/payment";
     const String checkStatusUrl =
-        "http://10.21.5.186:5000/api/v1/transaction-status";
+        "http://localhost:5000/api/v1/transaction-status";
     const String updateSeatUrl =
-        "http://10.21.5.186:5000/api/v1/book/thanhtoan"; // API cập nhật trạng thái ghế
+        "http://localhost:5000/api/v1/book/thanhtoan"; // API cập nhật trạng thái ghế
 
     setState(() {
       isLoading = true; // Hiển thị vòng xoay
