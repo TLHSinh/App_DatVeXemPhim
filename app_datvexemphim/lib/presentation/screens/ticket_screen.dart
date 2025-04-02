@@ -1,13 +1,11 @@
 import 'package:app_datvexemphim/data/services/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:app_datvexemphim/presentation/screens/detailticketuser_screen.dart';
-import 'package:app_datvexemphim/presentation/widgets/final_view.dart';
 
 class TicketScreen extends StatefulWidget {
-  const TicketScreen({Key? key}) : super(key: key);
+  const TicketScreen({super.key});
 
   @override
   _TicketScreenState createState() => _TicketScreenState();

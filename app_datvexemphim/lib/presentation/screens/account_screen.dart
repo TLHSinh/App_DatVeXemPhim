@@ -1,5 +1,7 @@
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
@@ -345,7 +347,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: const Text("Hủy"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
+                            onPressed: () async {
+                              // Navigator.of(context).pop(true);
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.remove('email');
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        OnboardingScreen(),
+                                  )).then((value) async => {});
+
+                              // GoRouter.of(context).go('/onboarding');
+                            },
                             child: const Text("Đăng xuất"),
                           ),
                         ],

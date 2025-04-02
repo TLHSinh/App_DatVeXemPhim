@@ -171,8 +171,9 @@ class _PickseatScreenState extends State<PickseatScreen> {
           mainAxisSize: MainAxisSize.min,
           children: List.generate(12, (col) {
             int index = row * 12 + col;
-            if (index >= availableSeats.length)
+            if (index >= availableSeats.length) {
               return SizedBox(); // Tránh lỗi khi không đủ ghế
+            }
 
             var seat = availableSeats[index];
             String seatLabel = seat["so_ghe"];
