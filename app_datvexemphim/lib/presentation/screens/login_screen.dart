@@ -99,6 +99,10 @@ class LoginScreenState extends State<LoginScreen> {
           String userId = response.data['data']['_id'];
 
           // Lưu vào SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('emailAcc', _emailController.text.trim());
+          await prefs.setString('passAcc', _passwordController.text.trim());
+
           await StorageService.saveUserData(token, userId);
 
           // Chuyển hướng đến màn hình chính
@@ -210,12 +214,19 @@ class LoginScreenState extends State<LoginScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
 
+    String? emailAcc = prefs.getString('emailAcc');
+    String? passAcc = prefs.getString('passAcc');
+
     if (email != null) {
       print("📌 Email đã lưu: $email");
       // setState(() => _currentAccount = email);
     } else {
       print("⚠️ Không tìm thấy email, thử đăng nhập lại...");
       await _handleSignOut(); // Chỉ đăng xuất khi không có email
+      setState(() {
+        _emailController.text = emailAcc ?? "";
+        _passwordController.text = passAcc ?? "";
+      });
       return;
     }
   }
