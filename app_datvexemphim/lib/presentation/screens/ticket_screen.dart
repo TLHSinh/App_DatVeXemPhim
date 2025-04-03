@@ -102,7 +102,7 @@ class _TicketScreenState extends State<TicketScreen> {
           "Danh Sách Vé",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 20,
           ),
         ),
         backgroundColor: Colors.white,

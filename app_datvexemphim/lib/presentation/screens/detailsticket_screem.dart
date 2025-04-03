@@ -181,20 +181,45 @@ class _DetailsTicketState extends State<DetailsTicket> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(cinema,
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(
+                          cinema,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
                         Text(movieTitle,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                         Text(format,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.orange,
                                 fontWeight: FontWeight.bold)),
-                        Text("Thời gian: $showtimeDate",
-                            style: TextStyle(color: Colors.grey[700])),
-                        Text("Ghế: ${widget.selectedSeats.join(", ")}",
-                            style: TextStyle(color: Colors.grey[700])),
+                                
+                        const SizedBox(height: 4),        
+                        Row(
+                          children: [
+                            const Icon(Icons.access_time,
+                                size: 16, color: Colors.grey),
+                            Text(
+                              "Thời gian: $showtimeDate",
+                              style: TextStyle(color: Colors.grey[700]),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.event_seat,
+                                size: 16, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Ghế: ${widget.selectedSeats.join(", ")}",
+                              style: TextStyle(color: Colors.grey[700]),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

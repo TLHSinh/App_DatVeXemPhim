@@ -31,7 +31,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  String selectedPaymentMethod = "Ví điện tử MoMo"; // Mặc định
+  String selectedPaymentMethod = "Mã MOMO50K - Giảm 50K"; // Mặc định chọn MoMo
   final TextEditingController _promoCodeController = TextEditingController();
   String? _promoMessage;
   int _discount = 0;
@@ -68,13 +68,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _discount = promoCodes[code]!;
         _finalPrice =
             (widget.totalPrice - _discount).clamp(0, widget.totalPrice);
-        _promoMessage = "✅ Mã giảm giá áp dụng thành công!";
+        _promoMessage = "Mã giảm giá áp dụng thành công!";
       });
     } else {
       setState(() {
         _discount = 0;
         _finalPrice = widget.totalPrice;
-        _promoMessage = "❌ Mã giảm giá không hợp lệ!";
+        _promoMessage = "Mã giảm giá không hợp lệ!";
       });
     }
   }
@@ -193,8 +193,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("🎬 Thông tin vé",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text("Thông tin vé",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             _buildTicketDetails(),
             const SizedBox(height: 16),
@@ -301,31 +301,56 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(cinema,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      cinema,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
                     Text(movieTitle,
                         style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                     Text(format,
                         style: const TextStyle(
                             color: Colors.orange, fontWeight: FontWeight.bold)),
-                    Text("Thời gian: $showtimeDate",
-                        style: TextStyle(color: Colors.grey[700])),
-                    Text("Ghế: ${widget.selectedSeats.join(", ")}",
-                        style: TextStyle(color: Colors.grey[700])),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time,
+                            size: 16, color: Colors.grey),
+                        Text(
+                          "Thời gian: $showtimeDate",
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.event_seat,
+                            size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Ghế: ${widget.selectedSeats.join(", ")}",
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+
         const SizedBox(height: 16),
 
         // Danh sách đồ ăn đã chọn
         if (widget.selectedFoods.isNotEmpty) ...[
-          const Text("🍿 Combo bắp nước",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text("Combo bắp nước",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ...widget.selectedFoods.entries.map((entry) {
             var food = widget.foods
                 .firstWhere((f) => f["_id"] == entry.key, orElse: () => {});
@@ -363,64 +388,151 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("💳 Mã Giảm Giá",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _promoCodeController,
-                decoration: InputDecoration(
-                  hintText: "Nhập mã giảm giá...",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+        const Text(
+          "Mã Giảm Giá",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 2,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.card_giftcard, color: Colors.redAccent),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _promoCodeController,
+                  decoration: const InputDecoration(
+                    hintText: "Nhập mã giảm giá...",
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: _applyPromoCode,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              child: const Text("Áp dụng"),
-            ),
-          ],
+              GestureDetector(
+                onTap: _applyPromoCode,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.redAccent, Colors.deepOrange],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.3),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    "Áp dụng",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         if (_promoMessage != null) ...[
-          const SizedBox(height: 8),
-          Text(_promoMessage!,
-              style:
-                  TextStyle(color: _discount > 0 ? Colors.green : Colors.red)),
+          const SizedBox(height: 10),
+          AnimatedOpacity(
+            opacity: 1.0,
+            duration: const Duration(milliseconds: 500),
+            child: Row(
+              children: [
+                Icon(
+                  _discount > 0 ? Icons.check_circle : Icons.error,
+                  color: _discount > 0 ? Colors.green : Colors.red,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  _promoMessage!,
+                  style: TextStyle(
+                    color: _discount > 0 ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ],
     );
   }
 
-  /// PTTT
   Widget _buildPaymentMethodSelection() {
+    final List<Map<String, dynamic>> paymentMethods = [
+      {"name": "Mã MOMO50K - Giảm 50K", "image": "assets/images/logomomo.png"},
+      {
+        "name": "Nhập ZALOCGV giảm đến 20K/bill",
+        "image": "assets/images/logozalopay.png"
+      },
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("💳 Chọn Phương Thức Thanh Toán",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text(
+          "Chọn Phương Thức Thanh Toán",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
-        _buildPaymentOption("Ví điện tử MoMo"),
-        _buildPaymentOption("Thẻ ngân hàng"),
+        ...paymentMethods.map((method) => _buildPaymentOption(method)).toList(),
       ],
     );
   }
 
-  Widget _buildPaymentOption(String method) {
+  Widget _buildPaymentOption(Map<String, dynamic> method) {
     return ListTile(
-      leading: Radio<String>(
-        value: method,
+      leading: Image.asset(
+        method["image"],
+        width: 45,
+        height: 45,
+      ),
+      title: Text(method["name"]),
+      trailing: Radio<String>(
+        value: method["name"],
         groupValue: selectedPaymentMethod,
         onChanged: (String? value) {
-          setState(() {
-            selectedPaymentMethod = value!;
-          });
+          if (value != "Mã MOMO50K - Giảm 50K") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Cổng thanh toán đang bảo trì"),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior
+                    .floating, // Giúp hiển thị ở vị trí mong muốn
+                margin: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height *
+                      0.13, // Điều chỉnh khoảng cách
+                  left: 0,
+                  right: 0,
+                ),
+              ),
+            );
+          } else {
+            setState(() {
+              selectedPaymentMethod = value!;
+            });
+          }
         },
       ),
-      title: Text(method),
     );
   }
 
