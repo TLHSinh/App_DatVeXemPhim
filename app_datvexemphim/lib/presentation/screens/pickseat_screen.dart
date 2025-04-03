@@ -347,7 +347,16 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
     int totalPrice =
         (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
+
+    // Lấy danh sách tên ghế từ danh sách ID ghế đã chọn
+    List<String> selectedSeatNames = availableSeats
+        .where((seat) => selectedSeats.contains(seat["_id_Ghe"]))
+        .map<String>(
+            (seat) => seat["so_ghe"] as String) // Chuyển kiểu dữ liệu về String
+        .toList();
+
     print("Danh sách ghế đã chọn: $selectedSeats");
+    print("Danh sách ghế đã chọn: $selectedSeatNames");
     print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
     try {
@@ -358,6 +367,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
           print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
           return ComboSelectionScreen(
             selectedSeats: selectedSeats, // Truyền danh sách ID ghế
+            selectedSeatNames: selectedSeatNames,
             totalPrice: totalPrice,
             selectedMovie: {
               "id_lich_chieu": widget.schedule["_id"],

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 class DetailsTicket extends StatefulWidget {
   final List<String> selectedSeats;
+  final List<String> selectedSeatNames;
   final int totalPrice;
   final Map<String, int> selectedFoods;
   final List<dynamic> foods;
@@ -21,6 +22,7 @@ class DetailsTicket extends StatefulWidget {
     required this.selectedMovie,
     required String movieId,
     required selectedShowtime,
+    required this.selectedSeatNames,
   });
 
   @override
@@ -84,6 +86,7 @@ class _DetailsTicketState extends State<DetailsTicket> {
         print("ID lịch chiếu: ${widget.selectedMovie['id_lich_chieu']}");
         print("Danh sách ghế: ${widget.selectedSeats.join(", ")}");
         print("Danh sách đồ ăn: ${widget.selectedFoods.keys.join(", ")}");
+        print("Danh sách ghế nhận được: ${widget.selectedSeatNames}");
 
         Navigator.push(
           context,
@@ -114,7 +117,7 @@ class _DetailsTicketState extends State<DetailsTicket> {
     String showtimeDate =
         formatShowtime(widget.selectedMovie['thoi_gian_chieu']);
 
-    // String listSeat = selectedSeats["_id"] ?? "Không có tên";
+    // String dsTenGhe = widget.selectedSeats["_id"]?['so_ghe'] ?? "Không có tên";
 
     String imageBaseUrl = "https://rapchieuphim.com";
     String fullImageUrl =
@@ -194,7 +197,7 @@ class _DetailsTicketState extends State<DetailsTicket> {
                                 fontWeight: FontWeight.bold)),
                         Text("Thời gian: $showtimeDate",
                             style: TextStyle(color: Colors.grey[700])),
-                        Text("Ghế: ${widget.selectedSeats.join(", ")}",
+                        Text("Ghế: ${widget.selectedSeatNames.join(", ")}",
                             style: TextStyle(color: Colors.grey[700])),
                       ],
                     ),

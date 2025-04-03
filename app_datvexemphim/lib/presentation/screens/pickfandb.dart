@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
+  final List<String> selectedSeatNames;
   final int totalPrice;
   final Map<String, dynamic> selectedMovie;
 
@@ -14,6 +15,7 @@ class ComboSelectionScreen extends StatefulWidget {
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedMovie,
+    required this.selectedSeatNames,
   });
 
   @override
@@ -29,6 +31,7 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     super.initState();
     fetchFoods();
     print("Danh sách ghế nhận được: ${widget.selectedSeats}");
+    print("Danh sách ghế nhận được: ${widget.selectedSeatNames}");
   }
 
   Future<void> fetchFoods() async {
@@ -166,7 +169,7 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
   void _bookTickets() async {
     if (widget.selectedSeats.isEmpty) return;
 
-    print("Danh sách ghế đã chọn: ${widget.selectedSeats}");
+    print("Danh sách ghế đã chọn: ${widget.selectedSeatNames}");
     // print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
     try {
@@ -189,6 +192,7 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
             MaterialPageRoute(
                 builder: (context) => DetailsTicket(
                       selectedSeats: widget.selectedSeats,
+                      selectedSeatNames: widget.selectedSeatNames,
                       totalPrice: widget.totalPrice,
                       selectedFoods: selectedFoods,
                       foods: foods,
