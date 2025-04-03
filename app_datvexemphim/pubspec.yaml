@@ -40,6 +40,8 @@ dependencies:
   qr_flutter: ^4.1.0
   google_sign_in: ^6.3.0
   flutter_signin_button: ^2.0.0
+  google_fonts: ^6.2.1
+  dropdown_button2: ^2.3.9
 
 
 

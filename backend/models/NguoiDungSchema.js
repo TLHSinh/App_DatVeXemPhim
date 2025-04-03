@@ -19,7 +19,12 @@ const NguoiDungSchema = new mongoose.Schema({
     default: "user"
   },
   trangThai: { type: Boolean, default: true },
-  diemTichLuy: { type: Number, default: 0 } // Trường tích điểm                          // Vai trò của người dùng
+  diemTichLuy: { type: Number, default: 0 },
+  rank: {
+    type: String,
+    enum: ["Basic", "Silver", "Gold", "Diamond","VIP"],
+    default: "Basic"
+  },                // Trường tích điểm                          // Vai trò của người dùng
 }, { timestamps: true });
 
 export default mongoose.model("NguoiDung", NguoiDungSchema);

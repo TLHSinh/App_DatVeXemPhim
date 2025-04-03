@@ -1,6 +1,7 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/storage_service.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? token;
   String? userId;
   Map<String, dynamic>? userData;
+  double? totalSpent;
   bool isLoading = true;
 
   Future<void>? _futureUserData;
@@ -42,7 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    _fetchUserData();
+    await _fetchUserData();
+    await _fetchTotalSpent();
   }
 
   Future<void> _fetchUserData() async {
@@ -59,6 +62,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print("❌ Lỗi lấy dữ liệu: $e");
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _fetchTotalSpent() async {
+    try {
+      final response = await ApiService.get("/user/Expenditure/$userId");
+
+      if (response?.statusCode == 200) {
+        setState(() {
+          totalSpent = response?.data['total_spent'];
+        });
+      }
+    } catch (e) {
+      print("❌ Lỗi lấy tổng chi tiêu: $e");
     }
   }
 
@@ -284,25 +301,154 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // Tổng chi tiêu
-          const Text(
-            'Tổng chi tiêu 2025',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          LinearProgressIndicator(
-            value: 0.0,
-            backgroundColor: Colors.grey.shade300,
-            color: Colors.red,
-            minHeight: 8,
-          ),
-          const SizedBox(height: 5),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('0đ', style: TextStyle(fontSize: 14)),
-              Text('2,000,000đ', style: TextStyle(fontSize: 14)),
-              Text('4,000,000đ', style: TextStyle(fontSize: 14)),
-            ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Builder(builder: (context) {
+              // Tính toán ngân sách tối đa dựa trên tổng chi tiêu
+              final double spentAmount = totalSpent ?? 0;
+              double maxBudget = 1000000; // Mặc định 1 triệu
+
+              if (spentAmount > 1000000) maxBudget = 3000000;
+              if (spentAmount > 3000000) maxBudget = 5000000;
+              if (spentAmount > 5000000) maxBudget = 10000000;
+              if (spentAmount > 10000000) maxBudget = 20000000;
+              if (spentAmount > 2000000) maxBudget = 50000000;
+              if (spentAmount > 50000000) maxBudget = 100000000;
+              if (spentAmount > 100000000) maxBudget = 500000000;
+              if (spentAmount > 500000000) maxBudget = 1000000000;
+
+              // Tính toán tỷ lệ phần trăm
+              final double percentage = (spentAmount / maxBudget);
+              final String percentageText =
+                  '${(percentage * 100).toStringAsFixed(1)}%';
+
+              // Format số tiền
+              final formatCurrency = NumberFormat.currency(
+                locale: 'vi_VN',
+                symbol: 'đ',
+                decimalDigits: 0,
+              );
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng chi tiêu ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEEEE),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          percentageText,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFE53935),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      Container(
+                        height: 12,
+                        width: MediaQuery.of(context).size.width *
+                            percentage *
+                            0.87, // Adjusted for padding
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFF8A80), Color(0xFFE53935)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        '0đ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF757575),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            formatCurrency.format(spentAmount),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFE53935),
+                            ),
+                          ),
+                          const Text(
+                            'Chi tiêu hiện tại',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF757575),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        formatCurrency.format(maxBudget),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF757575),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }),
           ),
           const SizedBox(height: 20),
 

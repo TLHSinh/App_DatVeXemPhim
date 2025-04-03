@@ -41,10 +41,12 @@ import emloyeeRoutes from "./routes/employeeRoutes.js";;
 
 
 //Kiểm tra huỷ vé nếu chưa thanh toán
-import "./helpers/paymentTime.js"; // Import cron job
+//import "./helpers/paymentTime.js"; // Import cron job
 
 //auto gửi mail nhắc nhở
-import "./helpers/autoSendMailRemind.js"; // Import cron job
+//import "./helpers/autoSendMailRemind.js"; // Import cron job
+
+//import "./helpers/autoDeleteOTP.js"; // Import cron job
 
 
 // Load environment variables

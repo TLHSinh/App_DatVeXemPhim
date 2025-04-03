@@ -1,5 +1,6 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/presentation/screens/detailsticket_screem.dart';
+import 'package:app_datvexemphim/presentation/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -146,36 +147,63 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailsTicket(
-                    selectedSeats: widget.selectedSeats,
-                    totalPrice: totalPrice,
-                    selectedFoods: selectedFoods,
-                    foods: foods,
-                    selectedMovie: widget.selectedMovie,
-                    movieId: widget.selectedMovie["_id"] ??
-                        "", // Thêm ID phim nếu cần
-                    selectedShowtime:
-                        widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
-                  ),
-                ),
-              );
-            },
+            onPressed: widget.selectedSeats.isEmpty ? null : _bookTickets,
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xffb81d24),
-                minimumSize: const Size(double.infinity, 50)),
-            child: const Text("Tiếp theo",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white)),
+                backgroundColor: const Color(0xffb20710)),
+            child: Text(
+              "Tiếp tục",
+              style: TextStyle(
+                  fontSize: AppSizes.blockSizeHorizontal * 4,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  void _bookTickets() async {
+    if (widget.selectedSeats.isEmpty) return;
+
+    print("Danh sách ghế đã chọn: ${widget.selectedSeats}");
+    // print("id lich chieu da chọn: ${widget.schedule["_id"]}");
+
+    try {
+      final response = await ApiService.post("/book/chonGhe", {
+        "idLichChieu": widget.selectedMovie["id_lich_chieu"],
+        "danhSachGhe": widget.selectedSeats, // Gửi ID của ghế
+        // "tong_tien": totalPrice,
+      });
+
+      if (response?.statusCode == 200) {
+        print("Đặt ghế thành công: ${response?.data}");
+        setState(() {
+          // bookedSeats.addAll(selectedSeats);
+          // selectedSeats.clear();
+        });
+
+        // Chuyển đến màn hình chọn combo
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailsTicket(
+                      selectedSeats: widget.selectedSeats,
+                      totalPrice: widget.totalPrice,
+                      selectedFoods: selectedFoods,
+                      foods: foods,
+                      selectedMovie: widget.selectedMovie,
+                      movieId: widget.selectedMovie["_id"] ?? "",
+                      selectedShowtime:
+                          widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
+                      seatLabel: [],
+                    )));
+      } else {
+        print("Lỗi đặt ghế: ${response?.data}");
+      }
+    } catch (e) {
+      print("Lỗi khi gọi API đặt ghế: $e");
+    }
   }
 
   /// 📸 Hiển thị từng item bắp nước đã chọn
