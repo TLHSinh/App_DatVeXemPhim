@@ -31,37 +31,31 @@ class _PickseatScreenState extends State<PickseatScreen> {
       if (response?.statusCode == 200) {
         List<dynamic> seatList = response?.data['danh_sach_ghe'];
 
+        // Sắp xếp ghế theo thứ tự alphabet và số
+        List<Map<String, dynamic>> sortedSeats =
+            seatList.cast<Map<String, dynamic>>()
+              ..sort((a, b) {
+                final aSeat = a["so_ghe"];
+                final bSeat = b["so_ghe"];
 
-      // Sắp xếp ghế theo thứ tự alphabet và số
-      List<Map<String, dynamic>> sortedSeats = seatList.cast<Map<String, dynamic>>()
-        ..sort((a, b) {
-          final aSeat = a["so_ghe"];
-          final bSeat = b["so_ghe"];
-          
-          // Tách phần chữ và số từ mã ghế
-          final aMatch = RegExp(r'(\D+)(\d+)').firstMatch(aSeat);
-          final bMatch = RegExp(r'(\D+)(\d+)').firstMatch(bSeat);
-          
-          final aLetter = aMatch?.group(1) ?? '';
-          final aNumber = int.tryParse(aMatch?.group(2) ?? '0') ?? 0;
-          // final aNumber = int.tryParse(aMatch!.group(2)) ?? 0;
-          final bLetter = bMatch?.group(1) ?? '';
-          final bNumber = int.tryParse(bMatch?.group(2) ?? '0') ?? 0;
+                // Tách phần chữ và số từ mã ghế
+                final aMatch = RegExp(r'(\D+)(\d+)').firstMatch(aSeat);
+                final bMatch = RegExp(r'(\D+)(\d+)').firstMatch(bSeat);
 
-          // So sánh phần chữ trước
-          if (aLetter.compareTo(bLetter) != 0) {
-            return aLetter.compareTo(bLetter);
-          }
-          
-          // Nếu cùng hàng thì so sánh số
-          return aNumber.compareTo(bNumber);
-        });
+                final aLetter = aMatch?.group(1) ?? '';
+                final aNumber = int.tryParse(aMatch?.group(2) ?? '0') ?? 0;
+                // final aNumber = int.tryParse(aMatch!.group(2)) ?? 0;
+                final bLetter = bMatch?.group(1) ?? '';
+                final bNumber = int.tryParse(bMatch?.group(2) ?? '0') ?? 0;
 
+                // So sánh phần chữ trước
+                if (aLetter.compareTo(bLetter) != 0) {
+                  return aLetter.compareTo(bLetter);
+                }
 
-
-
-
-
+                // Nếu cùng hàng thì so sánh số
+                return aNumber.compareTo(bNumber);
+              });
 
         List<String> booked = seatList
             .where((seat) => seat["trang_thai"] == "đã đặt trước")
@@ -193,112 +187,58 @@ class _PickseatScreenState extends State<PickseatScreen> {
     );
   }
 
-  // Widget _buildSeatMap() {
-  //   double seatWidth = AppSizes.blockSizeHorizontal * 6;
-  //   double seatHeight = AppSizes.blockSizeHorizontal * 6;
-  //   double seatMargin = AppSizes.blockSizeHorizontal * 1;
+  Widget _buildSeatMap() {
+    double seatWidth = AppSizes.blockSizeHorizontal * 6;
+    double seatHeight = AppSizes.blockSizeHorizontal * 6;
+    double seatMargin = AppSizes.blockSizeHorizontal * 1;
 
-  //   return Column(
-  //     children: List.generate(availableSeats.length ~/ 12 + 1, (row) {
-  //       return Row(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: List.generate(12, (col) {
-  //           int index = row * 12 + col;
-  //           if (index >= availableSeats.length) {
-  //             return SizedBox(); // Tránh lỗi khi không đủ ghế
-  //           }
+    // Nhóm ghế theo hàng
+    final Map<String, List<Map<String, dynamic>>> groupedSeats = {};
+    for (var seat in availableSeats) {
+      final seatNumber = seat["so_ghe"];
+      final row = seatNumber.replaceAll(RegExp(r'\d+'), '');
+      groupedSeats.putIfAbsent(row, () => []).add(seat);
+    }
 
-  //           var seat = availableSeats[index];
-  //           String seatLabel = seat["so_ghe"];
-  //           bool isBooked = bookedSeats.contains(seatLabel);
-  //           bool isSelected = selectedSeats
-  //               .contains(seat["_id_Ghe"]); // Kiểm tra ID ghế đã chọn
+    return Column(
+      children: groupedSeats.entries.map((entry) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: entry.value.map((seat) {
+            String seatLabel = seat["so_ghe"];
+            bool isBooked = bookedSeats.contains(seatLabel);
+            bool isSelected = selectedSeats.contains(seat["_id_Ghe"]);
 
-  //           return GestureDetector(
-  //             onTap:
-  //                 isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
-  //             child: Container(
-  //               width: seatWidth,
-  //               height: seatHeight,
-  //               margin: EdgeInsets.all(seatMargin),
-  //               alignment: Alignment.center,
-  //               decoration: BoxDecoration(
-  //                 color: isBooked
-  //                     ? Colors.red
-  //                     : isSelected
-  //                         ? Colors.green
-  //                         : Color(0xffb7b7b7),
-  //                 borderRadius: BorderRadius.circular(4),
-  //               ),
-  //               child: Text(
-  //                 seatLabel,
-  //                 style: TextStyle(
-  //                     color: Colors.white,
-  //                     fontWeight: FontWeight.bold,
-  //                     fontSize: AppSizes.blockSizeHorizontal * 2.0),
-  //               ),
-  //             ),
-  //           );
-  //         }),
-  //       );
-  //     }),
-  //   );
-  // }
-
-
-Widget _buildSeatMap() {
-  double seatWidth = AppSizes.blockSizeHorizontal * 6;
-  double seatHeight = AppSizes.blockSizeHorizontal * 6;
-  double seatMargin = AppSizes.blockSizeHorizontal * 1;
-
-  // Nhóm ghế theo hàng
-  final Map<String, List<Map<String, dynamic>>> groupedSeats = {};
-  for (var seat in availableSeats) {
-    final seatNumber = seat["so_ghe"];
-    final row = seatNumber.replaceAll(RegExp(r'\d+'), '');
-    groupedSeats.putIfAbsent(row, () => []).add(seat);
+            return GestureDetector(
+              onTap:
+                  isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
+              child: Container(
+                width: seatWidth,
+                height: seatHeight,
+                margin: EdgeInsets.all(seatMargin),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isBooked
+                      ? Colors.red
+                      : isSelected
+                          ? Colors.green
+                          : const Color(0xffb7b7b7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  seatLabel,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSizes.blockSizeHorizontal * 2.0),
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      }).toList(),
+    );
   }
-
-  return Column(
-    children: groupedSeats.entries.map((entry) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: entry.value.map((seat) {
-          String seatLabel = seat["so_ghe"];
-          bool isBooked = bookedSeats.contains(seatLabel);
-          bool isSelected = selectedSeats.contains(seat["_id_Ghe"]);
-
-          return GestureDetector(
-            onTap: isBooked ? null : () => _toggleSeatSelection(seat["_id_Ghe"]),
-            child: Container(
-              width: seatWidth,
-              height: seatHeight,
-              margin: EdgeInsets.all(seatMargin),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isBooked
-                    ? Colors.red
-                    : isSelected
-                        ? Colors.green
-                        : const Color(0xffb7b7b7),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                seatLabel,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppSizes.blockSizeHorizontal * 2.0),
-              ),
-            ),
-          );
-        }).toList(),
-      );
-    }).toList(),
-  );
-}
-
-
 
   void _toggleSeatSelection(String seatId) {
     setState(() {
@@ -388,7 +328,7 @@ Widget _buildSeatMap() {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffb20710)),
                 child: Text(
-                  "Đặt vé",
+                  "Tiếp tục",
                   style: TextStyle(
                       fontSize: AppSizes.blockSizeHorizontal * 4,
                       fontWeight: FontWeight.bold,
@@ -411,43 +351,26 @@ Widget _buildSeatMap() {
     print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
     try {
-      final response = await ApiService.post("/book/chonGhe", {
-        "idLichChieu": widget.schedule["_id"],
-        "danhSachGhe": selectedSeats, // Gửi ID của ghế
-        // "tong_tien": totalPrice,
-      });
-
-      if (response?.statusCode == 200) {
-        print("Đặt ghế thành công: ${response?.data}");
-        setState(() {
-          bookedSeats.addAll(selectedSeats);
-          // selectedSeats.clear();
-        });
-
-        // Chuyển đến màn hình chọn combo
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) {
-            print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
-            return ComboSelectionScreen(
-              selectedSeats: selectedSeats, // Truyền danh sách ID ghế
-              totalPrice: totalPrice,
-              selectedMovie: {
-                "id_lich_chieu": widget.schedule["_id"],
-                "ten_phim":
-                    widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
-                "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-                "thoi_gian_chieu":
-                    widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
-                "url_poster": widget.schedule["id_phim"]?["url_poster"],
-                "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
-              },
-            );
-          }),
-        );
-      } else {
-        print("Lỗi đặt ghế: ${response?.data}");
-      }
+      // Chuyển đến màn hình chọn combo
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
+          return ComboSelectionScreen(
+            selectedSeats: selectedSeats, // Truyền danh sách ID ghế
+            totalPrice: totalPrice,
+            selectedMovie: {
+              "id_lich_chieu": widget.schedule["_id"],
+              "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
+              "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
+              "thoi_gian_chieu":
+                  widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+              "url_poster": widget.schedule["id_phim"]?["url_poster"],
+              "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
+            },
+          );
+        }),
+      );
     } catch (e) {
       print("Lỗi khi gọi API đặt ghế: $e");
     }

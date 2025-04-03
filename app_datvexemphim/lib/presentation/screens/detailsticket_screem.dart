@@ -113,6 +113,7 @@ class _DetailsTicketState extends State<DetailsTicket> {
     String format = widget.selectedMovie['dinh_dang'] ?? "2D Phụ Đề";
     String showtimeDate =
         formatShowtime(widget.selectedMovie['thoi_gian_chieu']);
+
     // String listSeat = selectedSeats["_id"] ?? "Không có tên";
 
     String imageBaseUrl = "https://rapchieuphim.com";
