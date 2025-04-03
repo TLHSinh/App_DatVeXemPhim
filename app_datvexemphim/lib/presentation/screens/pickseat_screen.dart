@@ -15,6 +15,8 @@ class PickseatScreen extends StatefulWidget {
 class _PickseatScreenState extends State<PickseatScreen> {
   List<String> bookedSeats = [];
   List<String> selectedSeats = [];
+  List<String> seatLabel = [];
+
   List<Map<String, dynamic>> availableSeats = []; // Danh sách ghế từ API
   bool isLoading = true;
 
@@ -342,6 +344,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
           MaterialPageRoute(builder: (context) {
             print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
             return ComboSelectionScreen(
+              seatLabel: seatLabel,
               selectedSeats: selectedSeats, // Truyền danh sách ID ghế
               totalPrice: totalPrice,
               selectedMovie: {
@@ -380,8 +383,22 @@ class ScreenPainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
+    Rect rect =
+        Rect.fromLTWH(0, -size.height * 0.5, size.width, size.height * 1.5);
+    Gradient gradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Color(0xFFee0033),
+        Color.fromARGB(244, 250, 112, 142),
+        Color.fromARGB(204, 247, 136, 160),
+        Color.fromARGB(126, 243, 182, 195).withOpacity(0.8),
+        const Color.fromARGB(0, 255, 255, 255),
+      ],
+    );
+
     Paint fillPaint = Paint()
-      ..color = Colors.red.withOpacity(0.1) // Màu nền màn hình
+      ..shader = gradient.createShader(rect)
       ..style = PaintingStyle.fill;
 
     Path fillPath = Path();

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { addUser,updateUser,deleteUser, getSingleUser, getUserByEmailOrPhone,getAllUsers, getUserProfile } from '../controllers/UserController.js';
+import { addUser,updateUser,deleteUser, getSingleUser, getUserByEmailOrPhone,getAllUsers, getTotalExpenditure ,updatePoint} from '../controllers/UserController.js';
 import{authenticate, restrict} from'../auth/veryfyToken.js'
 const router = express.Router();
 
@@ -10,6 +10,8 @@ router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 router.get('/allUser',authenticate, restrict(["admin", "nhanvien"]), getAllUsers);
 router.get('/:id', getSingleUser);
+router.get('/Expenditure/:id', getTotalExpenditure);
+router.post('/updatePoint', updatePoint);
 
 //router.get('/profile/me', getUserProfile);
 

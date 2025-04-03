@@ -5,11 +5,14 @@ import 'package:intl/intl.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
+  final List<String> seatLabel;
+
   final int totalPrice;
   final Map<String, dynamic> selectedMovie;
 
   const ComboSelectionScreen({
     super.key,
+    required this.seatLabel,
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedMovie,
@@ -152,6 +155,7 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
                 MaterialPageRoute(
                   builder: (context) => DetailsTicket(
                     selectedSeats: widget.selectedSeats,
+                    seatLabel: widget.seatLabel,
                     totalPrice: totalPrice,
                     selectedFoods: selectedFoods,
                     foods: foods,

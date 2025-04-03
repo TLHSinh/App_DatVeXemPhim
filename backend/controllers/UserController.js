@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import NguoiDung from '../models/NguoiDungSchema.js';
+import DonDatVe from "../models/DonDatVeSchema.js";
+import mongoose from "mongoose";
 
 // Thêm người dùng mới
 export const addUser = async (req, res) => {
@@ -135,3 +137,83 @@ export const getUserProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server', error: err.message });
     }
 };
+
+
+// API lấy tổng chi tiêu của người dùng
+export const getTotalExpenditure = async (req, res) => {
+    try {
+        const id = req.params.id;
+   
+        
+        // Kiểm tra ID có hợp lệ không
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "ID người dùng không hợp lệ" });
+        }
+
+        // Tính tổng chi tiêu của người dùng
+        const result = await DonDatVe.aggregate([
+            { $match: { id_nguoi_dung: new mongoose.Types.ObjectId(id) } },
+            { $group: { _id: "$id_nguoi_dung", total_spent: { $sum: "$tien_thanh_toan" } } }
+        ]);
+
+        const totalSpent = result.length > 0 ? result[0].total_spent : 0;
+        
+        res.json({ id_nguoi_dung: id, total_spent: totalSpent });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+};
+
+
+
+// Hàm xác định rank dựa trên điểm thưởng
+const getRank = (diem) => {
+    if (diem < 100) return "Basic";
+    if (diem < 500) return "Silver";
+    if (diem < 1000) return "Gold";
+    if (diem < 5000) return "Diamond";
+    if (diem > 5000) return "VIP";
+
+  };
+  
+  // API cập nhật điểm thưởng và rank khi thanh toán thành công
+  export const updatePoint = async (req, res) => {
+    try {
+      const { id_nguoi_dung, id_don_dat_ve } = req.body;
+  
+      // Kiểm tra người dùng và đơn đặt vé có tồn tại không
+      const donDatVe = await DonDatVe.findById(id_don_dat_ve);
+      if (!donDatVe || donDatVe.trang_thai !== "đã thanh toán") {
+        return res.status(400).json({ message: "Đơn đặt vé không hợp lệ hoặc chưa thanh toán" });
+      }
+  
+      const nguoiDung = await NguoiDung.findById(id_nguoi_dung);
+      if (!nguoiDung) {
+        return res.status(404).json({ message: "Người dùng không tồn tại" });
+      }
+  
+      // Tính điểm thưởng từ tổng tiền thanh toán
+      const diemThuongMoi = Math.floor(donDatVe.tien_thanh_toan / 1000);
+  
+      // Cập nhật điểm tích lũy và kiểm tra rank mới
+      const diemMoi = nguoiDung.diemTichLuy + diemThuongMoi;
+      const rankMoi = getRank(diemMoi);
+  
+      // Cập nhật vào database
+      nguoiDung.diemTichLuy = diemMoi;
+      nguoiDung.rank = rankMoi;
+      await nguoiDung.save();
+  
+      return res.status(200).json({
+        message: "Cập nhật điểm thưởng và rank thành công",
+        diemTichLuy: diemMoi,
+        rank: rankMoi
+      });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Lỗi server" });
+    }
+  }
+  
