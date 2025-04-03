@@ -314,29 +314,31 @@ class _DetailsTicketState extends State<DetailsTicket>
   // Alert box with modern design
   Widget _buildAlertBox() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: Offset(0, 3),
           )
         ],
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Color(0xFFFFE0E0),
-              borderRadius: BorderRadius.circular(12),
+              color: Color(0xFFFFE0E0).withOpacity(0.8),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(Icons.info_outline, color: Color(0xFFB81D24)),
+            child: Icon(Icons.info_outline, color: Color(0xFFB81D24), size: 18),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,11 +351,11 @@ class _DetailsTicketState extends State<DetailsTicket>
                     color: Color(0xFF333333),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  "Vé đã mua không thể hoàn, huỷ, đổi. Vui lòng kiểm tra kỹ thông tin!",
+                  "Vé đã mua không thể hoàn, huỷ, đổi.",
                   style: TextStyle(
-                    color: Colors.grey[700],
+                    color: const Color.fromARGB(255, 61, 61, 61),
                     fontSize: 14,
                   ),
                 ),
