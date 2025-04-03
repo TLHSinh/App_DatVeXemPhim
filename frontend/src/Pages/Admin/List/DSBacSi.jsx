@@ -198,7 +198,7 @@ const DSBacSi = () => {
           <div className="card-list-ad">
             <div className=" header-list-card">
               <div style={{ float: "left" }}>
-                <h1 className="title-ad">DANH SÁCH BÁC SĨ</h1>
+                <h1 className="title-ad">DANH SÁCH NHÂN VIÊN</h1>
               </div>
               <div className="search-bar">
                 <input

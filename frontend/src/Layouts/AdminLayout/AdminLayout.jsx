@@ -55,12 +55,12 @@ const AdminLayout = () => {
       <div className={`topbar-ad ${isSidebarActive ? 'active' : ''}`}>
         <div className={`logo-toggle-ad ${isSidebarActive ? 'active' : ''}`}>
           <div className="logo-ad">
-            <img src="/logo_sta512.png" alt="STA HOSPITAL Logo" className="logo-img" />
+            <img src="/logo3.png" alt="STA HOSPITAL Logo" className="logo-img" />
             {!isSidebarActive && <span className="logo-text-ad">STA HOSPITAL</span>}
           </div>
 
           <div className="toggle-ad" onClick={handleToggleSidebar}>
-            <IoMenu size={"2em"} color="#66B5A3" />
+            <IoMenu size={"2em"} color="#EE0033" />
           </div>
         </div>
 

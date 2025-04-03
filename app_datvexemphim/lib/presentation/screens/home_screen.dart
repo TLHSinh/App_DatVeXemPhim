@@ -95,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   comingSoonMovies.isEmpty
                       ? _buildEmptyMessage("Không có phim sắp chiếu")
                       : _buildComingSoonMovies(),
+                  
                 ],
               ),
             ),

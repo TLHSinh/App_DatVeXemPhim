@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import RapPhim from "../../models/RapPhimSchema.js";
 import PhongChieu from "../../models/PhongChieuSchema.js";
+import LichChieu from "../../models/LichChieuSchema.js";
+import DonDatVe from "../../models/DonDatVeSchema.js";
 import { v4 as uuidv4 } from 'uuid';
 
 /* [Cinema/Theater] */
@@ -141,6 +143,45 @@ export const updateRoom = async (req, res) => {
         }
 
         res.status(200).json({ success: true, message: "Cập nhật phòng chiếu thành công", data: updatedRoom });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    }
+};
+
+
+// Xóa rạp phim
+export const deleteCinema = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Kiểm tra xem rạp có tồn tại không
+        const cinema = await RapPhim.findById(id);
+        if (!cinema) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy rạp phim" });
+        }
+
+
+
+        // Kiểm tra xem rạp có lịch chiếu nào có vé đã được đặt không
+        const hasBookedTickets = await DonDatVe.exists({ id_lich_chieu: { $in: await LichChieu.find({ id_rap: id }).distinct("_id") } });
+        if (hasBookedTickets) {
+            return res.status(400).json({ success: false, message: "Không thể xóa rạp vì có lịch chiếu với vé đã được đặt" });
+        }
+
+
+        // // Kiểm tra xem rạp có lịch chiếu nào không
+        // const hasSchedules = await LichChieu.exists({ id_rap: id });
+        // if (hasSchedules) {
+        //     return res.status(400).json({ success: false, message: "Không thể xóa rạp vì đang có lịch chiếu" });
+        // }
+
+        // Xóa tất cả phòng chiếu của rạp đó
+        await PhongChieu.deleteMany({ id_rap: id });
+
+        // Xóa rạp phim
+        await RapPhim.findByIdAndDelete(id);
+
+        res.status(200).json({ success: true, message: "Xóa rạp phim thành công" });
     } catch (err) {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }

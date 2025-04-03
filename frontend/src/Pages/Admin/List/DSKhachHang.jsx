@@ -215,19 +215,19 @@ const DSKhachHang = () => {
                           className="icon-function"
                           onClick={() => handleEditUser(user._id)}
                         >
-                          <FaPenToSquare color="#66B5A3" />
+                          <FaPenToSquare color="#EE0033" />
                         </button>
                         <button
                           className="icon-function"
                           onClick={() => deleteUser(user._id)}
                         >
-                          <FaTrash color="#66B5A3" />
+                          <FaTrash color="#EE0033" />
                         </button>
                         <button
                           className="icon-function"
                           onClick={() => detailUser(user._id)}
                         >
-                          <FaRegEye color="#66B5A3" />
+                          <FaRegEye color="#EE0033" />
                         </button>
                       </td>
                     </tr>

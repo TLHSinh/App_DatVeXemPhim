@@ -172,19 +172,19 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     print("Danh sách ghế đã chọn: ${widget.selectedSeatNames}");
     // print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
-    try {
-      final response = await ApiService.post("/book/chonGhe", {
-        "idLichChieu": widget.selectedMovie["id_lich_chieu"],
-        "danhSachGhe": widget.selectedSeats, // Gửi ID của ghế
-        // "tong_tien": totalPrice,
-      });
+  
+      // final response = await ApiService.post("/book/chonGhe", {
+      //   "idLichChieu": widget.selectedMovie["id_lich_chieu"],
+      //   "danhSachGhe": widget.selectedSeats, // Gửi ID của ghế
+      //   // "tong_tien": totalPrice,
+      // });
 
-      if (response?.statusCode == 200) {
-        print("Đặt ghế thành công: ${response?.data}");
-        setState(() {
-          // bookedSeats.addAll(selectedSeats);
-          // selectedSeats.clear();
-        });
+      // if (response?.statusCode == 200) {
+      //   print("Đặt ghế thành công: ${response?.data}");
+      //   setState(() {
+      //     // bookedSeats.addAll(selectedSeats);
+      //     // selectedSeats.clear();
+      //   });
 
         // Chuyển đến màn hình chọn combo
         Navigator.push(
@@ -201,12 +201,7 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
                       selectedShowtime:
                           widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
                     )));
-      } else {
-        print("Lỗi đặt ghế: ${response?.data}");
-      }
-    } catch (e) {
-      print("Lỗi khi gọi API đặt ghế: $e");
-    }
+
   }
 
   /// 📸 Hiển thị từng item bắp nước đã chọn
