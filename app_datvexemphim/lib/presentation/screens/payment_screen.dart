@@ -446,7 +446,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  ////
   Widget _buildPaymentButton() {
     return Container(
       padding: const EdgeInsets.all(16),
