@@ -46,3 +46,19 @@ export const verifyOtp = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
     }
 };
+
+
+export const ClearOtp = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Xóa OTP và dữ liệu tạm thời
+        await OTPModel.deleteOne({ email });
+        await TempUser.deleteOne({ email });
+
+        res.status(200).json({ success: true, message: "xoá OTP và TempUser" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    }
+};
+
