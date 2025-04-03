@@ -110,7 +110,6 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   //       // "upload_preset": uploadPreset,
   //     });
 
-
   //     final response = await ApiService.post("/uploadImg", formData);
 
   //      if (response?.statusCode == 200 && response?.data["secure_url"] != null) {
@@ -118,7 +117,6 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
   //     }
   //   } catch (e) {
   //     print("Lỗi upload ảnh: $e");
-    
 
   //   }
   // }
@@ -135,6 +133,7 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
       print("Người dùng chưa chọn ảnh.");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,27 +180,22 @@ class _EditUserProfileScreenState extends State<DetailprofileScreen> {
               ],
             ),
           ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                String? imageUrl;
+                if (userData?["hinhAnh"] != null) {
+                  final cloudinary = CloudinaryService();
+                  imageUrl = await cloudinary.uploadImage(_selectedImage!);
+                } else {
+                  print("Không có ảnh nào để cập nhật.");
+                }
 
-
-Center(
-  child: ElevatedButton(
-    onPressed: () async {
-      String? imageUrl;
-      if (imageUrl != null || userData?["hinhAnh"] != null) {
-        final cloudinary = CloudinaryService();
-       imageUrl = await cloudinary.uploadImage(_selectedImage!);
-      } else {
-        print("Không có ảnh nào để cập nhật.");
-      }
-  
-      await _updateUserData(imageUrl ?? userData?["hinhAnh"]);
-    },
-    child: const Text("Lưu thông tin"),
-  ),
-),
-
-
-
+                await _updateUserData(imageUrl ?? userData?["hinhAnh"]);
+              },
+              child: const Text("Lưu thông tin"),
+            ),
+          ),
           const SizedBox(height: 20),
           _buildTextField("Họ và Tên", _nameController),
           _buildTextField("Email", _emailController, enabled: false),

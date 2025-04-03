@@ -14,6 +14,7 @@ class _PaymentSuccessfulState extends State<PaymentSuccessful> {
     return Scaffold(
       appBar: AppBar(
         // title: const Text('Payment successfully'),
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
       ),
       body: Container(

@@ -30,7 +30,7 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
   String? _errorMessage;
 
   late String? _currentAccount;
@@ -38,8 +38,8 @@ class LoginScreenState extends State<LoginScreen> {
   bool _isAuthorized = false; // has granted permissions?
   final String _contactText = '';
 
-      final Color primaryColor = const Color(0xFFEE0033);
-    // final Color lightPrimaryColor = pri.withOpacity(0.1);
+  final Color primaryColor = const Color(0xFFEE0033);
+  // final Color lightPrimaryColor = pri.withOpacity(0.1);
 
   Future<void> _login() async {
     setState(() => _errorMessage = null);
@@ -124,7 +124,7 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
   }
 
-Widget _buildTextField(TextEditingController controller, String label,
+  Widget _buildTextField(TextEditingController controller, String label,
       IconData icon, Color primaryColor,
       {bool isPassword = false}) {
     return Container(
@@ -177,18 +177,26 @@ Widget _buildTextField(TextEditingController controller, String label,
 
         if (response != null && response.statusCode == 201) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Đăng nhập thành công!")),
+            const SnackBar(
+              content: Text("Đăng nhập thành công!"),
+              duration: Duration(seconds: 1),
+            ),
           );
         } else if (response!.statusCode == 400) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('email', emailUser ?? '');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Đăng nhập thành công!")),
+            const SnackBar(
+              content: Text("Đăng nhập thành công!"),
+              duration: Duration(seconds: 1),
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text("Đăng nhập thất bại! (${response.statusCode})")),
+              content: Text("Đăng nhập thất bại! (${response.statusCode})"),
+              duration: Duration(seconds: 1),
+            ),
           );
         }
       }
@@ -305,9 +313,11 @@ Widget _buildTextField(TextEditingController controller, String label,
                         color: Colors.black),
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField(_emailController, "Email", Icons.email, primaryColor),
+                  _buildTextField(
+                      _emailController, "Email", Icons.email, primaryColor),
                   const SizedBox(height: 15),
-                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock,primaryColor,
+                  _buildTextField(
+                      _passwordController, "Mật khẩu", Icons.lock, primaryColor,
                       isPassword: true),
                   const SizedBox(height: 10),
                   _errorMessage != null

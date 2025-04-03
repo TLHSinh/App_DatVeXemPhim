@@ -1,4 +1,5 @@
 import 'package:app_datvexemphim/presentation/screens/home_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/payment_fail.dart';
 import 'package:app_datvexemphim/presentation/screens/payment_successful.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +40,7 @@ class _PaymentScreenState extends State<PaymentScreen>
   int _discountRank = 0;
   int _finalPrice = 0;
   bool isLoading = false;
+  bool isCompleted = false;
 
   // Animation controller for section transitions
   late AnimationController _animationController;
@@ -179,6 +181,8 @@ class _PaymentScreenState extends State<PaymentScreen>
 
             if (resultCode == 0) {
               isPaid = true;
+              isCompleted = true;
+
               final updateResponse = await ApiService.put(
                 '/book/thanhtoan',
                 {'idDonDatVe': widget.idDonDatVe},
@@ -187,6 +191,7 @@ class _PaymentScreenState extends State<PaymentScreen>
               if (updateResponse != null && updateResponse.statusCode == 200) {
                 await _updateRewardPoints();
                 await _sendEmailReceipt();
+                if (!isCompleted) return;
                 setState(() => isLoading = false);
                 Navigator.pushReplacement(
                   context,
@@ -195,14 +200,24 @@ class _PaymentScreenState extends State<PaymentScreen>
                   ),
                 );
               } else {
-                throw 'Lỗi cập nhật trạng thái: ${updateResponse!.data}';
+                if (!isCompleted) return;
+                setState(() => isLoading = false);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentFail(),
+                  ),
+                );
               }
             } else if (resultCode == 1) {
               isPaid = true;
+              isCompleted = true;
               setState(() => isLoading = false);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(
+                  builder: (context) => PaymentFail(),
+                ),
               );
             }
           }
@@ -225,6 +240,21 @@ class _PaymentScreenState extends State<PaymentScreen>
         ),
       );
     }
+  }
+
+  void startPaymentProcess() {
+    _confirmPayment();
+
+    // Nếu sau 5 phút vẫn chưa nhận được phản hồi hợp lệ, tự động chuyển sang PaymentFail
+    Future.delayed(Duration(minutes: 5), () {
+      if (!isCompleted) {
+        setState(() => isLoading = false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PaymentFail()),
+        );
+      }
+    });
   }
 
   // Send email receipt
@@ -881,7 +911,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),
@@ -899,7 +929,7 @@ class _PaymentScreenState extends State<PaymentScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 10,
@@ -1007,7 +1037,7 @@ class _PaymentScreenState extends State<PaymentScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 10,
@@ -1111,7 +1141,7 @@ class _PaymentScreenState extends State<PaymentScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 10,
@@ -1192,12 +1222,12 @@ class _PaymentScreenState extends State<PaymentScreen>
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: const [
             CircularProgressIndicator(
               color: Colors.white,
               strokeWidth: 3,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(
               "Đang xử lý thanh toán...",
               style: TextStyle(
@@ -1206,7 +1236,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               "Vui lòng không tắt ứng dụng",
               style: TextStyle(
@@ -1278,7 +1308,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                   ),
                   child: userRank != "Basic"
                       ? Text(
-                          "Giảm ${(rankDiscount * 100).toInt()}% thành viên ${userRank}",
+                          "Giảm ${(rankDiscount * 100).toInt()}% thành viên $userRank",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -1296,7 +1326,7 @@ class _PaymentScreenState extends State<PaymentScreen>
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: isLoading ? null : _confirmPayment,
+                onPressed: isLoading ? null : startPaymentProcess,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFB81D24),
                   foregroundColor: Colors.white,
@@ -1308,9 +1338,9 @@ class _PaymentScreenState extends State<PaymentScreen>
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: const [
                     Icon(Icons.payment),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text(
                       "Thanh Toán Ngay",
                       style: TextStyle(

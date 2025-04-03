@@ -50,13 +50,13 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: const Color(0xfff9f9f9),
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-                "assets/images/splash_background.jpg"), // Thay bằng đường dẫn của ảnh nền
-            fit: BoxFit.cover,
-          ),
-        ),
+        // decoration: BoxDecoration(
+        //   image: DecorationImage(
+        //     image: AssetImage(
+        //         "assets/images/splash_background.jpg"), // Thay bằng đường dẫn của ảnh nền
+        //     fit: BoxFit.cover,
+        //   ),
+        // ),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,
