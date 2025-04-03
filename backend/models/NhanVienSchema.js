@@ -18,7 +18,8 @@ const NhanVienSchema  = new mongoose.Schema({
     type: String, 
     enum: ["nhanvien", "admin"], 
     default: "nhanvien" 
-  },          
+  },
+  trangThai: { type: Boolean, default: true },
   diemTichLuy: { type: Number, default: 0 } // Trường tích điểm                          // Vai trò của người dùng
 }, { timestamps: true });
 

@@ -1,9 +1,26 @@
 import express from 'express';
-import { login, register } from '../controllers/authController.js';
+import {
+        register,
+        loginAdmin,
+        loginUser,
+        logout,
+        changePassword,
+        getCurrentUser, loginGoogle
+} from '../controllers/authController.js';
+
+import { verifyOtp , ClearOtp} from '../auth/veryfyOTP.js';
 
 const router = express.Router();
 
 // Đảm bảo route đăng ký sử dụng phương thức POST
 router.post('/register', register);
-router.post('/login', login);
+router.post('/loginAdmin', loginAdmin);
+router.post('/loginUser', loginUser);
+
+router.post('/verifyOtp', verifyOtp);
+router.post('/ClearOtp', ClearOtp);
+
+router.post('/loginGoogle', loginGoogle);
+
+
 export default router;

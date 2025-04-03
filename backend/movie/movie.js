@@ -18,4 +18,6 @@ const MovieSchema = new mongoose.Schema({
     updated_at: { type: String, },
 });
 
-export default mongoose.model('movie', MovieSchema);
+const MovieModel = mongoose.model('movie', MovieSchema);
+
+module.exports = MovieModel;
