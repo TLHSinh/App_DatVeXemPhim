@@ -38,6 +38,9 @@ class LoginScreenState extends State<LoginScreen> {
   bool _isAuthorized = false; // has granted permissions?
   final String _contactText = '';
 
+      final Color primaryColor = const Color(0xFFEE0033);
+    // final Color lightPrimaryColor = pri.withOpacity(0.1);
+
   Future<void> _login() async {
     setState(() => _errorMessage = null);
 
@@ -117,35 +120,40 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String hint, IconData icon,
+Widget _buildTextField(TextEditingController controller, String label,
+      IconData icon, Color primaryColor,
       {bool isPassword = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword ? _obscurePassword : false,
-      style: const TextStyle(color: Colors.black),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        labelText: hint,
-        labelStyle: const TextStyle(color: Color(0xFF545454)),
-        prefixIcon: Icon(icon, color: Color(0xFFee0033)),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Color(0xFFee0033),
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              )
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFC20077)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.grey[600]),
+          prefixIcon: Icon(icon, color: primaryColor),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: primaryColor, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
@@ -275,7 +283,7 @@ class LoginScreenState extends State<LoginScreen> {
                 children: [
                   Center(
                     child:
-                        Image.asset('assets/images/logofull2.png', width: 500),
+                        Image.asset('assets/images/logofull2.png', width: 200),
                   ),
                   const SizedBox(height: 40),
                   const Text(
@@ -286,9 +294,9 @@ class LoginScreenState extends State<LoginScreen> {
                         color: Colors.black),
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField(_emailController, "Email", Icons.email),
+                  _buildTextField(_emailController, "Email", Icons.email, primaryColor),
                   const SizedBox(height: 15),
-                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock,
+                  _buildTextField(_passwordController, "Mật khẩu", Icons.lock,primaryColor,
                       isPassword: true),
                   const SizedBox(height: 10),
                   _errorMessage != null
@@ -363,9 +371,25 @@ class LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 10),
             GestureDetector(
               onTap: () => GoRouter.of(context).go('/register'),
-              child: const Text(
-                "Chưa có tài khoản? Đăng ký ngay",
-                style: TextStyle(color: Colors.black, fontSize: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Bạn chưa có tài khoản? ",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text(
+                    "Đăng ký ngay",
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
