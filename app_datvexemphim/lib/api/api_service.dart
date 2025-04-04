@@ -25,6 +25,32 @@ class ApiService {
     }
   }
 
+  // static Future<Response?> delete(String endpoint, {Map<String, dynamic>? data}) async {
+  //   try {
+  //     String? token = await StorageService.getToken();
+  //     Response response = await _dio.delete(
+  //       endpoint,
+  //       data: data,
+  //       options: Options(headers: {"Authorization": "Bearer $token"}),
+  //     );
+  //     return response;
+  //   } catch (e) {
+  //     print("❌ API DELETE Error ($endpoint): $e");
+  //     return null;
+  //   }
+  // }
+
+  static Future<Response?> delete(String endpoint,
+      {Map<String, dynamic>? data}) async {
+    try {
+      Response response = await _dio.delete(endpoint, data: data);
+      return response;
+    } catch (e) {
+      print("❌ API DELETE Error ($endpoint): $e");
+      return null;
+    }
+  }
+
   static Future<Response?> get(String endpoint,
       {Map<String, dynamic>? params}) async {
     try {

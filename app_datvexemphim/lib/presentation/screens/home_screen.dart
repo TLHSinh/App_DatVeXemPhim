@@ -16,6 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> nowShowingMovies = [];
   List<dynamic> comingSoonMovies = [];
   List<dynamic> adsList = [];
+  List<dynamic> latestMoviesAds =
+      []; // Danh sách phim mới nhất từ API quảng cáo
   bool isLoading = true;
   bool showPopup = false;
   Map<String, dynamic>? randomMovie;
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ApiService.get("/movie/phims/dangchieu"),
         ApiService.get("/movie/phims/sapchieu"),
         ApiService.get("/admin/ads"),
+        ApiService.get("/movie/phims/dangchieuforads"), // API lấy phim mới nhất
       ]);
 
       setState(() {
@@ -41,12 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
         comingSoonMovies =
             responses[1]?.statusCode == 200 ? responses[1]?.data : [];
         adsList = responses[2]?.statusCode == 200 ? responses[2]?.data : [];
+        latestMoviesAds =
+            responses[3]?.statusCode == 200 ? responses[3]?.data : [];
         isLoading = false;
 
-        // Chọn ngẫu nhiên một phim để hiển thị popup
-        if (nowShowingMovies.isNotEmpty) {
-          final randomIndex = Random().nextInt(nowShowingMovies.length);
-          randomMovie = nowShowingMovies[randomIndex];
+        // Chọn ngẫu nhiên một phim từ danh sách quảng cáo
+        if (latestMoviesAds.isNotEmpty) {
+          final randomIndex = Random().nextInt(latestMoviesAds.length);
+          randomMovie = latestMoviesAds[randomIndex];
           showPopup = true;
         }
       });
@@ -95,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   comingSoonMovies.isEmpty
                       ? _buildEmptyMessage("Không có phim sắp chiếu")
                       : _buildComingSoonMovies(),
+                  SizedBox(height: 100),
                 ],
               ),
             ),

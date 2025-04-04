@@ -129,32 +129,33 @@ export const getAllLichChieuTheoRap = async (req, res) => {
 
 export const datGhe = async (req, res) => {
   try {
-    const { idLichChieu, danhSachGhe } = req.body; // danhSachGhe là mảng chứa các id ghế
+    const { idLichChieu, danhSachGhe, idUser } = req.body; 
 
     if (!Array.isArray(danhSachGhe) || danhSachGhe.length === 0) {
       return res.status(400).json({ message: "Danh sách ghế không hợp lệ!" });
     }
 
-    // Kiểm tra xem có ghế nào đã bị đặt trước không
+    // Kiểm tra xem ghế đã bị đặt trước bởi người khác không
     const gheDaDat = await TrangThaiGhe.find({
       id_lich_chieu: idLichChieu,
       id_ghe: { $in: danhSachGhe },
       trang_thai: "đã đặt trước",
+      id_user: { $ne: idUser }, // Chặn nếu ghế đã bị giữ bởi người khác
     });
 
     if (gheDaDat.length > 0) {
       return res.status(400).json({
-        message: "Một hoặc nhiều ghế đã bị đặt trước!",
+        message: "Một hoặc nhiều ghế đã bị người khác giữ!",
         ghe_da_dat: gheDaDat.map(ghe => ghe.id_ghe),
       });
     }
 
-    // Cập nhật trạng thái của tất cả các ghế được chọn
+    // Cập nhật trạng thái ghế (hoặc giữ lại nếu cùng user)
     const updates = danhSachGhe.map(idGhe => ({
       updateOne: {
         filter: { id_lich_chieu: idLichChieu, id_ghe: idGhe },
-        update: { trang_thai: "đã đặt trước" },
-        upsert: true, // Nếu chưa có, tạo mới
+        update: { trang_thai: "đã đặt trước", id_user: idUser, thoi_gian_giu: new Date() },
+        upsert: true,
       },
     }));
 
@@ -165,6 +166,45 @@ export const datGhe = async (req, res) => {
     res.status(500).json({ message: "Lỗi server!", error: error.message });
   }
 };
+
+
+// API hủy ghế chưa thanh toán
+export const CanceldatGhe = async (req, res) => {
+  try {
+      const { idLichChieu, danhSachGhe } = req.body;
+      const { idUser } = req.params;
+
+      if (!idLichChieu || !idUser ) {
+          return res.status(400).json({ message: "Thiếu dữ liệu yêu cầu" });
+      }
+
+      let deletedCount = 0;
+
+      for (const idGhe of danhSachGhe) {
+          const result = await TrangThaiGhe.deleteOne({
+              id_lich_chieu: idLichChieu,
+              id_user: idUser,
+              id_ghe: idGhe,
+              trang_thai: "đã đặt trước",
+          });
+
+          deletedCount += result.deletedCount;
+      }
+
+      return res.status(200).json({
+          message: "Đã hủy các ghế chưa thanh toán",
+          deletedCount,
+      });
+  } catch (error) {
+      console.error("Lỗi khi hủy ghế:", error);
+      return res.status(500).json({ message: "Lỗi server", error });
+  }
+};
+
+
+
+
+
 
 
 

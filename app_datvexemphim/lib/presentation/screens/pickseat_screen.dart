@@ -3,6 +3,9 @@ import 'package:app_datvexemphim/presentation/screens/pickfandb.dart';
 import 'package:app_datvexemphim/presentation/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:app_datvexemphim/data/services/storage_service.dart';
+// Import the timer service
+import 'package:app_datvexemphim/data/services/timer_service.dart';
 
 class PickseatScreen extends StatefulWidget {
   final Map<String, dynamic> schedule;
@@ -17,11 +20,86 @@ class _PickseatScreenState extends State<PickseatScreen> {
   List<String> selectedSeats = [];
   List<Map<String, dynamic>> availableSeats = []; // Danh sách ghế từ API
   bool isLoading = true;
+  String? userId;
+  // Timer service instance
+  final BookingTimerService _timerService = BookingTimerService();
+  String _timeRemaining = "00:10";
 
   @override
   void initState() {
     super.initState();
     fetchSeatStatus(); // Gọi API lấy trạng thái ghế
+
+    // Add timer listener
+    _timerService.addListener(_onTimerUpdate);
+    _timeRemaining = _timerService.timeRemainingFormatted;
+  }
+
+  @override
+  void dispose() {
+    // Remove timer listener
+    _timerService.removeListener(_onTimerUpdate);
+    super.dispose();
+  }
+
+  // Timer update callback
+  void _onTimerUpdate(int secondsRemaining) {
+    setState(() {
+      _timeRemaining = _timerService.timeRemainingFormatted;
+    });
+  }
+
+  // Show session expired dialog
+// Show session expired dialog
+  void _showSessionExpiredDialog() async {
+    if (selectedSeats.isNotEmpty) {
+      try {
+        userId = await StorageService.getUserId();
+        print("ID Lịch Chiếu cần xoá: ${widget.schedule["_id"]}");
+        print("ID Người Dùng cần xoá: $userId");
+        print("Danh Sách Ghế cần xoá: ${selectedSeats}");
+
+        final response = await ApiService.delete(
+          "/book/cancelGhe/$userId",
+          data: {
+            "idLichChieu": widget.schedule["_id"],
+            "danhSachGhe": selectedSeats
+          },
+        );
+
+        if (response?.statusCode == 200) {
+          print("Đã hủy giữ chỗ ghế: ${response?.data}");
+        } else {
+          print("Lỗi khi hủy giữ chỗ: ${response?.data}");
+        }
+      } catch (e) {
+        print("Lỗi khi gọi API hủy ghế: $e");
+      }
+    }
+
+    setState(() {
+      selectedSeats.clear(); // Xóa danh sách ghế đã chọn
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Phiên đặt vé đã hết hạn'),
+          content: const Text(
+              'Thời gian đặt vé đã hết. Các ghế đã chọn đã bị hủy. Vui lòng thử lại.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Quay lại'),
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> fetchSeatStatus() async {
@@ -44,7 +122,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
                 final aLetter = aMatch?.group(1) ?? '';
                 final aNumber = int.tryParse(aMatch?.group(2) ?? '0') ?? 0;
-                // final aNumber = int.tryParse(aMatch!.group(2)) ?? 0;
                 final bLetter = bMatch?.group(1) ?? '';
                 final bNumber = int.tryParse(bMatch?.group(2) ?? '0') ?? 0;
 
@@ -98,6 +175,32 @@ class _PickseatScreenState extends State<PickseatScreen> {
             ),
           ],
         ),
+        actions: [
+          // Add timer to the app bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFEBEE),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE57373)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                const SizedBox(width: 2),
+                Text(
+                  _timeRemaining,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFB71C1C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -110,7 +213,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
                   child: SizedBox(
                     width: 100000,
                     child: InteractiveViewer(
-                      boundaryMargin: EdgeInsets.all(20),
+                      boundaryMargin: const EdgeInsets.all(20),
                       minScale: 0.0000005,
                       maxScale: 3.0,
                       child: SingleChildScrollView(
@@ -138,10 +241,10 @@ class _PickseatScreenState extends State<PickseatScreen> {
       child: Column(
         children: [
           CustomPaint(
-            size: Size(double.infinity, 50),
+            size: const Size(double.infinity, 50),
             painter: ScreenPainter(),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(
             "MÀN HÌNH",
             style: TextStyle(
@@ -343,6 +446,11 @@ class _PickseatScreenState extends State<PickseatScreen> {
   }
 
   void _bookTickets() async {
+    // Start the timer when user clicks "Tiếp tục"
+    _timerService.startTimer(onTimeExpired: _showSessionExpiredDialog);
+
+    userId = await StorageService.getUserId();
+
     if (selectedSeats.isEmpty) return;
 
     int totalPrice =
@@ -351,26 +459,44 @@ class _PickseatScreenState extends State<PickseatScreen> {
     print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
     try {
-      // Chuyển đến màn hình chọn combo
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
-          return ComboSelectionScreen(
-            selectedSeats: selectedSeats, // Truyền danh sách ID ghế
-            totalPrice: totalPrice,
-            selectedMovie: {
-              "id_lich_chieu": widget.schedule["_id"],
-              "ten_phim": widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
-              "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
-              "thoi_gian_chieu":
-                  widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
-              "url_poster": widget.schedule["id_phim"]?["url_poster"],
-              "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
-            },
-          );
-        }),
-      );
+      final response = await ApiService.post("/book/chonGhe", {
+        "idLichChieu": widget.schedule["_id"],
+        "danhSachGhe": selectedSeats, // Gửi ID của ghế
+        "idUser": userId, // Truyền idUser của người dùng
+        // "tong_tien": totalPrice,
+      });
+
+      if (response?.statusCode == 200) {
+        print("Đặt ghế thành công: ${response?.data}");
+        setState(() {
+          bookedSeats.addAll(selectedSeats);
+          // selectedSeats.clear();
+        });
+
+        // Chuyển đến màn hình chọn combo
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) {
+            print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
+            return ComboSelectionScreen(
+              selectedSeats: selectedSeats, // Truyền danh sách ID ghế
+              totalPrice: totalPrice,
+              selectedMovie: {
+                "id_lich_chieu": widget.schedule["_id"],
+                "ten_phim":
+                    widget.schedule["id_phim"]?["ten_phim"] ?? "Tên phim",
+                "thoi_luong": widget.schedule["id_phim"]?["thoi_luong"] ?? 0,
+                "thoi_gian_chieu":
+                    widget.schedule["thoi_gian_chieu"] ?? "Không rõ",
+                "url_poster": widget.schedule["id_phim"]?["url_poster"],
+                "ten_rap": widget.schedule["id_rap"]?["ten_rap"],
+              },
+            );
+          }),
+        );
+      } else {
+        print("Lỗi đặt ghế: ${response?.data}");
+      }
     } catch (e) {
       print("Lỗi khi gọi API đặt ghế: $e");
     }

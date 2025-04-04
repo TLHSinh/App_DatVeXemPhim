@@ -75,9 +75,7 @@ class _TicketScreenState extends State<TicketScreen> {
     }
   }
 
-  // Hàm xử lý khi người dùng nhấp vào vé
   void _navigateToTicketDetail(dynamic ticket) {
-    // Điều hướng đến trang chi tiết vé
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -86,7 +84,6 @@ class _TicketScreenState extends State<TicketScreen> {
         ),
       ),
     ).then((_) {
-      // Khi quay lại màn hình danh sách vé, cập nhật lại danh sách
       _fetchTickets();
     });
   }
@@ -94,182 +91,268 @@ class _TicketScreenState extends State<TicketScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: const Text(
           "Danh Sách Vé",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 20,
           ),
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchTickets,
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : tickets.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Không có vé nào đã đặt."),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: _fetchTickets,
-                          child: const Text("Tải lại"),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: tickets.length,
-                    itemBuilder: (context, index) {
-                      var ticket = tickets[index];
-                      var movieData = ticket["id_lich_chieu"]?["id_phim"];
-                      var showtime =
-                          ticket["id_lich_chieu"]?["thoi_gian_chieu"];
+      body: Padding(
+        padding: const EdgeInsets.only(
+            bottom: 70), // Space for bottom navigation bar
+        child: RefreshIndicator(
+          color: Colors.red,
+          onRefresh: _fetchTickets,
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ))
+              : tickets.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.local_movies_outlined,
+                            size: 80,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Không có vé nào đã đặt",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Hãy đặt vé xem phim ngay!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: _fetchTickets,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                            ),
+                            child: const Text("Tải lại"),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: tickets.length,
+                      itemBuilder: (context, index) {
+                        var ticket = tickets[index];
+                        var movieData = ticket["id_lich_chieu"]?["id_phim"];
+                        var showtime =
+                            ticket["id_lich_chieu"]?["thoi_gian_chieu"];
 
-                      return InkWell(
-                        onTap: () {
-                          // Điều hướng đến trang chi tiết vé
-                          _navigateToTicketDetail(ticket);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.grey[200]!,
-                                width: 1,
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => _navigateToTicketDetail(ticket),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      movieData?["url_poster"] != null
+                                          ? imageBaseUrl +
+                                              movieData["url_poster"].toString()
+                                          : "https://via.placeholder.com/300",
+                                      width: 80,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          width: 80,
+                                          height: 120,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(Icons.movie,
+                                              color: Colors.grey, size: 40),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    _getStatusBackgroundColor(
+                                                        ticket["trang_thai"]),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                _getStatusText(
+                                                    ticket["trang_thai"]),
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: _getStatusColor(
+                                                      ticket["trang_thai"]),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          movieData?["ten_phim"]
+                                                  ?.toUpperCase() ??
+                                              "PHIM KHÔNG XÁC ĐỊNH",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.calendar_today,
+                                                size: 14,
+                                                color: Colors.grey[600]),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              _formatDateTime(showtime),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(Icons.notifications_active,
+                                                    size: 14,
+                                                    color: Colors.grey[600]),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  "Nhắc nhở trước 30 phút",
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.grey[700],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Switch(
+                                              value: false,
+                                              onChanged: (value) {
+                                                // Xử lý bật/tắt thông báo
+                                              },
+                                              activeColor: Colors.red,
+                                              activeTrackColor:
+                                                  Colors.red.withOpacity(0.5),
+                                              inactiveThumbColor:
+                                                  Colors.grey[400],
+                                              inactiveTrackColor:
+                                                  Colors.grey[300],
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  _navigateToTicketDetail(
+                                                      ticket),
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.red,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 8),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  side: const BorderSide(
+                                                      color: Colors.red),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: const [
+                                                  Text("Chi tiết"),
+                                                  SizedBox(width: 4),
+                                                  Icon(Icons.arrow_forward,
+                                                      size: 16),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Poster phim
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: Image.network(
-                                    movieData?["url_poster"] != null
-                                        ? imageBaseUrl +
-                                            movieData["url_poster"].toString()
-                                        : "https://via.placeholder.com/300",
-                                    width: 50,
-                                    height: 75,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 50,
-                                        height: 75,
-                                        color: Colors.grey[300],
-                                        child: const Icon(Icons.movie,
-                                            color: Colors.grey),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Thông tin phim
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        movieData?["ten_phim"]?.toUpperCase() ??
-                                            "PHIM KHÔNG XÁC ĐỊNH",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        _formatDateTime(showtime),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      // Hiển thị trạng thái vé
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: _getStatusBackgroundColor(
-                                                  ticket["trang_thai"]),
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              _getStatusText(
-                                                  ticket["trang_thai"]),
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: _getStatusColor(
-                                                    ticket["trang_thai"]),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "Nhắc nhở trước 30 phút",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Switch(
-                                            value: false,
-                                            onChanged: (value) {
-                                              // Xử lý bật/tắt thông báo
-                                            },
-                                            activeColor: Colors.red,
-                                            activeTrackColor:
-                                                Colors.red.withOpacity(0.5),
-                                            inactiveThumbColor:
-                                                Colors.grey[400],
-                                            inactiveTrackColor:
-                                                Colors.grey[300],
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Icon mũi tên
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.grey[400],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+        ),
       ),
     );
   }
@@ -290,13 +373,13 @@ class _TicketScreenState extends State<TicketScreen> {
   Color _getStatusColor(String? status) {
     switch (status) {
       case "da_thanh_toan":
-        return Colors.green;
+        return Colors.green[700]!;
       case "da_su_dung":
-        return Colors.blue;
+        return Colors.blue[700]!;
       case "da_huy":
-        return Colors.red;
+        return Colors.red[700]!;
       default:
-        return Colors.grey;
+        return Colors.grey[700]!;
     }
   }
 

@@ -1,10 +1,13 @@
 import express from 'express';
 
-import { datGhe, xacNhanDatVe, layDonDatVe, thanhToan, getLichChieu, getLichChieuTheoNgay, getLichChieuTheoRap, getAllLichChieuTheoRap } from "../controllers/bookTicketsController.js";
+import { CanceldatGhe,datGhe, xacNhanDatVe, layDonDatVe, thanhToan, getLichChieu, getLichChieuTheoNgay, getLichChieuTheoRap, getAllLichChieuTheoRap } from "../controllers/bookTicketsController.js";
 
 const router = express.Router();
 
 router.post("/chonGhe", datGhe); //API chọn ghế
+router.delete("/cancelGhe/:idUser", CanceldatGhe); //API chọn ghế
+
+
 router.post("/xacNhanDatVe", xacNhanDatVe); // API xác nhận đặt vé
 router.get("/:idDonDatVe", layDonDatVe);    //API lấy thông tin đơn vé
 

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getSinglePhim, getAllMovies, addPhim, updatePhim, fetchAndSaveMovies, getUpcomingMovies, getNowShowingMovies } from '../controllers/movieController.js';
+import { getSinglePhim, getAllMovies, addPhim, updatePhim, fetchAndSaveMovies, getUpcomingMovies, getNowShowingMovies ,getLatestMoviesForAds} from '../controllers/movieController.js';
 
 const router = express.Router();
 
@@ -11,6 +11,9 @@ router.get('/Allphims', getAllMovies);
 //get phim from mongoDB
 router.get('/phims/sapchieu', getUpcomingMovies);
 router.get('/phims/dangchieu', getNowShowingMovies);
+
+router.get('/phims/dangchieuforads', getLatestMoviesForAds);
+
 //Thêm phim mới thủ công
 router.post('/phims/addPhims', addPhim);
 //cập nhật phim 

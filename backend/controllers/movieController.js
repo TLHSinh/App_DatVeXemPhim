@@ -249,30 +249,70 @@ export const getUpcomingMovies = async (req, res) => {
 //Hàm lấy danh sách phim [đang chiếu] - 7 ngày trước
 export const getNowShowingMovies = async (req, res) => {
     try {
+        // Xác định ngày hôm nay
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00 để so sánh chính xác
+        today.setHours(0, 0, 0, 0);
 
+        // Ngày bắt đầu: 2 tuần trước (14 ngày trước)
+        const startDate = new Date();
+        startDate.setDate(today.getDate() - 14);
+        startDate.setHours(0, 0, 0, 0);
 
-        const twoWeeksAgo = new Date();
-        twoWeeksAgo.setDate(today.getDate() - 30);
-        twoWeeksAgo.setHours(0, 0, 0, 0); // Đặt thời gian về 00:00:00
+        // Ngày kết thúc: 2 ngày sau hôm nay
+        const endDate = new Date();
+        endDate.setDate(today.getDate() + 2);
+        endDate.setHours(23, 59, 59, 999); // Để bao trọn cả ngày
 
-
-        // Lấy tất cả phim từ MongoDB
-        const allMovies = await Phim.find();
-
-        // Lọc phim có ngày công chiếu trong khoảng từ 7 ngày trước đến hôm nay
-        const nowShowingMovies = allMovies.filter(movie => {
-            const movieDate = new Date(movie.ngay_cong_chieu);
-            return movieDate >= twoWeeksAgo && movieDate <= today;
+        // Truy vấn MongoDB: Lọc phim có ngày công chiếu trong khoảng từ startDate đến endDate
+        const nowShowingMovies = await Phim.find({
+            ngay_cong_chieu: { $gte: startDate, $lte: endDate }
         });
 
-        res.json(nowShowingMovies);
+        // Trả về dữ liệu JSON
+        res.status(200).json(nowShowingMovies);
     } catch (error) {
-        console.error("Error retrieving now showing movies:", error);
-        res.status(500).json({ message: "Error retrieving now showing movies" });
+        console.error("Lỗi khi lấy danh sách phim đang chiếu:", error);
+        res.status(500).json({ 
+            message: "Không thể lấy danh sách phim đang chiếu", 
+            error: error.message 
+        });
     }
 };
+
+
+
+export const getLatestMoviesForAds = async (req, res) => {
+    try {
+        // Số lượng phim cần lấy, có thể nhận từ query params (mặc định là 5)
+        const limit = parseInt(req.query.limit) || 5;  
+        // Xác định ngày hôm nay (00:00:00)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Xác định ngày bắt đầu (2 ngày trước)
+        const startDate = new Date();
+        startDate.setDate(today.getDate() - 2);
+        startDate.setHours(0, 0, 0, 0);
+
+        // Truy vấn MongoDB để lấy phim có ngày công chiếu từ startDate đến today
+        const latestMovies = await Phim.find({
+            ngay_cong_chieu: { $gte: startDate, $lte: today }
+        }).sort({ ngay_cong_chieu: -1 }) // Sắp xếp phim mới nhất trước
+        .limit(limit); // Giới hạn số lượng phim
+
+
+        // Trả về dữ liệu JSON
+        res.status(200).json(latestMovies);
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách phim mới nhất:", error);
+        res.status(500).json({ 
+            message: "Không thể lấy danh sách phim mới nhất", 
+            error: error.message 
+        });
+    }
+};
+
+
 
 
 

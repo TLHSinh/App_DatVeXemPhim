@@ -3,6 +3,9 @@ import 'package:app_datvexemphim/presentation/screens/detailsticket_screem.dart'
 import 'package:app_datvexemphim/presentation/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// Import the timer service
+import 'package:app_datvexemphim/data/services/timer_service.dart';
+import 'package:app_datvexemphim/data/services/storage_service.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
@@ -23,12 +26,89 @@ class ComboSelectionScreen extends StatefulWidget {
 class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
   List<dynamic> foods = [];
   Map<String, int> selectedFoods = {};
+  // Timer service instance
+  final BookingTimerService _timerService = BookingTimerService();
+  String _timeRemaining = "05:00";
 
   @override
   void initState() {
     super.initState();
     fetchFoods();
     print("Danh sách ghế nhận được: ${widget.selectedSeats}");
+
+    // Add timer listener
+    _timerService.addListener(_onTimerUpdate);
+    _timeRemaining = _timerService.timeRemainingFormatted;
+  }
+
+  @override
+  void dispose() {
+    // Remove timer listener
+    _timerService.removeListener(_onTimerUpdate);
+    super.dispose();
+  }
+
+  // Timer update callback
+  void _onTimerUpdate(int secondsRemaining) {
+    setState(() {
+      _timeRemaining = _timerService.timeRemainingFormatted;
+    });
+  }
+
+  // Show session expired dialog
+  void _showSessionExpiredDialog() async {
+    // Nếu có ghế đã chọn
+    if (widget.selectedSeats.isNotEmpty) {
+      try {
+        String? userId =
+            await StorageService.getUserId(); // Lấy userId từ local storage
+
+        print("ID Lịch Chiếu cần xoá: ${widget.selectedMovie["_id"]}");
+        print("ID Người Dùng cần xoá: $userId");
+        print("Danh Sách Ghế cần xoá: ${widget.selectedSeats}");
+
+        final response = await ApiService.delete(
+          "/book/cancelGhe/$userId",
+          data: {
+            "idLichChieu": widget.selectedMovie["_id"],
+            "danhSachGhe": widget.selectedSeats
+          },
+        );
+
+        if (response?.statusCode == 200) {
+          print("Hủy giữ chỗ ghế thành công: ${response?.data}");
+        } else {
+          print("Lỗi khi hủy giữ chỗ: ${response?.data}");
+        }
+      } catch (e) {
+        print("Lỗi khi gọi API hủy ghế: $e");
+      }
+    }
+
+    // Xóa danh sách ghế đã chọn và hiển thị thông báo hết thời gian
+    setState(() {
+      widget.selectedSeats.clear(); // Xóa danh sách ghế đã chọn
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Phiên đặt vé đã hết hạn'),
+          content: const Text(
+              'Thời gian đặt vé đã hết. Các ghế đã chọn đã bị hủy. Vui lòng thử lại.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Quay lại'),
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> fetchFoods() async {
@@ -49,7 +129,35 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
     return Scaffold(
       backgroundColor: const Color(0xffe6e6e6),
       appBar: AppBar(
-          backgroundColor: Colors.white, title: const Text("Chọn Bắp Nước")),
+        backgroundColor: Colors.white,
+        title: const Text("Chọn Bắp Nước"),
+        actions: [
+          // Add timer to the app bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFEBEE),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE57373)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                const SizedBox(width: 2),
+                Text(
+                  _timeRemaining,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFB71C1C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -110,7 +218,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // const SizedBox(height: 8),
                 SizedBox(
                   height: 70, // Giới hạn chiều cao
                   child: ListView.builder(
@@ -147,63 +254,42 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: widget.selectedSeats.isEmpty ? null : _bookTickets,
+            onPressed: () {
+              // Check if timer has expired before proceeding
+              if (!_timerService.isRunning) {
+                _showSessionExpiredDialog();
+                return;
+              }
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailsTicket(
+                    selectedSeats: widget.selectedSeats,
+                    totalPrice: totalPrice,
+                    selectedFoods: selectedFoods,
+                    foods: foods,
+                    selectedMovie: widget.selectedMovie,
+                    movieId: widget.selectedMovie["_id"] ?? "",
+                    selectedShowtime:
+                        widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
+                    seatLabel: [],
+                  ),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xffb20710)),
-            child: Text(
-              "Tiếp tục",
-              style: TextStyle(
-                  fontSize: AppSizes.blockSizeHorizontal * 4,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
+                backgroundColor: const Color(0xffb81d24),
+                minimumSize: const Size(double.infinity, 50)),
+            child: const Text("Tiếp theo",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ),
         ],
       ),
     );
-  }
-
-  void _bookTickets() async {
-    if (widget.selectedSeats.isEmpty) return;
-
-    print("Danh sách ghế đã chọn: ${widget.selectedSeats}");
-    // print("id lich chieu da chọn: ${widget.schedule["_id"]}");
-
-    try {
-      final response = await ApiService.post("/book/chonGhe", {
-        "idLichChieu": widget.selectedMovie["id_lich_chieu"],
-        "danhSachGhe": widget.selectedSeats, // Gửi ID của ghế
-        // "tong_tien": totalPrice,
-      });
-
-      if (response?.statusCode == 200) {
-        print("Đặt ghế thành công: ${response?.data}");
-        setState(() {
-          // bookedSeats.addAll(selectedSeats);
-          // selectedSeats.clear();
-        });
-
-        // Chuyển đến màn hình chọn combo
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DetailsTicket(
-                      selectedSeats: widget.selectedSeats,
-                      totalPrice: widget.totalPrice,
-                      selectedFoods: selectedFoods,
-                      foods: foods,
-                      selectedMovie: widget.selectedMovie,
-                      movieId: widget.selectedMovie["_id"] ?? "",
-                      selectedShowtime:
-                          widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
-                      seatLabel: [],
-                    )));
-      } else {
-        print("Lỗi đặt ghế: ${response?.data}");
-      }
-    } catch (e) {
-      print("Lỗi khi gọi API đặt ghế: $e");
-    }
   }
 
   /// 📸 Hiển thị từng item bắp nước đã chọn
@@ -296,12 +382,21 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
                 onPressed: () {
                   setState(() {
                     if (quantity > 0) selectedFoods[foodId] = quantity - 1;
+                    if ((selectedFoods[foodId] ?? 0) == 0) {
+                      selectedFoods.remove(foodId);
+                    }
                   });
                 }),
             Text(quantity.toString()),
             IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
+                  // Check if timer has expired before adding items
+                  if (!_timerService.isRunning) {
+                    _showSessionExpiredDialog();
+                    return;
+                  }
+
                   setState(() {
                     selectedFoods[foodId] = quantity + 1;
                   });

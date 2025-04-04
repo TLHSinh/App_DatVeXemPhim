@@ -1,5 +1,6 @@
 import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/data/services/storage_service.dart';
+import 'package:app_datvexemphim/data/services/timer_service.dart'; // Import timer service
 import 'package:app_datvexemphim/presentation/screens/payment_screen.dart'
     show PaymentScreen;
 import 'package:flutter/material.dart';
@@ -37,6 +38,10 @@ class _DetailsTicketState extends State<DetailsTicket>
   late Animation<double> _fadeAnimation;
   bool isLoading = false;
 
+  // Timer service instance
+  final BookingTimerService _timerService = BookingTimerService();
+  String _timeRemaining = "05:00";
+
   @override
   void initState() {
     super.initState();
@@ -55,12 +60,52 @@ class _DetailsTicketState extends State<DetailsTicket>
     );
 
     _animationController.forward();
+
+    // Add timer listener
+    _timerService.addListener(_onTimerUpdate);
+    _timeRemaining = _timerService.timeRemainingFormatted;
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    // Remove timer listener
+    _timerService.removeListener(_onTimerUpdate);
     super.dispose();
+  }
+
+  // Timer update callback
+  void _onTimerUpdate(int secondsRemaining) {
+    setState(() {
+      _timeRemaining = _timerService.timeRemainingFormatted;
+    });
+
+    // Check if timer expired
+    if (secondsRemaining <= 0) {
+      _showSessionExpiredDialog();
+    }
+  }
+
+  // Show session expired dialog
+  void _showSessionExpiredDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Phiên đặt vé đã hết hạn'),
+          content: const Text('Thời gian đặt vé đã hết. Vui lòng thử lại.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Quay lại'),
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   String formatCurrency(int amount) {
@@ -111,6 +156,12 @@ class _DetailsTicketState extends State<DetailsTicket>
   }
 
   Future<void> _confirmBooking(BuildContext context) async {
+    // Check if timer has expired before proceeding
+    if (!_timerService.isRunning) {
+      _showSessionExpiredDialog();
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
@@ -231,6 +282,32 @@ class _DetailsTicketState extends State<DetailsTicket>
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        // Add timer to app bar
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFEBEE),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE57373)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                const SizedBox(width: 2),
+                Text(
+                  _timeRemaining,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFB71C1C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       backgroundColor: Colors.grey[100],
       body: Stack(

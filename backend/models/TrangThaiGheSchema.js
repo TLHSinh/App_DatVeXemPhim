@@ -8,6 +8,7 @@ const TrangThaiGheSchema = new mongoose.Schema({
     enum: ["có sẵn", ,"đã đặt", "đã đặt trước"], 
     default: "có sẵn" 
   },
+  id_user: { type: mongoose.Types.ObjectId, ref: "NguoiDung", required: true },
 }, { timestamps: true });
 
 // Đảm bảo mỗi suất chiếu có trạng thái riêng cho từng ghế

@@ -7,6 +7,7 @@ import 'package:app_datvexemphim/api/api_service.dart';
 import 'package:app_datvexemphim/data/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
+import 'package:app_datvexemphim/data/services/timer_service.dart'; // Import timer service
 
 class PaymentScreen extends StatefulWidget {
   final List<String> selectedSeats;
@@ -32,7 +33,11 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen>
     with SingleTickerProviderStateMixin {
-  String selectedPaymentMethod = "Ví điện tử MoMo"; // Default
+  // Thêm timer service
+  final BookingTimerService _timerService = BookingTimerService();
+  String _timeRemaining = "05:00";
+
+  String selectedPaymentMethod = "Ví điện tử MoMo";
   final TextEditingController _promoCodeController = TextEditingController();
   String? _promoMessage;
   int _discount = 0;
@@ -40,12 +45,10 @@ class _PaymentScreenState extends State<PaymentScreen>
   int _finalPrice = 0;
   bool isLoading = false;
 
-  // Animation controller for section transitions
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-
-  String userRank = "Basic"; // Default
-  double rankDiscount = 0.00; // Default no discount
+  String userRank = "Basic";
+  double rankDiscount = 0.00;
 
   // List of payment methods with icons
   final List<Map<String, dynamic>> paymentMethods = [
@@ -74,6 +77,10 @@ class _PaymentScreenState extends State<PaymentScreen>
   @override
   void initState() {
     super.initState();
+    // Thêm listener cho timer
+    _timerService.addListener(_onTimerUpdate);
+    _timeRemaining = _timerService.timeRemainingFormatted;
+
     _fetchUserRank();
     _finalPrice = widget.totalPrice;
 
@@ -94,7 +101,40 @@ class _PaymentScreenState extends State<PaymentScreen>
   void dispose() {
     _animationController.dispose();
     _promoCodeController.dispose();
+    _timerService.removeListener(_onTimerUpdate); // Thêm dòng này
     super.dispose();
+  }
+
+  // Thêm hàm xử lý timer
+  void _onTimerUpdate(int secondsRemaining) {
+    setState(() {
+      _timeRemaining = _timerService.timeRemainingFormatted;
+    });
+
+    if (secondsRemaining <= 0) {
+      _showSessionExpiredDialog();
+    }
+  }
+
+  void _showSessionExpiredDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Phiên thanh toán đã hết hạn'),
+          content: const Text('Thời gian thanh toán đã hết. Vui lòng thử lại.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Quay lại'),
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Format currency
@@ -139,6 +179,10 @@ class _PaymentScreenState extends State<PaymentScreen>
 
   // Handle payment confirmation
   void _confirmPayment() async {
+    if (!_timerService.isRunning) {
+      _showSessionExpiredDialog();
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -365,6 +409,32 @@ class _PaymentScreenState extends State<PaymentScreen>
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        // Thêm timer vào app bar
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFEBEE),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE57373)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                const SizedBox(width: 2),
+                Text(
+                  _timeRemaining,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFB71C1C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: Stack(
         children: [
