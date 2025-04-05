@@ -159,79 +159,84 @@ class _PickseatScreenState extends State<PickseatScreen> {
   @override
   Widget build(BuildContext context) {
     AppSizes().init(context); // Khởi tạo AppSizes
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 3,
-        backgroundColor: Colors.white,
-        shadowColor: Colors.black26,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.schedule["id_rap"]?["ten_rap"] ?? "Tên rạp"),
-            Text(
-              "${widget.schedule["id_phong"]?["ten_phong"]} - ${widget.schedule["thoi_gian_chieu"]}",
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-        actions: [
-          // Add timer to the app bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEBEE),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE57373)),
-            ),
-            child: Row(
+    return WillPopScope(
+        onWillPop: () async {
+          _showSessionExpiredDialog();
+          return false; // Không pop ngay, đợi xử lý xong
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            elevation: 3,
+            backgroundColor: Colors.white,
+            shadowColor: Colors.black26,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
-                const SizedBox(width: 2),
+                Text(widget.schedule["id_rap"]?["ten_rap"] ?? "Tên rạp"),
                 Text(
-                  _timeRemaining,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFB71C1C),
-                  ),
+                  "${widget.schedule["id_phong"]?["ten_phong"]} - ${widget.schedule["thoi_gian_chieu"]}",
+                  style: const TextStyle(fontSize: 14),
                 ),
               ],
             ),
+            actions: [
+              // Add timer to the app bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEBEE),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFE57373)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                    const SizedBox(width: 2),
+                    Text(
+                      _timeRemaining,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFB71C1C),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                SizedBox(height: AppSizes.blockSizeVertical * 1),
-                _buildScreenIndicator(),
-                SizedBox(height: AppSizes.blockSizeVertical * 1),
-                Expanded(
-                  child: SizedBox(
-                    width: 100000,
-                    child: InteractiveViewer(
-                      boundaryMargin: const EdgeInsets.all(20),
-                      minScale: 0.0000005,
-                      maxScale: 3.0,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: _buildSeatMap(),
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    SizedBox(height: AppSizes.blockSizeVertical * 1),
+                    _buildScreenIndicator(),
+                    SizedBox(height: AppSizes.blockSizeVertical * 1),
+                    Expanded(
+                      child: SizedBox(
+                        width: 100000,
+                        child: InteractiveViewer(
+                          boundaryMargin: const EdgeInsets.all(20),
+                          minScale: 0.0000005,
+                          maxScale: 3.0,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: _buildSeatMap(),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    SizedBox(height: AppSizes.blockSizeVertical * 1),
+                    _buildSeatLegend(),
+                  ],
                 ),
-                SizedBox(height: AppSizes.blockSizeVertical * 1),
-                _buildSeatLegend(),
-              ],
-            ),
-      bottomNavigationBar: _buildBottomNavBar(),
-    );
+          bottomNavigationBar: _buildBottomNavBar(),
+        ));
   }
 
   Widget _buildScreenIndicator() {

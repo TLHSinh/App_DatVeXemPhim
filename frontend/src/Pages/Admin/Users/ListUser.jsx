@@ -5,7 +5,13 @@ import { Fab, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../../config";
 import { AuthContext } from "../../../context/AuthContext.jsx"; // Import AuthContext để lấy token
-import { FaPenToSquare, FaTrash, FaPlus, FaRegEye } from "react-icons/fa6";
+import {
+  Eye,
+  Info,
+  Edit,
+  Trash,
+  Plus,
+} from "lucide-react";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Breadcrumb from "../../../Components/Breadcrumb";
 import { FcSearch } from "react-icons/fc";
@@ -211,24 +217,26 @@ const DSKhachHang = () => {
                       <td>{user.email}</td>
                       <td>{user.soDienThoai}</td>
                       <td>
-                        <button
-                          className="icon-function"
-                          onClick={() => handleEditUser(user._id)}
-                        >
-                          <FaPenToSquare color="#66B5A3" />
-                        </button>
-                        <button
-                          className="icon-function"
-                          onClick={() => deleteUser(user._id)}
-                        >
-                          <FaTrash color="#66B5A3" />
-                        </button>
-                        <button
-                          className="icon-function"
-                          onClick={() => detailUser(user._id)}
-                        >
-                          <FaRegEye color="#66B5A3" />
-                        </button>
+                        <div className="flex justify-center space-x-2">
+                          <button
+                            className="p-1.5 bg-yellow-100 text-yellow-600 rounded-md hover:bg-yellow-200"
+                            onClick={() => handleEditUser(user._id)}
+                          >
+                            <Edit color="#66B5A3" />
+                          </button>
+                          <button
+                            className="p-1.5 bg-red-100 text-red-600 rounded-md hover:bg-red-200"
+                            onClick={() => deleteUser(user._id)}
+                          >
+                            <Trash color="#66B5A3" />
+                          </button>
+                          <button
+                            className="p-1.5 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200"
+                            onClick={() => detailUser(user._id)}
+                          >
+                            <Eye color="#66B5A3" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -272,7 +280,7 @@ const DSKhachHang = () => {
         }}
         aria-label="add"
       >
-        <FaPlus color="white" size={18} />
+        <Plus color="white" size={18} />
       </Fab>
     </div>
   );

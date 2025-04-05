@@ -55,13 +55,13 @@
 }
 .menu-list-ad .item-ad:hover{
     background: #f2faf8;
-    color: #66B5A3;
+    color: #EE0033;
 }
 .menu-ad.active .item-ad{
     width: 45px;
 }
 .icon{
-    color: #66B5A3;
+    color: #EE0033;
 }
 
 

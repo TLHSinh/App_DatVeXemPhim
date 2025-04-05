@@ -104,13 +104,34 @@ const TheaterList = () => {
     // Thực hiện chuyển hướng hoặc mở modal để sửa
   };
 
-  const handleDelete = (theaterId) => {
-    console.log(`Xóa rạp ${theaterId}`);
-    // Hiển thị xác nhận trước khi xóa
-    if (window.confirm("Bạn có chắc chắn muốn xóa rạp này không?")) {
-      // Thực hiện API call để xóa
+  const handleDelete = async (theaterId) => { 
+    if (!window.confirm("Bạn có chắc chắn muốn xoá rạp này không?")) return;
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/v1/admin/theaters/${theaterId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Xoá rạp thành công!");
+
+            setTheaters((prevTheaters) => prevTheaters.filter(theater => theater._id !== theaterId));
+            // Cập nhật danh sách rạp sau khi xoá thành công (nếu cần)
+        } else {
+            if (response.status === 400) {
+                alert(`Lỗi: ${data.message || "Rạp đang có đơn đặt vé, không thể xoá."}`);
+            } else {
+                alert(data.message || "Có lỗi xảy ra khi xoá rạp.");
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi khi xoá rạp:", error);
+        alert("Lỗi server khi xoá rạp.");
     }
-  };
+};
 
   const handleAdd = () => {
     console.log("Thêm rạp mới");
