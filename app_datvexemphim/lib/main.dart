@@ -9,6 +9,7 @@ import 'package:app_datvexemphim/presentation/screens/register_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/detailprofile_screen.dart';
 import '../presentation/screens/veryfyOTP_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/account_screen.dart';
+import 'package:app_datvexemphim/api/api_service.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+  await ApiService.init(); // <-- Thêm dòng này
 
   runApp(MyApp()); // Chạy app sau khi Firebase đã được khởi tạo
 }
