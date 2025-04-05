@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:app_datvexemphim/api/api_service.dart';
+import 'package:app_datvexemphim/presentation/screens/detailmovie2_screen.dart';
 import 'package:app_datvexemphim/presentation/screens/detailmovie_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/detailxemtatcaSC_screen.dart';
+import 'package:app_datvexemphim/presentation/screens/detailxemtatca_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -90,17 +93,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (adsList.isNotEmpty) _buildAdsSlider(),
-                  _buildSectionTitle("Phim Đang Chiếu"),
+                  _buildSectionTitle("Phim Nổi Bật"),
                   isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : nowShowingMovies.isEmpty
                           ? _buildEmptyMessage("Không có phim nào đang chiếu")
                           : _buildMovieSlider(nowShowingMovies),
-                  _buildSectionTitle("Phim Sắp Chiếu"),
+                  const SizedBox(height: 24),
+                  comingSoonMovies.isEmpty
+                      ? _buildEmptyMessage("Không có phim đang chiếu")
+                      : _buildNowShowingMovies(),
+                  const SizedBox(height: 14),
                   comingSoonMovies.isEmpty
                       ? _buildEmptyMessage("Không có phim sắp chiếu")
                       : _buildComingSoonMovies(),
-                  SizedBox(height: 100),
+                  const SizedBox(height: 34),
                 ],
               ),
             ),
@@ -112,71 +119,67 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPopup() {
-    return Center(
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: () => setState(() => showPopup = false),
-            child: Container(
-              color: Colors.black.withOpacity(0.5),
-              width: double.infinity,
-              height: double.infinity,
-            ),
-          ),
-          Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (randomMovie != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DetailMovieScreen(movie: randomMovie!),
-                        ),
-                      );
-                      setState(() => showPopup = false);
-                    }
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: CachedNetworkImage(
-                      imageUrl: randomMovie != null
-                          ? imageBaseUrl + (randomMovie!["url_poster"] ?? "")
-                          : "https://via.placeholder.com/300",
-                      width: 300,
-                      height: 450,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          Image.network("https://via.placeholder.com/300"),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: GestureDetector(
-                    onTap: () => setState(() => showPopup = false),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
+    return AnimatedOpacity(
+      opacity: showPopup ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 300),
+      child: Center(
+        child: GestureDetector(
+          onTap: () => setState(() => showPopup = false),
+          child: Container(
+            color: Colors.black.withOpacity(0.5),
+            width: double.infinity,
+            height: double.infinity,
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (randomMovie != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DetailMovieScreen(movie: randomMovie!),
+                          ),
+                        );
+                        setState(() => showPopup = false);
+                      }
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        imageUrl: randomMovie?["url_poster"] != null
+                            ? imageBaseUrl + randomMovie!["url_poster"]
+                            : "https://via.placeholder.com/300",
+                        width: 300,
+                        height: 450,
+                        fit: BoxFit.cover,
                       ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.close, color: Colors.white),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: GestureDetector(
+                      onTap: () => setState(() => showPopup = false),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.close, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -260,29 +263,210 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildComingSoonMovies() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: comingSoonMovies.map((movie) {
-          return Container(
-            margin: const EdgeInsets.only(right: 10),
-            width: 150,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: CachedNetworkImage(
-                imageUrl: movie["url_poster"] != null
-                    ? imageBaseUrl + movie["url_poster"]
-                    : "https://via.placeholder.com/150",
-                height: 220,
-                width: 150,
-                fit: BoxFit.cover,
+  //Phim ĐANG Chiếu
+  Widget _buildNowShowingMovies() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (nowShowingMovies.isEmpty) {
+      return _buildEmptyMessage("Không có phim nào đang chiếu");
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Phim hay Đang chiếu",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-          );
-        }).toList(),
-      ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailXemTatCaHome(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Xem tất cả >",
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 230,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount:
+                nowShowingMovies.length > 8 ? 8 : nowShowingMovies.length,
+            itemBuilder: (context, index) {
+              final movie = nowShowingMovies[index];
+              final imageUrl = movie["url_poster"] != null
+                  ? imageBaseUrl + movie["url_poster"]
+                  : "https://via.placeholder.com/150";
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailMovieScreen(movie: movie),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  width: 130,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          height: 180,
+                          width: 130,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              Image.network("https://via.placeholder.com/150"),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        movie["ten_phim"] ?? "Không có tiêu đề",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        movie["genre"] ?? "Hài - Tình cảm",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  //Phim SẮP Chiếu
+  Widget _buildComingSoonMovies() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (comingSoonMovies.isEmpty) {
+      return _buildEmptyMessage("Không có phim nào Sắp chiếu");
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Phim hay Sắp chiếu",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailXemTatCaSapChieu(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Xem tất cả >",
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 230,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount:
+                comingSoonMovies.length > 8 ? 8 : comingSoonMovies.length,
+            itemBuilder: (context, index) {
+              final movie = comingSoonMovies[index];
+              final imageUrl = movie["url_poster"] != null
+                  ? imageBaseUrl + movie["url_poster"]
+                  : "https://via.placeholder.com/150";
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailMovieScreen2(movie: movie),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  width: 130,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          height: 180,
+                          width: 130,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              Image.network("https://via.placeholder.com/150"),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        movie["ten_phim"] ?? "Không có tiêu đề",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
