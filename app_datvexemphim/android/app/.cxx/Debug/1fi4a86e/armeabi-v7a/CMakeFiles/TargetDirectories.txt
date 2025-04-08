@@ -1,0 +1,2 @@
+C:/Users/ASUS/OneDrive/Desktop/appp/App_DatVeXemPhim4-7/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/Debug/1fi4a86e/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/ASUS/OneDrive/Desktop/appp/App_DatVeXemPhim4-7/App_DatVeXemPhim/app_datvexemphim/android/app/.cxx/Debug/1fi4a86e/armeabi-v7a/CMakeFiles/rebuild_cache.dir

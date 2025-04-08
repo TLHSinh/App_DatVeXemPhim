@@ -20,7 +20,7 @@ export const getLichChieu = async (req, res) => {
     }
 
     const lichChieuList = await LichChieu.find({ id_phim: idPhim })
-      .populate("id_phim", ["ten_phim", "url_poster"])
+      .populate("id_phim", ["ten_phim", "url_poster","thoi_luong", "gioi_han_tuoi", "ngay_cong_chieu"])
       .populate("id_phong", "ten_phong")
       .populate("id_rap", "ten_rap")
       .sort({ thoi_gian_chieu: 1 });
@@ -168,38 +168,61 @@ export const datGhe = async (req, res) => {
 };
 
 
-// API hủy ghế chưa thanh toán
 export const CanceldatGhe = async (req, res) => {
   try {
-      const { idLichChieu, danhSachGhe } = req.body;
-      const { idUser } = req.params;
+    const { idLichChieu, danhSachGhe } = req.body;
+    const { idUser } = req.params;
 
-      if (!idLichChieu || !idUser ) {
-          return res.status(400).json({ message: "Thiếu dữ liệu yêu cầu" });
-      }
+    if (!idLichChieu || !idUser || !Array.isArray(danhSachGhe) || danhSachGhe.length === 0) {
+      return res.status(400).json({ message: "Thiếu dữ liệu yêu cầu hoặc danh sách ghế không hợp lệ" });
+    }
 
-      let deletedCount = 0;
+    let deletedCount = 0;
+    let notDeleted = [];
 
-      for (const idGhe of danhSachGhe) {
-          const result = await TrangThaiGhe.deleteOne({
-              id_lich_chieu: idLichChieu,
-              id_user: idUser,
-              id_ghe: idGhe,
-              trang_thai: "đã đặt trước",
-          });
-
-          deletedCount += result.deletedCount;
-      }
-
-      return res.status(200).json({
-          message: "Đã hủy các ghế chưa thanh toán",
-          deletedCount,
+    for (const idGhe of danhSachGhe) {
+      const donDatVe = await DonDatVe.findOne({
+        id_lich_chieu: idLichChieu,
+        danh_sach_ghe: idGhe,
       });
+
+      if (donDatVe && donDatVe.trang_thai === "đã thanh toán") {
+        notDeleted.push(idGhe);
+        continue;
+      }
+
+      const result = await TrangThaiGhe.deleteOne({
+        id_lich_chieu: idLichChieu,
+        id_user: idUser,
+        id_ghe: idGhe,
+        trang_thai: "đã đặt trước",
+      });
+
+      if (result.deletedCount > 0) {
+        deletedCount += 1;
+      } else {
+        notDeleted.push(idGhe); // không xoá được do không khớp điều kiện
+      }
+    }
+
+    if (deletedCount === 0) {
+      return res.status(400).json({
+        message: "Không có ghế nào được huỷ. Có thể đã thanh toán hoặc không hợp lệ.",
+        notDeleted,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Huỷ ghế thành công",
+      deletedCount,
+      notDeleted,
+    });
   } catch (error) {
-      console.error("Lỗi khi hủy ghế:", error);
-      return res.status(500).json({ message: "Lỗi server", error });
+    console.error("Lỗi khi hủy ghế:", error);
+    return res.status(500).json({ message: "Lỗi server", error });
   }
 };
+
 
 
 
@@ -352,6 +375,39 @@ export const layDonDatVe = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+export const updateDonDatVe = async (req, res) => {
+  try {
+    const { idDonDatVe } = req.params;
+    const updateData = req.body;
+console.log("id đơn đặt",idDonDatVe)
+    // Kiểm tra đơn đặt vé có tồn tại không
+    const existing = await DonDatVe.findById(idDonDatVe);
+    if (!existing) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn đặt vé.' });
+    }
+
+    // Cập nhật
+    const updated = await DonDatVe.findByIdAndUpdate(
+      idDonDatVe,
+      { $set: updateData },
+      { new: true } // Trả về bản ghi sau khi cập nhật
+    );
+
+    res.status(200).json({
+      message: 'Cập nhật đơn đặt vé thành công.',
+      data: updated,
+    });
+  } catch (error) {
+    console.error('Lỗi khi cập nhật đơn đặt vé:', error);
+    res.status(500).json({ message: 'Đã xảy ra lỗi máy chủ.', error: error.message });
+  }
+};
 
 
 

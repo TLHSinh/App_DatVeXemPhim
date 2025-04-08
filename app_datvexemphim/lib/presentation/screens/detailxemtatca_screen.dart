@@ -174,9 +174,10 @@ class _MovieCardState extends State<MovieCard> {
                                 color: Colors.amber, size: 16),
                             const SizedBox(width: 4),
                             Text(
-                              widget.movie['danh_gia']?.toString() ?? 'N/A',
+                              "${widget.movie['danh_gia']?.toString() ?? '0.0'}/5",
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.black87,
                               ),
                             ),
@@ -237,6 +238,8 @@ class _MovieCardState extends State<MovieCard> {
                     ],
                   ),
                   const SizedBox(height: 12),
+
+                  //2 nút Chi tiết và Mua vé  (Sinh)
                   Row(
                     children: [
                       Expanded(
@@ -246,24 +249,28 @@ class _MovieCardState extends State<MovieCard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailMovieScreen(
-                                    movie: Map<String, dynamic>.from(
-                                        widget.movie)),
+                                  movie:
+                                      Map<String, dynamic>.from(widget.movie),
+                                ),
                               ),
                             );
                           },
                           icon: const Icon(Icons.info_outline,
                               size: 16, color: Colors.red),
-                          label: const Text("Chi tiết",
-                              style: TextStyle(color: Colors.black)),
+                          label: const Text(
+                            "Chi tiết",
+                            style: TextStyle(color: Colors.red),
+                          ),
                           style: TextButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                               side: const BorderSide(color: Colors.red),
                             ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 8), // Khoảng cách giữa 2 nút
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
@@ -271,8 +278,9 @@ class _MovieCardState extends State<MovieCard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PickCinemaAndTimeScreen(
-                                    movie: Map<String, dynamic>.from(
-                                        widget.movie)),
+                                  movie:
+                                      Map<String, dynamic>.from(widget.movie),
+                                ),
                               ),
                             );
                           },
@@ -285,11 +293,12 @@ class _MovieCardState extends State<MovieCard> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),

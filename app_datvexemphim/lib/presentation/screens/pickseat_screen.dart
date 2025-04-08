@@ -21,32 +21,18 @@ class _PickseatScreenState extends State<PickseatScreen> {
   List<Map<String, dynamic>> availableSeats = []; // Danh sách ghế từ API
   bool isLoading = true;
   String? userId;
-  // Timer service instance
-  final BookingTimerService _timerService = BookingTimerService();
-  String _timeRemaining = "00:10";
 
   @override
   void initState() {
     super.initState();
     fetchSeatStatus(); // Gọi API lấy trạng thái ghế
-
-    // Add timer listener
-    _timerService.addListener(_onTimerUpdate);
-    _timeRemaining = _timerService.timeRemainingFormatted;
   }
 
   @override
   void dispose() {
     // Remove timer listener
-    _timerService.removeListener(_onTimerUpdate);
-    super.dispose();
-  }
 
-  // Timer update callback
-  void _onTimerUpdate(int secondsRemaining) {
-    setState(() {
-      _timeRemaining = _timerService.timeRemainingFormatted;
-    });
+    super.dispose();
   }
 
   // Show session expired dialog
@@ -189,20 +175,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
                   color: const Color(0xFFFFEBEE),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFE57373)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
-                    const SizedBox(width: 2),
-                    Text(
-                      _timeRemaining,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFB71C1C),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
@@ -452,7 +424,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
   void _bookTickets() async {
     // Start the timer when user clicks "Tiếp tục"
-    _timerService.startTimer(onTimeExpired: _showSessionExpiredDialog);
 
     userId = await StorageService.getUserId();
 
@@ -460,6 +431,13 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
     int totalPrice =
         (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
+    // Lấy danh sách tên ghế từ danh sách ID ghế đã chọn
+    List<String> selectedSeatNames = availableSeats
+        .where((seat) => selectedSeats.contains(seat["_id_Ghe"]))
+        .map<String>(
+            (seat) => seat["so_ghe"] as String) // Chuyển kiểu dữ liệu về String
+        .toList();
+
     print("Danh sách ghế đã chọn: $selectedSeats");
     print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
@@ -485,6 +463,8 @@ class _PickseatScreenState extends State<PickseatScreen> {
             print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
             return ComboSelectionScreen(
               selectedSeats: selectedSeats, // Truyền danh sách ID ghế
+              selectedSeatNames: selectedSeatNames,
+
               totalPrice: totalPrice,
               selectedMovie: {
                 "id_lich_chieu": widget.schedule["_id"],

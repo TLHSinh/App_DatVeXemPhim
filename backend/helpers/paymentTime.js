@@ -8,7 +8,7 @@ import LichSuHuyVe from "../models/LichSuHuyVeSchema.js";
 cron.schedule("* * * * *", async () => {
   console.log("🔍 Đang kiểm tra đơn vé chưa thanh toán...");
 
-  const timeLimit = new Date(Date.now() - 0.5 * 60 * 1000); // 5 phút trước
+  const timeLimit = new Date(Date.now() - 5 * 60 * 1000); // 5 phút trước
 
   try {
     const donHetHan = await DonDatVe.find({

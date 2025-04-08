@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { CanceldatGhe,datGhe, xacNhanDatVe, layDonDatVe, thanhToan, getLichChieu, getLichChieuTheoNgay, getLichChieuTheoRap, getAllLichChieuTheoRap } from "../controllers/bookTicketsController.js";
+import { updateDonDatVe,CanceldatGhe,datGhe, xacNhanDatVe, layDonDatVe, thanhToan, getLichChieu, getLichChieuTheoNgay, getLichChieuTheoRap, getAllLichChieuTheoRap } from "../controllers/bookTicketsController.js";
 
 const router = express.Router();
 
@@ -18,6 +18,7 @@ router.get("/lich-chieu/:idPhim/ngay", getLichChieuTheoNgay);  //API lấy lịc
 router.get("/lich-chieu/:idPhim/rap", getLichChieuTheoRap);    //API lấy lịch chiếu theo rạp
 
 router.get("/all-lich-chieu/:idRap", getAllLichChieuTheoRap);    //API lấy all lịch chiếu theo rạp
+router.put("/updateDonDatVe/:idDonDatVe", updateDonDatVe);// API xử lý thanh toán đơn vé
 
 
 export default router;

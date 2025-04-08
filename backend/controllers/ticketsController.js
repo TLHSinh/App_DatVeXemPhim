@@ -6,7 +6,89 @@ import ChiTietDonDoAn from "../models/ChiTietDonDoAnSchema.js";
 
 
 
-const router = express.Router();
+
+
+export const getListTicketByStatus = async (req, res) => {
+  try {
+    const { id_nguoi_dung } = req.params;
+    const { status } = req.query;  // Lấy giá trị trạng thái từ query parameter
+
+    if (!mongoose.Types.ObjectId.isValid(id_nguoi_dung)) {
+      return res.status(400).json({ message: "ID người dùng không hợp lệ" });
+    }
+
+    // Xây dựng điều kiện tìm kiếm
+    let query = { id_nguoi_dung };
+
+    // Nếu có trạng thái, thêm điều kiện vào query
+    if (status && ["Tất cả", "đã thanh toán", "đã sử dụng", "đã hủy"].includes(status)) {
+      if (status !== "Tất cả") {
+        query.trang_thai = status; // Lọc theo trạng thái
+      }
+    }
+
+    // Lấy danh sách đơn đặt vé theo ID người dùng và trạng thái (nếu có)
+    const donDatVeList = await DonDatVe.find(query)
+      .populate("id_nguoi_dung", "ten email")
+      .populate({
+        path: "id_lich_chieu",
+        select: "thoi_gian_chieu", 
+        populate: {
+          path: "id_phim",
+          select: "ten_phim url_poster",
+        },
+      })
+      .populate({
+        path: "id_lich_chieu",
+        populate: {
+          path: "id_phong",
+          select: "ten_phong",
+        },
+      })
+      .populate({
+        path: "id_lich_chieu",
+        populate: {
+          path: "id_rap",
+          select: "ten_rap",
+        },
+      })
+      .populate({
+        path: "danh_sach_ghe",
+        select: "so_ghe",
+      })
+      .populate({
+        path: "danh_sach_do_an",
+        select: "ten_do_an",
+      })
+      .populate("id_voucher", "ma_voucher gia_tri")
+      .populate("nhanVienXuatVeGiay", "ten")
+      .lean();
+
+    if (!donDatVeList.length) {
+      return res.status(404).json({ message: "Không tìm thấy đơn đặt vé" });
+    }
+
+    // Lấy chi tiết ghế và đồ ăn của từng đơn đặt vé
+    const results = await Promise.all(
+      donDatVeList.map(async (don) => {
+        const chiTietVe = await ChiTietVe.find({ id_don: don._id }).populate("id_ghe").lean();
+        const chiTietDoAn = await ChiTietDonDoAn.find({ id_don: don._id }).populate("id_do_an").lean();
+
+        return {
+          ...don,
+          chiTietVe,
+          chiTietDoAn,
+        };
+      })
+    );
+
+    res.status(200).json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi máy chủ" });
+  }
+};
+
 
 // API lấy danh sách đơn đặt vé theo ID người dùng
 export const getListTicketByID = async (req, res) => {

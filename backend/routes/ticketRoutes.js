@@ -1,10 +1,13 @@
 import express from "express";
-import { getListTicketByID, getTicketByID ,layDonVeTheoGheVaXuatChieu} from "../controllers/ticketsController.js";
+import { getListTicketByID, getListTicketByStatus, getTicketByID ,layDonVeTheoGheVaXuatChieu} from "../controllers/ticketsController.js";
 
 const router = express.Router();
 
 // API lấy danh sách vé ttheo id người dung
 router.get("/listticket/:id_nguoi_dung", getListTicketByID);
+
+// API lấy danh sách vé ttheo trang thai
+router.get("/listticketStatus/:id_nguoi_dung", getListTicketByStatus);
 
 // API lấy chi tiết vé theo id vé
 router.get("/detailticket/:id_ve", getTicketByID);

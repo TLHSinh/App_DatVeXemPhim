@@ -167,102 +167,7 @@ class DatePickerHorizontal extends StatelessWidget {
   }
 }
 
-// class ShowtimeList extends StatelessWidget {
-//   final List<dynamic> showtimes;
-//   final DateTime? selectedDate;
-//   final Map<String, bool> expandedCinemas;
-//   final Function(String) toggleCinema;
-
-//   const ShowtimeList({
-//     super.key,
-//     required this.showtimes,
-//     required this.selectedDate,
-//     required this.expandedCinemas,
-//     required this.toggleCinema,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Map<String, List<dynamic>> groupedShowtimes = {};
-//     for (var s in showtimes) {
-//       DateTime showDate = DateTime.parse(s['thoi_gian_chieu']);
-//       if (selectedDate != null &&
-//           showDate.year == selectedDate!.year &&
-//           showDate.month == selectedDate!.month &&
-//           showDate.day == selectedDate!.day) {
-//         String cinemaName = s['id_rap']['ten_rap'] ?? "Không rõ rạp";
-//         if (!groupedShowtimes.containsKey(cinemaName)) {
-//           groupedShowtimes[cinemaName] = [];
-//         }
-//         groupedShowtimes[cinemaName]!.add(s);
-//       }
-//     }
-
-//     return ListView(
-//       children: groupedShowtimes.entries.map((entry) {
-//         bool isExpanded = expandedCinemas[entry.key] ?? false;
-//         return Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             GestureDetector(
-//               onTap: () => toggleCinema(entry.key),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Text(entry.key,
-//                       style:
-//                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//                   Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-//                 ],
-//               ),
-//             ),
-//             AnimatedSize(
-//               duration: Duration(milliseconds: 300),
-//               child: isExpanded
-//                   ? Padding(
-//                       padding: EdgeInsets.symmetric(vertical: 10),
-//                       child: GridView.builder(
-//                         shrinkWrap:
-//                             true, // Đảm bảo GridView không chiếm toàn bộ không gian
-//                         physics:
-//                             NeverScrollableScrollPhysics(), // Tránh cuộn bên trong ListView
-//                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//                           crossAxisCount: 4, // Mỗi hàng chứa 4 suất chiếu
-//                           crossAxisSpacing: 8,
-//                           mainAxisSpacing: 10,
-//                           childAspectRatio: 2, // Điều chỉnh tỉ lệ phù hợp
-//                         ),
-//                         itemCount: entry.value.length,
-//                         itemBuilder: (context, index) {
-//                           var s = entry.value[index];
-//                           return ElevatedButton(
-//                             style: ElevatedButton.styleFrom(
-//                                 backgroundColor: Colors.red),
-//                             onPressed: () => Navigator.push(
-//                               context,
-//                               MaterialPageRoute(
-//                                   builder: (context) =>
-//                                       PickseatScreen(schedule: s)),
-//                             ),
-//                             child: Text(
-//                               DateFormat('HH:mm')
-//                                   .format(DateTime.parse(s['thoi_gian_chieu'])),
-//                               style: TextStyle(color: Colors.white),
-//                             ),
-//                           );
-//                         },
-//                       ),
-//                     )
-//                   : SizedBox(),
-//             ),
-//             SizedBox(height: 15),
-//           ],
-//         );
-//       }).toList(),
-//     );
-//   }
-// }
-
+//Fix lỗi cho Sinh
 class ShowtimeList extends StatelessWidget {
   final List<dynamic> showtimes;
   final DateTime? selectedDate;
@@ -277,106 +182,162 @@ class ShowtimeList extends StatelessWidget {
     required this.toggleCinema,
   });
 
+  String calculateEndTime(String fullStartTime, int duration) {
+    try {
+      final start = DateTime.parse(fullStartTime); // GIỮ NGUYÊN
+      final end = start.add(Duration(minutes: duration));
+      return DateFormat("HH:mm").format(end);
+    } catch (e) {
+      print("Error calculating end time: $e");
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, List<dynamic>> groupedShowtimes = {};
     for (var s in showtimes) {
-      DateTime showDate = DateTime.parse(s['thoi_gian_chieu']);
+      DateTime showDate =
+          DateTime.parse(s['thoi_gian_chieu']); // KHÔNG toLocal()
       if (selectedDate != null &&
           showDate.year == selectedDate!.year &&
           showDate.month == selectedDate!.month &&
           showDate.day == selectedDate!.day) {
         String cinemaName = s['id_rap']['ten_rap'] ?? "Không rõ rạp";
-        if (!groupedShowtimes.containsKey(cinemaName)) {
-          groupedShowtimes[cinemaName] = [];
-        }
+        groupedShowtimes.putIfAbsent(cinemaName, () => []);
         groupedShowtimes[cinemaName]!.add(s);
       }
     }
 
     return ListView(
+      padding: const EdgeInsets.all(10),
       children: groupedShowtimes.entries.map((entry) {
-        bool isExpanded = expandedCinemas[entry.key] ?? false;
+        final isExpanded = expandedCinemas[entry.key] ?? false;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
               onTap: () => toggleCinema(entry.key),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(entry.key,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        entry.key,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 24,
+                    ),
+                  ],
+                ),
               ),
             ),
             AnimatedSize(
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               child: isExpanded
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 2,
-                        ),
-                        itemCount: entry.value.length,
-                        itemBuilder: (context, index) {
-                          var s = entry.value[index];
-                          return ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red),
-                            onPressed: () async {
-                              String? token = await StorageService.getToken();
-                              if (token == null) {
-                                // Nếu chưa đăng nhập -> Chuyển sang LoginScreen
-                                bool? result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginScreen()),
-                                );
-
-                                // Nếu đăng nhập thành công -> Chuyển sang PickseatScreen
-                                if (result == true) {
-                                  token = await StorageService
-                                      .getToken(); // Kiểm tra lại token
-                                  if (token != null) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PickseatScreen(schedule: s)),
-                                    );
-                                  }
-                                }
-                              } else {
-                                // Nếu đã đăng nhập -> Chuyển sang PickseatScreen
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PickseatScreen(schedule: s)),
-                                );
-                              }
-                            },
-                            child: Text(
-                              DateFormat('HH:mm')
-                                  .format(DateTime.parse(s['thoi_gian_chieu'])),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          );
-                        },
+                  ? GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: entry.value.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 2.5,
                       ),
-                    )
-                  : SizedBox(),
+                      itemBuilder: (context, index) {
+                        final schedule = entry.value[index];
+                        final fullStartTime = schedule["thoi_gian_chieu"];
+                        final startDateTime =
+                            DateTime.parse(fullStartTime); // KHÔNG toLocal()
+                        final start = DateFormat("HH:mm").format(startDateTime);
+
+                        final duration =
+                            schedule["id_phim"]?["thoi_luong"] ?? 120;
+                        final end = calculateEndTime(fullStartTime, duration);
+
+                        return GestureDetector(
+                          onTap: () async {
+                            String? token = await StorageService.getToken();
+                            if (token == null) {
+                              bool? result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginScreen()),
+                              );
+                              if (result == true) {
+                                token = await StorageService.getToken();
+                                if (token != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PickseatScreen(schedule: schedule),
+                                    ),
+                                  );
+                                }
+                              }
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      PickseatScreen(schedule: schedule),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
+                              color: Colors.white,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text.rich(
+                              TextSpan(
+                                text: start,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  const TextSpan(
+                                    text: " ~ ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: end,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      })
+                  : const SizedBox(),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
           ],
         );
       }).toList(),

@@ -27,7 +27,7 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
-  await ApiService.init(); // <-- Thêm dòng này
+  //1await ApiService.init(); // <-- Thêm dòng này
 
   runApp(MyApp()); // Chạy app sau khi Firebase đã được khởi tạo
 }

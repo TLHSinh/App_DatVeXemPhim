@@ -9,6 +9,8 @@ import 'package:app_datvexemphim/data/services/storage_service.dart';
 
 class ComboSelectionScreen extends StatefulWidget {
   final List<String> selectedSeats;
+  final List<String> selectedSeatNames;
+
   final int totalPrice;
   final Map<String, dynamic> selectedMovie;
 
@@ -17,6 +19,7 @@ class ComboSelectionScreen extends StatefulWidget {
     required this.selectedSeats,
     required this.totalPrice,
     required this.selectedMovie,
+    required this.selectedSeatNames,
   });
 
   @override
@@ -26,33 +29,12 @@ class ComboSelectionScreen extends StatefulWidget {
 class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
   List<dynamic> foods = [];
   Map<String, int> selectedFoods = {};
-  // Timer service instance
-  final BookingTimerService _timerService = BookingTimerService();
-  String _timeRemaining = "05:00";
 
   @override
   void initState() {
     super.initState();
     fetchFoods();
     print("Danh sách ghế nhận được: ${widget.selectedSeats}");
-
-    // Add timer listener
-    _timerService.addListener(_onTimerUpdate);
-    _timeRemaining = _timerService.timeRemainingFormatted;
-  }
-
-  @override
-  void dispose() {
-    // Remove timer listener
-    _timerService.removeListener(_onTimerUpdate);
-    super.dispose();
-  }
-
-  // Timer update callback
-  void _onTimerUpdate(int secondsRemaining) {
-    setState(() {
-      _timeRemaining = _timerService.timeRemainingFormatted;
-    });
   }
 
   // Show session expired dialog
@@ -140,20 +122,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
               color: const Color(0xFFFFEBEE),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFFE57373)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
-                const SizedBox(width: 2),
-                Text(
-                  _timeRemaining,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFB71C1C),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -255,17 +223,12 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              // Check if timer has expired before proceeding
-              if (!_timerService.isRunning) {
-                _showSessionExpiredDialog();
-                return;
-              }
-
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DetailsTicket(
                     selectedSeats: widget.selectedSeats,
+                    selectedSeatNames: widget.selectedSeatNames,
                     totalPrice: totalPrice,
                     selectedFoods: selectedFoods,
                     foods: foods,
@@ -273,7 +236,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
                     movieId: widget.selectedMovie["_id"] ?? "",
                     selectedShowtime:
                         widget.selectedMovie["thoi_gian_chieu"] ?? "Chưa có",
-                    seatLabel: [],
                   ),
                 ),
               );
@@ -314,12 +276,14 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
               height: 50,
               width: 50,
               fit: BoxFit.cover,
+              filterQuality: FilterQuality.none, // 🔧 thêm dòng này
               errorBuilder: (context, error, stackTrace) {
                 return Image.network(
                   "https://via.placeholder.com/50",
                   height: 50,
                   width: 50,
                   fit: BoxFit.cover,
+                  filterQuality: FilterQuality.none, // 🔧 thêm ở đây nữa
                 );
               },
             ),
@@ -370,8 +334,13 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
       color: Colors.grey[200],
       margin: const EdgeInsets.only(bottom: 16),
       child: ListTile(
-        leading: Image.network(food["url_hinh"],
-            width: 60, height: 60, fit: BoxFit.cover),
+        leading: Image.network(
+          food["url_hinh"],
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.none, // 🔧 thêm dòng này
+        ),
         title: Text(food["ten_do_an"]),
         subtitle: Text("${food["gia"].toStringAsFixed(0)}đ"),
         trailing: Row(
@@ -392,10 +361,6 @@ class _ComboSelectionScreenState extends State<ComboSelectionScreen> {
                 icon: const Icon(Icons.add),
                 onPressed: () {
                   // Check if timer has expired before adding items
-                  if (!_timerService.isRunning) {
-                    _showSessionExpiredDialog();
-                    return;
-                  }
 
                   setState(() {
                     selectedFoods[foodId] = quantity + 1;

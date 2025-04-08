@@ -24,9 +24,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       });
     });
 
-    // Chờ 3 giây rồi chuyển sang OnboardingScreen
-    Timer(Duration(seconds: 3), () {
-      context.go('/onboarding');
+    // Chờ 1.2 giây rồi chuyển sang OnboardingScreen
+    Timer(const Duration(milliseconds: 1200), () {
+      context.go('/home');
     });
   }
 

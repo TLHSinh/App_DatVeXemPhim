@@ -33,10 +33,6 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen>
     with SingleTickerProviderStateMixin {
-  // Thêm timer service
-  final BookingTimerService _timerService = BookingTimerService();
-  String _timeRemaining = "05:00";
-
   String selectedPaymentMethod = "Ví điện tử MoMo";
   final TextEditingController _promoCodeController = TextEditingController();
   String? _promoMessage;
@@ -44,6 +40,7 @@ class _PaymentScreenState extends State<PaymentScreen>
   int _discountRank = 0;
   int _finalPrice = 0;
   bool isLoading = false;
+  bool _isPaymentCompleted = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -77,9 +74,6 @@ class _PaymentScreenState extends State<PaymentScreen>
   @override
   void initState() {
     super.initState();
-    // Thêm listener cho timer
-    _timerService.addListener(_onTimerUpdate);
-    _timeRemaining = _timerService.timeRemainingFormatted;
 
     _fetchUserRank();
     _finalPrice = widget.totalPrice;
@@ -101,19 +95,59 @@ class _PaymentScreenState extends State<PaymentScreen>
   void dispose() {
     _animationController.dispose();
     _promoCodeController.dispose();
-    _timerService.removeListener(_onTimerUpdate); // Thêm dòng này
+
     super.dispose();
   }
 
-  // Thêm hàm xử lý timer
-  void _onTimerUpdate(int secondsRemaining) {
-    setState(() {
-      _timeRemaining = _timerService.timeRemainingFormatted;
-    });
+// Hàm hủy đơn và hiển thị dialog khi hết thời gian
+  void _cancelBookingAndShowDialog() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
 
-    if (secondsRemaining <= 0) {
-      _showSessionExpiredDialog();
+      if (userId == null) {
+        print("❌ Không tìm thấy userId trong SharedPreferences!");
+        return;
+      }
+
+      // // API hủy đơn đặt vé
+      // final cancelResponse = await ApiService.delete(
+      //   "/book/huydon/${widget.idDonDatVe}",
+      // );
+
+      // if (cancelResponse != null && cancelResponse.statusCode == 200) {
+      //   print("✅ Đã hủy đơn đặt vé thành công khi hết thời gian!");
+      // } else {
+      //   print("❌ Lỗi khi hủy đơn đặt vé: ${cancelResponse?.data}");
+      // }
+
+      // API hủy giữ chỗ ghế
+      if (widget.selectedSeats.isNotEmpty) {
+        print(
+            "ID Lịch Chiếu cần xoá: ${widget.selectedMovie['id_lich_chieu']}");
+        print("ID Người Dùng cần xoá: $userId");
+        print("Danh Sách Ghế cần xoá: ${widget.selectedSeats}");
+
+        final response = await ApiService.delete(
+          "/book/cancelGhe/$userId",
+          data: {
+            "idLichChieu": widget.selectedMovie['id_lich_chieu'],
+            "danhSachGhe": widget.selectedSeats
+          },
+        );
+
+        if (response?.statusCode == 200) {
+          print("✅ Đã hủy giữ chỗ ghế: ${response?.data}");
+        } else {
+          print("❌ Lỗi khi hủy giữ chỗ: ${response?.data}");
+        }
+      }
+    } catch (e) {
+      print("❌ Lỗi khi gọi API hủy đơn/ghế: $e");
     }
+
+    // Hiển thị dialog
+    _showSessionExpiredDialog();
   }
 
   void _showSessionExpiredDialog() {
@@ -179,10 +213,6 @@ class _PaymentScreenState extends State<PaymentScreen>
 
   // Handle payment confirmation
   void _confirmPayment() async {
-    if (!_timerService.isRunning) {
-      _showSessionExpiredDialog();
-      return;
-    }
     setState(() {
       isLoading = true;
     });
@@ -223,6 +253,7 @@ class _PaymentScreenState extends State<PaymentScreen>
 
             if (resultCode == 0) {
               isPaid = true;
+              _isPaymentCompleted = true; // Đánh dấu đã thanh toán thành công
               final updateResponse = await ApiService.put(
                 '/book/thanhtoan',
                 {'idDonDatVe': widget.idDonDatVe},
@@ -418,20 +449,6 @@ class _PaymentScreenState extends State<PaymentScreen>
               color: const Color(0xFFFFEBEE),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFFE57373)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
-                const SizedBox(width: 2),
-                Text(
-                  _timeRemaining,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFB71C1C),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
