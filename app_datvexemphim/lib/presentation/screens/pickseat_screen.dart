@@ -21,23 +21,89 @@ class _PickseatScreenState extends State<PickseatScreen> {
   List<Map<String, dynamic>> availableSeats = []; // Danh sách ghế từ API
   bool isLoading = true;
   String? userId;
+  // Timer service instance
+  final BookingTimerService _timerService = BookingTimerService();
+  String _timeRemaining = "10:00";
 
   @override
   void initState() {
     super.initState();
     fetchSeatStatus(); // Gọi API lấy trạng thái ghế
+
+    // Add timer listener
+    _timerService.addListener(_onTimerUpdate);
+    _timeRemaining = _timerService.timeRemainingFormatted;
   }
 
   @override
   void dispose() {
     // Remove timer listener
-
+    _timerService.removeListener(_onTimerUpdate);
     super.dispose();
   }
 
+  // Timer update callback
+  void _onTimerUpdate(int secondsRemaining) {
+    setState(() {
+      _timeRemaining = _timerService.timeRemainingFormatted;
+    });
+  }
+
   // Show session expired dialog
-// Show session expired dialog
   void _showSessionExpiredDialog() async {
+    if (selectedSeats.isNotEmpty) {
+      try {
+        userId = await StorageService.getUserId();
+        print("ID Lịch Chiếu cần xoá: ${widget.schedule["_id"]}");
+        print("ID Người Dùng cần xoá: $userId");
+        print("Danh Sách Ghế cần xoá: ${selectedSeats}");
+
+        final response = await ApiService.delete(
+          "/book/cancelGhe/$userId",
+          data: {
+            "idLichChieu": widget.schedule["_id"],
+            "danhSachGhe": selectedSeats
+          },
+        );
+
+        if (response?.statusCode == 200 && response?.data["deletedCount"] > 0) {
+          print("Đã hủy giữ chỗ ghế: ${response?.data}");
+
+          setState(() {
+            selectedSeats.clear(); // Xoá danh sách ghế đã chọn
+          });
+
+          // Chỉ hiện dialog nếu huỷ thành công
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Phiên đặt vé đã hết hạn'),
+                content: const Text(
+                    'Thời gian đặt vé đã hết. Các ghế đã chọn đã bị hủy. Vui lòng thử lại.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Quay lại'),
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          print("Không có ghế nào được huỷ hoặc lỗi xảy ra: ${response?.data}");
+        }
+      } catch (e) {
+        print("Lỗi khi gọi API hủy ghế: $e");
+      }
+    }
+  }
+
+// Show session expired dialog
+  void _showSessionExpiredDialogforback() async {
     if (selectedSeats.isNotEmpty) {
       try {
         userId = await StorageService.getUserId();
@@ -147,7 +213,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
     AppSizes().init(context); // Khởi tạo AppSizes
     return WillPopScope(
         onWillPop: () async {
-          _showSessionExpiredDialog();
+          _showSessionExpiredDialogforback();
           return false; // Không pop ngay, đợi xử lý xong
         },
         child: Scaffold(
@@ -175,6 +241,20 @@ class _PickseatScreenState extends State<PickseatScreen> {
                   color: const Color(0xFFFFEBEE),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFE57373)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer, color: Color(0xFFB71C1C), size: 18),
+                    const SizedBox(width: 2),
+                    Text(
+                      _timeRemaining,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFB71C1C),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -424,6 +504,7 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
   void _bookTickets() async {
     // Start the timer when user clicks "Tiếp tục"
+    _timerService.startTimer(onTimeExpired: _showSessionExpiredDialog);
 
     userId = await StorageService.getUserId();
 
@@ -431,13 +512,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
 
     int totalPrice =
         (selectedSeats.length * (widget.schedule["gia_ve"] ?? 0)).toInt();
-    // Lấy danh sách tên ghế từ danh sách ID ghế đã chọn
-    List<String> selectedSeatNames = availableSeats
-        .where((seat) => selectedSeats.contains(seat["_id_Ghe"]))
-        .map<String>(
-            (seat) => seat["so_ghe"] as String) // Chuyển kiểu dữ liệu về String
-        .toList();
-
     print("Danh sách ghế đã chọn: $selectedSeats");
     print("id lich chieu da chọn: ${widget.schedule["_id"]}");
 
@@ -463,8 +537,6 @@ class _PickseatScreenState extends State<PickseatScreen> {
             print("Chuyển đến ComboSelectionScreen với ghế: $selectedSeats");
             return ComboSelectionScreen(
               selectedSeats: selectedSeats, // Truyền danh sách ID ghế
-              selectedSeatNames: selectedSeatNames,
-
               totalPrice: totalPrice,
               selectedMovie: {
                 "id_lich_chieu": widget.schedule["_id"],

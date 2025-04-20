@@ -3,7 +3,7 @@ import {
   Calendar,
   Clock,
   Building,
-  DollarSign,
+  VNĐ,
   X,
   Save,
   AlertCircle,
@@ -474,9 +474,7 @@ const ThemLichChieu = ({ onClose, onSuccess }) => {
                     disabled={submitting || success}
                     required
                   />
-                  <div className="absolute left-3 top-2.5 text-blue-500 bg-white">
-                    <DollarSign size={18} />
-                  </div>
+                  <div className="absolute left-3 top-2.5 text-blue-500 bg-white"></div>
                   <span className="absolute right-3 top-2.5 text-gray-500 text-sm font-medium">
                     VNĐ
                   </span>

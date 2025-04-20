@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ApiService.get("/movie/phims/dangchieu"),
         ApiService.get("/movie/phims/sapchieu"),
         ApiService.get("/admin/ads"),
-        ApiService.get("/movie/phims/dangchieuforads"), // API lấy phim mới nhất
       ]);
 
       setState(() {
@@ -47,14 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
         comingSoonMovies =
             responses[1]?.statusCode == 200 ? responses[1]?.data : [];
         adsList = responses[2]?.statusCode == 200 ? responses[2]?.data : [];
-        latestMoviesAds =
-            responses[3]?.statusCode == 200 ? responses[3]?.data : [];
         isLoading = false;
 
-        // Chọn ngẫu nhiên một phim từ danh sách quảng cáo
-        if (latestMoviesAds.isNotEmpty) {
-          final randomIndex = Random().nextInt(latestMoviesAds.length);
-          randomMovie = latestMoviesAds[randomIndex];
+        // Chọn ngẫu nhiên một phim để hiển thị popup
+        if (nowShowingMovies.isNotEmpty) {
+          final randomIndex = Random().nextInt(nowShowingMovies.length);
+          randomMovie = nowShowingMovies[randomIndex];
           showPopup = true;
         }
       });
@@ -63,6 +60,38 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => isLoading = false);
     }
   }
+
+  // Future<void> fetchAllData() async {
+  //   try {
+  //     final responses = await Future.wait([
+  //       ApiService.get("/movie/phims/dangchieu"),
+  //       ApiService.get("/movie/phims/sapchieu"),
+  //       ApiService.get("/admin/ads"),
+  //       ApiService.get("/movie/phims/dangchieuforads"), // API lấy phim mới nhất
+  //     ]);
+
+  //     setState(() {
+  //       nowShowingMovies =
+  //           responses[0]?.statusCode == 200 ? responses[0]?.data : [];
+  //       comingSoonMovies =
+  //           responses[1]?.statusCode == 200 ? responses[1]?.data : [];
+  //       adsList = responses[2]?.statusCode == 200 ? responses[2]?.data : [];
+  //       latestMoviesAds =
+  //           responses[3]?.statusCode == 200 ? responses[3]?.data : [];
+  //       isLoading = false;
+
+  //       // Chọn ngẫu nhiên một phim từ danh sách quảng cáo
+  //       if (latestMoviesAds.isNotEmpty) {
+  //         final randomIndex = Random().nextInt(latestMoviesAds.length);
+  //         randomMovie = latestMoviesAds[randomIndex];
+  //         showPopup = true;
+  //       }
+  //     });
+  //   } catch (e) {
+  //     debugPrint("Lỗi khi tải dữ liệu: $e");
+  //     setState(() => isLoading = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

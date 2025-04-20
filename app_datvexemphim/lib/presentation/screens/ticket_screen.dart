@@ -331,9 +331,12 @@ class _TicketScreenState extends State<TicketScreen>
             padding: const EdgeInsets.all(16),
             itemCount: tickets.length,
             itemBuilder: (context, index) {
-              final ticket = tickets[index];
-              final showtimeData = ticket["id_lich_chieu"] ?? {};
-              final movieData = showtimeData["id_phim"] ?? {};
+              final ticket = tickets[index] as Map<String, dynamic>;
+              final showtimeData =
+                  Map<String, dynamic>.from(ticket["id_lich_chieu"] ?? {});
+              final movieData =
+                  Map<String, dynamic>.from(showtimeData["id_phim"] ?? {});
+
               final showtime = showtimeData["thoi_gian_chieu"];
               final cinemaName =
                   showtimeData["id_rap"]?["ten_rap"] ?? "Rạp không xác định";
@@ -355,9 +358,12 @@ class _TicketScreenState extends State<TicketScreen>
             padding: EdgeInsets.all(isTablet ? 20 : 16),
             itemCount: tickets.length,
             itemBuilder: (context, index) {
-              final ticket = tickets[index];
-              final showtimeData = ticket["id_lich_chieu"] ?? {};
-              final movieData = showtimeData["id_phim"] ?? {};
+              final ticket = tickets[index] as Map<String, dynamic>;
+              final showtimeData =
+                  Map<String, dynamic>.from(ticket["id_lich_chieu"] ?? {});
+              final movieData =
+                  Map<String, dynamic>.from(showtimeData["id_phim"] ?? {});
+
               final showtime = showtimeData["thoi_gian_chieu"];
               final cinemaName =
                   showtimeData["id_rap"]?["ten_rap"] ?? "Rạp không xác định";
